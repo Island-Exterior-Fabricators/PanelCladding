@@ -53,3 +53,11 @@ rollback is needed. Ignored local assets moved with their owning directories.
 Local extraction, independent builds/tests and private repository creation passed.
 Git publication is recorded below after push confirmation. Existing historical
 native/interactive acceptance limitations remain in their original records.
+
+## GitHub publication (2026-10-13)
+
+Private repository creation and visibility readback passed. The first published
+standalone commit is `cc4923bdbc10a079cf50d72f4095cd5a68f74bb7`; local master and
+`git ls-remote origin refs/heads/master` matched after push. MCP_Rhino's remote
+master contained four newer commits ending at `593fd0b`; none changed any of the
+655 extracted files. The cleanup integrates that upstream work before publication.
