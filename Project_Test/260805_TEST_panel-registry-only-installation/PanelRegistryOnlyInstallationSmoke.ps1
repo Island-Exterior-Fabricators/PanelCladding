@@ -8,7 +8,7 @@ $ErrorActionPreference = 'Stop'
 $BundleRoot = [IO.Path]::GetFullPath($BundleRoot)
 $artifactBase = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot 'artifacts'))
 $fixtureRoot = Join-Path $artifactBase 'panel-registry-only-smoke'
-$registryRoot = 'Registry::HKEY_CURRENT_USER\Software\MCP_Rhino\InstallerTests\PanelRegistryOnlyInstallation\Plug-Ins'
+$registryRoot = 'Registry::HKEY_CURRENT_USER\Software\PanelCladdingEditor\InstallerTests\PanelRegistryOnlyInstallation\Plug-Ins'
 
 function Require([bool] $Condition, [string] $Message) {
     if (-not $Condition) { throw $Message }

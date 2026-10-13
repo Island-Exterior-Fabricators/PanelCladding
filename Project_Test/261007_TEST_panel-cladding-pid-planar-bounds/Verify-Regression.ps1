@@ -16,7 +16,7 @@ try {
             if ($LASTEXITCODE -ne 0) { throw "$pcboundsConfig $pcboundsName failed" }
             Write-Output "PASS $pcboundsConfig $pcboundsName"
         }
-        & dotnet build MCP_Rhino.sln -c $pcboundsConfig --nologo -m:1 -p:BuildInParallel=false > (Join-Path $PSScriptRoot "$pcboundsConfig-solution.log") 2>&1
+        & dotnet build PanelCladding.sln -c $pcboundsConfig --nologo -m:1 -p:BuildInParallel=false > (Join-Path $PSScriptRoot "$pcboundsConfig-solution.log") 2>&1
         if ($LASTEXITCODE -ne 0) { throw "$pcboundsConfig solution build failed" }
         Write-Output "PASS $pcboundsConfig solution build"
         & dotnet build src/PanelCladdingEditor/PanelCladdingEditor.csproj -c $pcboundsConfig --nologo > (Join-Path $PSScriptRoot "$pcboundsConfig-standalone.log") 2>&1

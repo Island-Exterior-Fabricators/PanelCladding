@@ -134,7 +134,7 @@ internal static class Program
             directory = directory.Parent;
         }
 
-        throw new DirectoryNotFoundException("Could not locate the MCP_Rhino repository root.");
+        throw new DirectoryNotFoundException("Could not locate the PanelCladding repository root.");
     }
 
     private static void Require(bool condition, string message)
