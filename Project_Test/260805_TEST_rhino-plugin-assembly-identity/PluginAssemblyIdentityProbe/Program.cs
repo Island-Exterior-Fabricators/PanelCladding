@@ -36,19 +36,26 @@ foreach (string argument in args)
     MetadataReader reader = peReader.GetMetadataReader();
     AssemblyDefinition assembly = reader.GetAssemblyDefinition();
     string assemblyName = reader.GetString(assembly.Name);
-    string? declaredGuid = ReadAssemblyGuidAttribute(reader, assembly);
+    string? declaredGuid = ReadGuidAttribute(reader, assembly.GetCustomAttributes());
     Guid pluginId = declaredGuid is null ? Guid.Empty : new Guid(declaredGuid);
+    var pluginTypes = reader.TypeDefinitions.Select(reader.GetTypeDefinition).Where(type =>
+        reader.GetString(type.Namespace) == "PanelCladdingEditor" &&
+        reader.GetString(type.Name) == "PanelCladdingEditorPlugin").ToArray();
+    string? classGuid = pluginTypes.Length == 1
+        ? ReadGuidAttribute(reader, pluginTypes[0].GetCustomAttributes()) : null;
+    Guid classId = classGuid is null ? Guid.Empty : new Guid(classGuid);
 
     Console.WriteLine(
         $"PLUGIN_ASSEMBLY_IDENTITY|path={path}|assembly={assemblyName}" +
-        $"|pluginId={pluginId:D}|declared={declaredGuid is not null}");
+        $"|pluginId={pluginId:D}|declared={declaredGuid is not null}" +
+        $"|classId={classId:D}|version={assembly.Version}");
 }
 
 return 0;
 
-static string? ReadAssemblyGuidAttribute(MetadataReader reader, AssemblyDefinition assembly)
+static string? ReadGuidAttribute(MetadataReader reader, CustomAttributeHandleCollection attributes)
 {
-    foreach (CustomAttributeHandle handle in assembly.GetCustomAttributes())
+    foreach (CustomAttributeHandle handle in attributes)
     {
         CustomAttribute attribute = reader.GetCustomAttribute(handle);
         if (!IsGuidAttribute(reader, attribute))

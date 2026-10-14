@@ -67,12 +67,9 @@ function Get-PanelExpectedCommands {
     )
 }
 
-function Set-PanelPluginRegistration([string] $RegistryRoot, [string] $PluginId, [string] $RhpPath) {
+function Assert-PanelPluginRegistrationOwner([string] $RegistryRoot, [string] $PluginId) {
     $pluginKey = Get-PanelPluginKey $RegistryRoot $PluginId
     $pluginFileKey = Join-Path $pluginKey 'PlugIn'
-    $commandListKey = Join-Path $pluginKey 'CommandList'
-    $canonicalRhp = [IO.Path]::GetFullPath($RhpPath)
-
     if (Test-Path -LiteralPath $pluginKey) {
         $existing = Get-ItemProperty -LiteralPath $pluginKey -ErrorAction SilentlyContinue
         $existingFile = Get-ItemProperty -LiteralPath $pluginFileKey -ErrorAction SilentlyContinue
@@ -86,7 +83,16 @@ function Set-PanelPluginRegistration([string] $RegistryRoot, [string] $PluginId,
             }).Count -gt 0) {
             throw "The PanelCladdingEditor plug-in GUID is registered to an unowned product: $pluginKey"
         }
+    }
+}
 
+function Set-PanelPluginRegistration([string] $RegistryRoot, [string] $PluginId, [string] $RhpPath) {
+    Assert-PanelPluginRegistrationOwner $RegistryRoot $PluginId
+    $pluginKey = Get-PanelPluginKey $RegistryRoot $PluginId
+    $pluginFileKey = Join-Path $pluginKey 'PlugIn'
+    $commandListKey = Join-Path $pluginKey 'CommandList'
+    $canonicalRhp = [IO.Path]::GetFullPath($RhpPath)
+    if (Test-Path -LiteralPath $pluginKey) {
         # Replace only the verified product-owned key so stale shorthand,
         # partial, or older command registrations cannot survive repair.
         Remove-Item -LiteralPath $pluginKey -Recurse -Force
@@ -297,10 +303,19 @@ $unexpected = @($searchRoots | Where-Object { Test-Path -LiteralPath $_ -PathTyp
 })
 if ($unexpected.Count -gt 0) { throw "Another PanelCladdingEditor RHP is discoverable: $($unexpected[0].FullName)" }
 
+# Refuse foreign registration before moving any existing plug-in files.
+Assert-PanelPluginRegistrationOwner $RhinoPluginRegistryRoot $pluginId
 $installId = [Guid]::NewGuid().ToString('N')
 $pluginStage = Join-Path $RhinoPluginRoot ".$version-$installId"
 $rollbackRoot = Join-Path (Join-Path $ProductRoot 'rollback') $installId
 New-Item -ItemType Directory -Path $pluginStage, $rollbackRoot -Force | Out-Null
+$pluginKey = Get-PanelPluginKey $RhinoPluginRegistryRoot $pluginId
+$registryBackup = Join-Path $rollbackRoot 'prior-registration.reg'
+if (Test-Path -LiteralPath $pluginKey) {
+    $nativeRegistryKey = $pluginKey.Replace('Registry::HKEY_CURRENT_USER', 'HKCU')
+    & "$env:SystemRoot\System32\reg.exe" export $nativeRegistryKey $registryBackup /y | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw 'Unable to back up the prior current-user registration.' }
+}
 $installedFiles = @()
 foreach ($file in @($bundle.files | Where-Object { ([string]$_.path).StartsWith('Plugin/', [StringComparison]::OrdinalIgnoreCase) })) {
     $relative = ([string]$file.path).Substring('Plugin/'.Length).Replace('/', '\')
@@ -313,6 +328,7 @@ Assert-DirectPanelRhp $pluginStage
 
 $moved = @()
 $activated = $false
+$registrationTouched = $false
 try {
     if (Test-Path -LiteralPath $pluginRoot -PathType Container) {
         $backup = Join-Path $rollbackRoot 'prior-active'
@@ -328,6 +344,7 @@ try {
     }
     Move-Item -LiteralPath $pluginStage -Destination $pluginRoot
     $activated = $true
+    $registrationTouched = $true
     Set-PanelPluginRegistration $RhinoPluginRegistryRoot $pluginId $rhpPath
 
     foreach ($legacyRoot in $legacyRoots) {
@@ -365,7 +382,9 @@ try {
 catch {
     $failure = $_
     $pluginKey = Get-PanelPluginKey $RhinoPluginRegistryRoot $pluginId
-    if (Test-Path -LiteralPath $pluginKey) { Remove-Item -LiteralPath $pluginKey -Recurse -Force }
+    if ($registrationTouched -and (Test-Path -LiteralPath $pluginKey)) {
+        Remove-Item -LiteralPath $pluginKey -Recurse -Force
+    }
     if ($activated -and (Test-Path -LiteralPath $pluginRoot -PathType Container)) {
         Remove-Item -LiteralPath $pluginRoot -Recurse -Force
     }
@@ -373,6 +392,12 @@ catch {
         if (Test-Path -LiteralPath $entry.backup) {
             New-Item -ItemType Directory -Path (Split-Path -Parent ([string]$entry.original)) -Force | Out-Null
             Move-Item -LiteralPath $entry.backup -Destination $entry.original
+        }
+    }
+    if ($registrationTouched -and (Test-Path -LiteralPath $registryBackup)) {
+        & "$env:SystemRoot\System32\reg.exe" import $registryBackup | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            throw "Install failed and registration restore failed. Prior registration backup: $registryBackup. Original error: $failure"
         }
     }
     throw $failure

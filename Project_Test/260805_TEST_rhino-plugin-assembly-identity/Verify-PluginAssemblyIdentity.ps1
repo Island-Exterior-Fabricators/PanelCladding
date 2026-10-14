@@ -78,6 +78,17 @@ for ($index = 0; $index -lt $products.Count; $index++) {
     if (-not $pluginId.Equals([string]$expected, [StringComparison]::OrdinalIgnoreCase)) {
         throw "$($product.Name) declares plug-in id '$pluginId' instead of the manifest id '$expected'."
     }
+    if ($row -notmatch '\|classId=([0-9a-fA-F-]{36})\|version=([0-9.]+)' -or
+        -not $pluginId.Equals($Matches[1], [StringComparison]::OrdinalIgnoreCase)) {
+        throw "$($product.Name) compiled plug-in class GUID does not match the assembly GUID."
+    }
+    $manifestVersion = [version](Get-Content -Raw -LiteralPath $product.Manifest | ConvertFrom-Json).version
+    $assemblyVersion = [version]$Matches[2]
+    if ($assemblyVersion.Major -ne $manifestVersion.Major -or
+        $assemblyVersion.Minor -ne $manifestVersion.Minor -or
+        $assemblyVersion.Build -ne $manifestVersion.Build) {
+        throw "$($product.Name) compiled version '$assemblyVersion' does not match '$manifestVersion'."
+    }
 
     $key = $pluginId.ToLowerInvariant()
     if ($seen.ContainsKey($key)) {
