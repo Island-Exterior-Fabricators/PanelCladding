@@ -8,6 +8,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>PanelCladdingEditor</RootNamespace>
     <AssemblyName>PanelCladdingEditor</AssemblyName>
+    <Version>1.0.97</Version>
     <TargetExt Condition="'$(PanelCladdingTestHost)' != 'true'">.rhp</TargetExt>
     <TargetExt Condition="'$(PanelCladdingTestHost)' == 'true'">.dll</TargetExt>
     <LangVersion>latest</LangVersion>

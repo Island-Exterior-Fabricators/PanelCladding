@@ -4,6 +4,17 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+function Get-InstalledFileHash([string] $Path) {
+    # Hash directly: Windows PowerShell 5.1's Get-FileHash can suppress its
+    # internal ProviderPath read when the script is launched with -WhatIf.
+    $algorithm = [Security.Cryptography.SHA256]::Create()
+    try {
+        $stream = [IO.File]::OpenRead($Path)
+        try {
+            return [BitConverter]::ToString($algorithm.ComputeHash($stream)).Replace('-', '').ToLowerInvariant()
+        } finally { $stream.Dispose() }
+    } finally { $algorithm.Dispose() }
+}
 $ProductRoot = [IO.Path]::GetFullPath($ProductRoot)
 $manifestPath = Join-Path $ProductRoot 'install-manifest.json'
 if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
@@ -33,9 +44,9 @@ if (Test-Path -LiteralPath $pluginKey) {
     $childPath = if ($null -ne $child) { [string]$child.FileName } else { '' }
     $owned = $null -ne $root -and $null -ne $child -and
         ([string]$root.Name).Equals('PanelCladdingEditor', [StringComparison]::OrdinalIgnoreCase) -and
-        -not [string]::IsNullOrWhiteSpace($rootPath) -and
         -not [string]::IsNullOrWhiteSpace($childPath) -and
-        ([IO.Path]::GetFullPath($rootPath)).Equals([IO.Path]::GetFullPath($ownedRhp), [StringComparison]::OrdinalIgnoreCase) -and
+        ([string]::IsNullOrWhiteSpace($rootPath) -or
+         ([IO.Path]::GetFullPath($rootPath)).Equals([IO.Path]::GetFullPath($ownedRhp), [StringComparison]::OrdinalIgnoreCase)) -and
         ([IO.Path]::GetFullPath($childPath)).Equals([IO.Path]::GetFullPath($ownedRhp), [StringComparison]::OrdinalIgnoreCase)
     if ($owned) {
         if ($PSCmdlet.ShouldProcess($pluginKey, 'Remove installer-owned Rhino plug-in registration')) {
@@ -49,7 +60,7 @@ if (Test-Path -LiteralPath $pluginKey) {
 $retained = @()
 foreach ($file in @($manifest.files)) {
     if (-not (Test-Path -LiteralPath $file.path -PathType Leaf)) { continue }
-    $actual = (Get-FileHash -LiteralPath $file.path -Algorithm SHA256).Hash.ToLowerInvariant()
+    $actual = Get-InstalledFileHash ([string]$file.path)
     if ($actual -ne [string]$file.sha256) {
         $retained += [string]$file.path
         Write-Warning "Modified installer-owned file was left untouched: $($file.path)"
@@ -69,19 +80,25 @@ foreach ($root in $cleanupRoots) {
         Get-ChildItem -LiteralPath $root -Directory -Recurse -ErrorAction SilentlyContinue |
             Sort-Object { $_.FullName.Length } -Descending | ForEach-Object {
                 if (-not (Get-ChildItem -LiteralPath $_.FullName -Force | Select-Object -First 1)) {
-                    Remove-Item -LiteralPath $_.FullName
+                    if ($PSCmdlet.ShouldProcess($_.FullName, 'Remove empty plug-in directory')) {
+                        Remove-Item -LiteralPath $_.FullName
+                    }
                 }
             }
     }
     if ((Test-Path -LiteralPath $root -PathType Container) -and
         -not (Get-ChildItem -LiteralPath $root -Force | Select-Object -First 1)) {
-        Remove-Item -LiteralPath $root
+        if ($PSCmdlet.ShouldProcess($root, 'Remove empty plug-in directory')) {
+            Remove-Item -LiteralPath $root
+        }
     }
 }
 
 if ($retained.Count -eq 0) {
-    Remove-Item -LiteralPath $manifestPath -Force
-    Write-Output 'PanelCladdingEditor installer-owned registration and files were removed. Migration backups were retained.'
+    if ($PSCmdlet.ShouldProcess($manifestPath, 'Remove installation ownership manifest')) {
+        Remove-Item -LiteralPath $manifestPath -Force
+        Write-Output 'PanelCladdingEditor installer-owned registration and files were removed. Migration backups were retained.'
+    }
 } else {
     Write-Warning 'Uninstall retained modified files and the ownership manifest for manual review.'
 }

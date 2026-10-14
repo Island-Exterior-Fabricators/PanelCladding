@@ -5,6 +5,22 @@ Standalone Rhino 8 panel cladding editor, migrated from
 The plug-in/assembly name remains **PanelCladdingEditor** and its primary command
 is **PCEditor**. No MCP server or Router is needed.
 
+## Install (no administrator access)
+
+Download **PanelCladdingEditor-1.0.97-win-x64.zip** from the
+[latest release](https://github.com/novan-xu/PanelCladding/releases/latest).
+Extract all files, close Rhino, and double-click **Install.cmd** as your normal
+Windows user. After installation and validation pass, start Rhino and run **PCEditor**.
+
+Requires Windows x64 and Rhino 8 running .NET 8. You do not need the .NET SDK or
+an MCP server to install. Files live in your LocalAppData folder and registration
+uses only `HKEY_CURRENT_USER`. The launcher does not request elevation or change
+your saved PowerShell execution policy. Organization policies may restrict unsigned
+scripts. Close Rhino and use **Uninstall.cmd** to remove the package.
+
+The release includes a SHA-256 checksum; repair and validation instructions are
+in the bundled **QUICKSTART.txt**. Do not install a second copy via Package Manager.
+
 ## Build
 
 Requires Windows, the .NET 8 SDK, and Rhino 8 at `C:\Program Files\Rhino 8`.

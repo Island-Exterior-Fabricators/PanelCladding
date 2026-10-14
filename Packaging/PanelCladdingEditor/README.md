@@ -252,7 +252,7 @@ activate it.
 The installed RHP and its private dependencies live at
 `%LOCALAPPDATA%\PanelCladdingEditor\plugin\<version>`. The installer writes the complete Rhino 8
 current-user registration directly: root product/startup metadata, `PlugIn\FileName`, and the exact
-eleven-command `CommandList`. It does not rely on Rhino consuming a shorthand root `FileName` during
+twelve-command `CommandList`. It does not rely on Rhino consuming a shorthand root `FileName` during
 first startup. Installer validation rejects shorthand-only, partial, stale-command, or mixed
 registrations. It removes the legacy `PanelCladdingEditor` and `LegacyPanelCladdingEditor` roots
 from Rhino Package Manager discovery. Do not place the RHP under
@@ -264,3 +264,26 @@ Only `PanelCladdingEditor.rhp` is shipped for the plug-in assembly. Do not also 
 
 The installer writes `%LOCALAPPDATA%\PanelCladdingEditor\install-manifest.json` for hash validation
 and ownership-aware uninstall. Run `Uninstall-PanelCladdingEditor.ps1` only while Rhino is closed.
+
+## Downloadable release installation
+
+Download the `PanelCladdingEditor-<version>-win-x64.zip` asset from
+[GitHub Releases](https://github.com/novan-xu/PanelCladding/releases/latest), extract
+all files, close Rhino, and run `Install.cmd` normally. The launcher installs for
+the current Windows user and runs `-Mode Validate` before reporting success.
+Restart Rhino and run `PCEditor`. Use `Uninstall.cmd` with Rhino closed to remove it.
+See `QUICKSTART.txt` for command-line repair, validation and checksum verification.
+
+Installation uses LocalAppData and HKCU only. It requires no administrator rights,
+SDK, MCP server, or machine-wide execution-policy changes. Rhino 8 with its .NET 8
+runtime must already be installed on Windows x64; macOS is not supported by the WPF
+UI. Organization script policies may still restrict unsigned PowerShell scripts.
+
+Rhino 8.20 or newer includes .NET 8 by default. If Rhino is configured to use
+.NET Framework, select .NET Core with `SetDotNetRuntime` and restart it. See
+[McNeel's runtime guide](https://developer.rhino3d.com/guides/rhinocommon/moving-to-dotnet-core/).
+
+The package builder verifies compiled assembly/class/manifest GUIDs and versions,
+then produces a ZIP and SHA-256 sidecar beside the bundle directory. Only the direct
+RHP and private managed/Windows x64 native dependencies are shipped. Build machines
+require the .NET 8 SDK and RhinoCommon; end users do not need the SDK.

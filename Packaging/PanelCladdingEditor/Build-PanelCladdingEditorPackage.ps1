@@ -6,11 +6,13 @@ param(
 
 $ErrorActionPreference = "Stop"
 if ([string]::IsNullOrWhiteSpace($OutputRoot)) { $OutputRoot = Join-Path $PSScriptRoot "artifacts" }
+$OutputRoot = [IO.Path]::GetFullPath($OutputRoot)
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $project = Join-Path $repoRoot "src\PanelCladdingEditor\PanelCladdingEditor.csproj"
 $definitionPath = Join-Path $PSScriptRoot "package-manifest.json"
 $definition = Get-Content -Raw -LiteralPath $definitionPath | ConvertFrom-Json
 if ([string]::IsNullOrWhiteSpace($Version)) { $Version = [string]$definition.version }
+if ($Version -notmatch '^\d+\.\d+\.\d+$') { throw 'Package version must use major.minor.patch.' }
 if (-not $Version.Equals([string]$definition.version, [StringComparison]::OrdinalIgnoreCase)) {
     throw "Requested version '$Version' does not match package-manifest.json version '$($definition.version)'."
 }
@@ -20,14 +22,22 @@ $bundle = Join-Path $OutputRoot "PanelCladdingEditor-$Version"
 $plugin = Join-Path $bundle "Plugin"
 $installer = Join-Path $bundle "Installer"
 
-if (Test-Path -LiteralPath $publish) { Remove-Item -LiteralPath $publish -Recurse -Force }
-if (Test-Path -LiteralPath $bundle) { Remove-Item -LiteralPath $bundle -Recurse -Force }
+foreach ($generatedRoot in @($publish, $bundle)) {
+    $resolvedRoot = [IO.Path]::GetFullPath($generatedRoot)
+    if (-not $resolvedRoot.StartsWith($OutputRoot.TrimEnd('\') + '\', [StringComparison]::OrdinalIgnoreCase)) {
+        throw "Generated path is outside the output root: $resolvedRoot"
+    }
+    if (Test-Path -LiteralPath $resolvedRoot) { Remove-Item -LiteralPath $resolvedRoot -Recurse -Force }
+}
 New-Item -ItemType Directory -Path $plugin, $installer -Force | Out-Null
 
 dotnet publish $project -c Release -o $publish --nologo
 if ($LASTEXITCODE -ne 0) { throw "PanelCladdingEditor publish failed." }
 dotnet build $project -c Release -t:Rebuild --nologo
 if ($LASTEXITCODE -ne 0) { throw "PanelCladdingEditor direct RHP build failed." }
+
+# Inspect compiled PE metadata before copying an RHP into a distributable bundle.
+& (Join-Path $repoRoot 'Project_Test\260805_TEST_rhino-plugin-assembly-identity\Verify-PluginAssemblyIdentity.ps1') -Configuration Release -SkipBuild | Out-Host
 
 Get-ChildItem -LiteralPath $publish -Recurse -File | ForEach-Object {
     $relativePath = $_.FullName.Substring($publish.Length).TrimStart('\')
@@ -90,6 +100,11 @@ if ($forbidden) { throw "Forbidden dependency in package: $($forbidden.Name -joi
 Copy-Item -LiteralPath $definitionPath -Destination (Join-Path $bundle "package-manifest.json") -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot "Install-PanelCladdingEditor.ps1") -Destination $installer -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot "Uninstall-PanelCladdingEditor.ps1") -Destination $installer -Force
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'Install-Package.ps1') -Destination $installer -Force
+foreach ($entry in @('Install.cmd', 'Uninstall.cmd', 'QUICKSTART.txt')) {
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot $entry) -Destination $bundle -Force
+}
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'README.md') -Destination $bundle -Force
 
 $files = Get-ChildItem -LiteralPath $bundle -Recurse -File | Sort-Object FullName | ForEach-Object {
     $relativePath = $_.FullName.Substring($bundle.Length).TrimStart('\')
@@ -101,4 +116,11 @@ $files = Get-ChildItem -LiteralPath $bundle -Recurse -File | Sort-Object FullNam
 [ordered]@{ name = "PanelCladdingEditor"; version = $Version; files = @($files) } |
     ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $bundle "bundle-manifest.json") -Encoding utf8
 
+$archive = Join-Path $OutputRoot "PanelCladdingEditor-$Version-win-x64.zip"
+Compress-Archive -LiteralPath $bundle -DestinationPath $archive -CompressionLevel Optimal -Force
+$checksum = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+"$checksum  $([IO.Path]::GetFileName($archive))" |
+    Set-Content -LiteralPath "$archive.sha256" -Encoding ascii
+Write-Host "Release archive: $archive"
+Write-Host "SHA-256: $checksum"
 Write-Output $bundle
