@@ -399,14 +399,57 @@ twelve-command `CommandList`. It does not rely on Rhino consuming a shorthand ro
 first startup. Installer validation rejects shorthand-only, partial, stale-command, or mixed
 registrations. It removes the legacy `PanelCladdingEditor` and `LegacyPanelCladdingEditor` roots
 from Rhino Package Manager discovery. Do not place the RHP under
-`%APPDATA%\McNeel\Rhinoceros\packages`; doing so gives Rhino two loaders for one plug-in identity
-and produces `ID already in use`.
+`%APPDATA%\McNeel\Rhinoceros\packages` while the registry installation exists; doing so gives
+Rhino two loaders for one plug-in identity and produces `ID already in use`. To move to the Yak
+package, uninstall this installation first (see Package Manager installation).
 
 Only `PanelCladdingEditor.rhp` is shipped for the plug-in assembly. Do not also ship the identical
 `.dll`; Rhino interprets both files as plug-ins with the same ID.
 
 The installer writes `%LOCALAPPDATA%\PanelCladdingEditor\install-manifest.json` for hash validation
 and ownership-aware uninstall. Run `Uninstall-PanelCladdingEditor.ps1` only while Rhino is closed.
+
+## Package Manager (Yak) installation
+
+Since 1.2.4 the plug-in is also published as a Rhino Yak package, so users install and update it
+from Rhino's `_PackageManager` instead of running the zip installer. The package goes to a
+company-internal package source, not the public McNeel server: a shared folder (or a private Yak
+server) that Package Manager lists alongside `https://yak.rhino3d.com`. Only people with access to
+that folder see the package.
+
+Build, and optionally publish, from the repository:
+
+```powershell
+# Build artifacts\panelcladdingeditor-<version>-rh8_<n>-win.yak and its .sha256
+.\Packaging\PanelCladdingEditor\Build-PanelCladdingEditorYak.ps1
+# Build and copy the package into the company source folder
+.\Packaging\PanelCladdingEditor\Build-PanelCladdingEditorYak.ps1 -Source \\server\share\RhinoPackages
+# Publish a package that is already built and verified
+.\Packaging\PanelCladdingEditor\Build-PanelCladdingEditorYak.ps1 -PackagePath <file.yak> -Source \\server\share\RhinoPackages
+```
+
+The script reuses `Build-PanelCladdingEditorPackage.ps1` (same files and GUID checks), writes the
+Yak `manifest.yml` with a `guid:` keyword so Rhino can offer the package when a model needs the
+plug-in, and runs Rhino 8's `Yak.exe build --platform win`. A folder source only needs the `.yak`
+file copied in, so publishing needs no Rhino Accounts login; an `http(s)` source is pushed with
+`Yak.exe push` and that server's own authentication. The public McNeel server is refused. A
+published version is never replaced: publishing different content under an existing version
+fails, so bump the version for every release.
+
+The `rh8_<n>` tag follows the RhinoCommon the plug-in was compiled against: a package built with
+Rhino 8.33 installed is offered only to Rhino 8.33 or newer.
+
+Each user, once:
+
+1. Close Rhino. If the zip release is installed, run its `Uninstall.cmd` (the Yak copy and the
+   registry copy must never both exist; the zip installer also moves a Package Manager copy aside).
+2. Start Rhino, open `Options > Package Manager`, and add the company folder (for example
+   `\\server\share\RhinoPackages`) to `Sources`.
+3. Run `_PackageManager`, search `PanelCladdingEditor`, install, and restart Rhino.
+
+Updating: publish a new version to the source; users see it in `_PackageManager` (Updates) and
+the new version loads after a Rhino restart. Rhino installs packages under
+`%APPDATA%\McNeel\Rhinoceros\packages\8.0\PanelCladdingEditor\<version>`.
 
 ## Downloadable release installation
 
