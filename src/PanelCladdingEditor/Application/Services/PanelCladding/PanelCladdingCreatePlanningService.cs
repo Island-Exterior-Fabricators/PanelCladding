@@ -9,13 +9,11 @@ public sealed partial class PanelCladdingCreatePlanningService
     private const double OrthogonalRatio = 2d;
     private readonly PanelCladdingKeyService _keys;
     private readonly PanelCladdingLogicService _claddingLogic;
-    private readonly PanelCladdingLogicalCellService _logicalCells;
 
     public PanelCladdingCreatePlanningService(PanelCladdingKeyService keys)
     {
         _keys = keys;
         _claddingLogic = new PanelCladdingLogicService();
-        _logicalCells = new PanelCladdingLogicalCellService();
     }
 
     public OperationResponse<PanelCladdingCreatePlan> CreatePlan(
@@ -193,8 +191,14 @@ public sealed partial class PanelCladdingCreatePlanningService
                 $"PANEL_CLADDING_CREATE_TOPOLOGY_INVALID: {panel.ObjectId:D}: {masks.Message}");
         }
 
+        // PCCreate owns the grid only. CW_4.xx and the cladding logic stay as they are, except a
+        // logic that no longer fits the new grid, which is removed so the panel loads unconfigured.
+        bool staleLogic = !LogicFitsGrid(panel.UserText, keySet.Data.Cells);
         string[] deletes = panel.UserText.Keys
             .Where(key => ResetAttributeRegex().IsMatch(key) ||
+                (staleLogic && IsCladdingLogicKey(key)) ||
+                string.Equals(key, PanelCladdingKeyService.LegacyCladdingLogicKey, StringComparison.OrdinalIgnoreCase) ||
+                PanelCladdingKeyService.IsRetiredCladdingTypeKey(key) ||
                 PanelCladdingKeyService.IsTopologyKey(key) ||
                 PanelCladdingKeyService.IsRetiredFrameKey(key) ||
                 string.Equals(key, PanelCladdingKeyService.FrameTypeKey, StringComparison.OrdinalIgnoreCase) ||
@@ -230,28 +234,6 @@ public sealed partial class PanelCladdingCreatePlanningService
             writes[key] = value;
         }
 
-        var blanks = keySet.Data.Cells.ToDictionary(
-            cell => cell.UserTextKey,
-            _ => string.Empty,
-            StringComparer.OrdinalIgnoreCase);
-        IReadOnlyDictionary<string, string> logicalBlanks = _logicalCells.Collapse(
-            keySet.Data.Cells,
-            inferred.Topology,
-            blanks);
-        foreach ((string key, string value) in logicalBlanks)
-        {
-            writes[key] = PanelCladdingKeyService.EncodeCellValueForStorage(value);
-        }
-        OperationResponse<string> claddingLogic = _claddingLogic.Encode(
-            keySet.Data.Cells,
-            blanks);
-        if (!claddingLogic.Success || claddingLogic.Data is null)
-        {
-            return OperationResponse<PanelCladdingCreatePanelPlan>.Fail(
-                $"PANEL_CLADDING_CREATE_LOGIC_INVALID: {panel.ObjectId:D}: {claddingLogic.Message}");
-        }
-        writes[PanelCladdingKeyService.CladdingLogicKey] = claddingLogic.Data;
-
         return OperationResponse<PanelCladdingCreatePanelPlan>.Ok(new PanelCladdingCreatePanelPlan
         {
             ObjectId = panel.ObjectId,
@@ -262,6 +244,25 @@ public sealed partial class PanelCladdingCreatePlanningService
             Warnings = warnings
         });
     }
+
+    private bool LogicFitsGrid(
+        IReadOnlyDictionary<string, string> userText,
+        IReadOnlyList<PanelCladdingCell> cells)
+    {
+        if (!PanelCladdingKeyService.IsCladdingConfigured(userText))
+        {
+            return true;
+        }
+        OperationResponse<IReadOnlyDictionary<string, string>> logic = _claddingLogic.Decode(
+            PanelCladdingKeyService.ReadUserDefinedValue(userText, PanelCladdingKeyService.CladdingLogicKey));
+        return logic.Success && logic.Data is not null && logic.Data.Keys
+            .ToHashSet(StringComparer.OrdinalIgnoreCase)
+            .SetEquals(cells.Select(cell => cell.ShortLabel));
+    }
+
+    private static bool IsCladdingLogicKey(string key) =>
+        string.Equals(key, PanelCladdingKeyService.CladdingLogicKey, StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(key, PanelCladdingKeyService.LegacyUserDefinedCladdingLogicKey, StringComparison.OrdinalIgnoreCase);
 
     private static TopologyInference InferClosedTopology(
         IReadOnlyList<GuideCandidate> candidates,
@@ -482,7 +483,7 @@ public sealed partial class PanelCladdingCreatePlanningService
         PanelCladdingTopologyState Topology);
 
     [GeneratedRegex(
-        @"^CW_\d+\.\d{2}_(?:OFFSET|CLADDING)_.+$",
+        @"^CW_\d+\.\d{2}_OFFSET_.+$",
         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex ResetAttributeRegex();
 }

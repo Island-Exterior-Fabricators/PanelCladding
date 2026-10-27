@@ -11,8 +11,8 @@ namespace PanelCladdingEditor.Infrastructure.Rhino.Live.PanelCladding;
 // Per-document frame configuration codes in the project's Frame-Config format
 // (LivePanelNamingFormat). The registry is stored in the document string
 // PanelCladdingEditor.FrameConfigCodes, keeps every code ever assigned, and is seeded from the
-// sheet's Frame-Config rows and from panels that already carry a CW_1.08 code with its CW_9.02
-// configuration. Codes that do not fit the format were assigned under another one and are skipped.
+// sheet's Frame-Config rows and from panels that already carry a CW_1.08 code with its UD_FRAME_CONFIG
+// (or legacy CW_9.02) configuration. Codes that do not fit the format were assigned under another one and are skipped.
 internal static class LivePanelFrameConfigCodes
 {
     public const string DocumentKey = "PanelCladdingEditor.FrameConfigCodes";
@@ -20,7 +20,7 @@ internal static class LivePanelFrameConfigCodes
     private static readonly HashSet<uint> ReportedForeignCodes = new();
     private static readonly PanelCladdingKeyService Keys = new();
 
-    // Writes the canonical CW_9.02 configuration and its CW_1.08 code on proposed attributes.
+    // Writes the canonical UD_FRAME_CONFIG configuration and its CW_1.08 code on proposed attributes.
     internal static bool Normalize(RhinoDoc document, ObjectAttributes attributes)
     {
         string config = ReadCanonical(attributes);
@@ -86,7 +86,8 @@ internal static class LivePanelFrameConfigCodes
                  }))
         {
             string? code = rhinoObject.Attributes.GetUserString(PanelCladdingKeyService.FrameConfigKey)?.Trim();
-            string? config = rhinoObject.Attributes.GetUserString(PanelCladdingKeyService.FrameConfigBackupKey)?.Trim();
+            string config = PanelCladdingKeyService.ReadUserDefinedValue(
+                LivePanelCladdingCidService.Read(rhinoObject.Attributes), PanelCladdingKeyService.FrameConfigBackupKey).Trim();
             if (registry.IsCode(code) && PanelFrameConfigFormat.IsFormatted(config))
             {
                 registry.Register(code!, config!);

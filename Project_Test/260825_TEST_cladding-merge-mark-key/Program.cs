@@ -2,6 +2,7 @@ using System.Text.Json;
 using PanelCladdingEditor.Application.Services.PanelCladding;
 using PanelCladdingEditor.Contracts.Responses;
 using PanelCladdingEditor.Domain.Models.PanelCladding;
+using PanelCladdingTestFixtures;
 
 namespace CladdingMergeMarkKeySmoke;
 
@@ -60,7 +61,7 @@ internal static class Program
             [PanelCladdingKeyService.GetCellKey(1, "A")] = "0A"
         };
         PanelCladdingKeySet keySet = RequireData(
-            keys.Parse(userText, 90d, 198d, 0.001d),
+            keys.Parse(CladdingLogicFixture.WithLogic(userText), 90d, 198d, 0.001d),
             "Parse merged spawn grid");
         PanelCladdingSpawnPlan plan = RequireData(
             new PanelCladdingSpawnPlanningService(keys).CreatePlan(userText, keySet),

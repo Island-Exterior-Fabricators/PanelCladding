@@ -35,3 +35,5 @@ persistence; evidence is in `Project_Test/261007_TEST_frame-config-type-attribut
 The segmented default supersedes the original guide-continuity merge inference
 under the user's 2026-10-06 correction. Follow-up evidence is in
 `Project_Test/261006_TEST_pccreate-segmented-default/`.
+
+Since 1.2.4 `PCCreate` writes no blank cell placeholders; the five-blank-cells assertion now requires none (see [the logic authority TEST](../261027_TEST_panel-cladding-logic-authority/README.md)). Results recorded above predate that change.

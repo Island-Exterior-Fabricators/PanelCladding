@@ -21,3 +21,5 @@ Run with:
 dotnet run --project Project_Test/260818_TEST_panel-cladding-create-command/PanelCladdingCreateSmoke.csproj -c Debug
 dotnet run --project Project_Test/260818_TEST_panel-cladding-create-command/PanelCladdingCreateSmoke.csproj -c Release
 ```
+
+Since 1.2.4 `PCCreate` writes no `CW_4` placeholders or logic and keeps existing `CW_4` keys; the smoke's expected writes and deletes were updated accordingly (see [the logic authority TEST](../261027_TEST_panel-cladding-logic-authority/README.md)). Results recorded above predate that change.

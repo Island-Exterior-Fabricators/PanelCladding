@@ -20,7 +20,7 @@ internal static class Program
         SyncBackfillsAndVerifiesLogic();
         OtherCladdingMutationsMaintainLogic();
 
-        Console.WriteLine("[OK] CW_2.13_CLADDING_LOGIC stores deterministic material-free cell logic.");
+        Console.WriteLine("[OK] UD_CLADDING_LOGIC stores deterministic cell logic with owner materials (1.2.4).");
         Console.WriteLine("[OK] PCSyncSrf preserves valid saved owners and uses geometry for edited splits/merges.");
         Console.WriteLine("[OK] missing logic is backward-compatible and malformed logic fails before mutation.");
         Console.WriteLine("[OK] Save, PCCreate, PCMatchSrf, PCSyncSrf, and PCClear maintain the logic attribute.");
@@ -39,10 +39,9 @@ internal static class Program
             layout.Cells,
             layout.Cells.ToDictionary(cell => cell.UserTextKey, cell => cell.Value)),
             "Encode logic");
-        Require(encoded == "{\"0A\":\"\",\"1A\":\"0A\"}",
+        // Since 1.2.4 the logic is the cladding read source and carries the owner's material.
+        Require(encoded == "{\"0A\":\"MPL-001\",\"1A\":\"0A\"}",
             $"Unexpected canonical logic payload: {encoded}");
-        Require(!encoded.Contains(Material, StringComparison.OrdinalIgnoreCase),
-            "The logic payload leaked a material code.");
 
         IReadOnlyDictionary<string, string> decoded = Required(logic.Decode(encoded), "Decode logic");
         Require(Required(logic.ResolveOwnerLabel(new[] { "0A", "1A" }, decoded),
@@ -126,7 +125,7 @@ internal static class Program
             "Plan legacy geometry-only sync");
         PanelCladdingSurfaceSyncPanelPlan panel = legacyPlan.Panels.Single();
         Require(panel.CladdingChanged &&
-                panel.CladdingLogic == "{\"0A\":\"\",\"1A\":\"0A\"}",
+                panel.CladdingLogic == "{\"0A\":\"MPL-001\",\"1A\":\"0A\"}",
             "A legacy panel did not use geometry inference and schedule a logic backfill.");
 
         PanelCladdingLayout malformed = BuildLayout(keys, 2, new Dictionary<string, string>
@@ -168,7 +167,7 @@ internal static class Program
             "Run logic backfill sync");
         PanelCladdingSurfaceSyncPanelWrite write = live.LastCommit?.PanelWrites.Single() ??
             throw new InvalidOperationException("PCSyncSrf did not schedule one panel write.");
-        Require(write.CladdingLogic == "{\"0A\":\"\",\"1A\":\"0A\"}",
+        Require(write.CladdingLogic == "{\"0A\":\"MPL-001\",\"1A\":\"0A\"}",
             "The PCSyncSrf panel write omitted the derived logic.");
 
         var applied = new Dictionary<string, string>(write.CellValues, StringComparer.OrdinalIgnoreCase)
@@ -206,9 +205,8 @@ internal static class Program
         }), "Save cladding logic");
         string savedLogic = saveRepository.LastCommit?.UserTextWrites.GetValueOrDefault(
             PanelCladdingKeyService.CladdingLogicKey) ?? string.Empty;
-        Require(savedLogic == "{\"0A\":\"\",\"1A\":\"0A\"}" &&
-                !savedLogic.Contains(Material, StringComparison.OrdinalIgnoreCase),
-            "PCEditor cladding Save omitted or polluted the logic attribute.");
+        Require(savedLogic == "{\"0A\":\"MPL-001\",\"1A\":\"0A\"}",
+            "PCEditor cladding Save omitted the logic attribute or its material.");
 
         PanelCladdingCreatePlan create = Required(new PanelCladdingCreatePlanningService(keys).CreatePlan(new[]
         {
@@ -236,10 +234,10 @@ internal static class Program
                     }
                 }
             }
-        }), "Create blank panel logic");
-        string createdLogic = create.Panels.Single().UserTextWrites[PanelCladdingKeyService.CladdingLogicKey];
-        Require(createdLogic == "{\"0A\":\"\",\"0B\":\"\"}",
-            $"PCCreate did not initialize blank logic: {createdLogic}");
+        }), "Create panel grid");
+        // Since 1.2.4 PCCreate leaves an unconfigured panel unconfigured: no placeholder logic.
+        Require(!create.Panels.Single().UserTextWrites.ContainsKey(PanelCladdingKeyService.CladdingLogicKey),
+            "PCCreate generated cladding logic for an unconfigured panel.");
 
         PanelCladdingMatchGeometryDescriptor geometry = new()
         {
@@ -253,7 +251,10 @@ internal static class Program
             {
                 ObjectId = Guid.Parse("68000000-0000-0000-0000-000000000050"),
                 Geometry = geometry,
-                UserText = layout.SourceUserText
+                UserText = new Dictionary<string, string>(layout.SourceUserText)
+                {
+                    [PanelCladdingKeyService.CladdingLogicKey] = savedLogic
+                }
             },
             new[]
             {
@@ -269,7 +270,7 @@ internal static class Program
             }), "Match cladding logic");
         PanelCladdingMatchTargetPlan matchTarget = match.Targets.Single();
         Require(matchTarget.UserTextWrites[PanelCladdingKeyService.CladdingLogicKey] ==
-                "{\"0A\":\"\",\"1A\":\"0A\"}" &&
+                "{\"0A\":\"MPL-001\",\"1A\":\"0A\"}" &&
                 matchTarget.UserTextDeletes.Contains(
                     PanelCladdingKeyService.CladdingLogicKey,
                     StringComparer.OrdinalIgnoreCase),

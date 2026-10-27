@@ -79,13 +79,8 @@ internal static class Program
             ["CW_2.01_UNIT_WIDTH"] = "100.00000",
             ["CW_2.02_UNIT_HEIGHT"] = "80.00000",
             ["CW_2.03_OFFSET_H0"] = "20",
-            ["CW_2.04_OFFSET_V0"] = "40",
-            [PanelCladdingKeyService.CladdingLogicKey] =
-                "{\"0A\":\"\",\"0B\":\"\",\"1A\":\"\",\"1B\":\"\"}",
-            ["CW_4.00_CLADDING_0A"] = " ",
-            ["CW_4.00_CLADDING_0B"] = " ",
-            ["CW_4.01_CLADDING_1A"] = " ",
-            ["CW_4.01_CLADDING_1B"] = " "
+            ["CW_2.04_OFFSET_V0"] = "40"
+            // Since 1.2.4 PCCreate writes no CW_4 placeholders and no UD_CLADDING_LOGIC.
         };
         Require(panel.UserTextWrites.Count == expectedWrites.Count, "Grid write count is incorrect.");
         Require(new[] { PanelCladdingKeyService.FrameTypeKey, PanelCladdingKeyService.LegacyFrameAssignmentsKey,
@@ -100,7 +95,7 @@ internal static class Program
 
         foreach (string deleted in new[]
         {
-            "CW_2.03_OFFSET_H0", "CW_2.04_OFFSET_V0", "CW_4.00_CLADDING_0A",
+            "CW_2.03_OFFSET_H0", "CW_2.04_OFFSET_V0",
             "CW_9.99_OFFSET_CUSTOM", PanelCladdingKeyService.TypeCodeKey,
             PanelCladdingKeyService.LegacyTypeCodeKey, PanelCladdingKeyService.SignatureKey,
             PanelCladdingKeyService.LegacySignatureKey, PanelCladdingKeyService.MergeMaskKey
@@ -111,7 +106,8 @@ internal static class Program
         }
         foreach (string preserved in new[]
         {
-            "CW_1.01_PID", "CW_1.05_LOT", "CW_1.07_WALL_TYPE", "CW_1.02_CID", "Custom"
+            "CW_1.01_PID", "CW_1.05_LOT", "CW_1.07_WALL_TYPE", "CW_1.02_CID", "Custom",
+            "CW_4.00_CLADDING_0A"
         })
         {
             Require(!panel.UserTextDeletes.Contains(preserved, StringComparer.OrdinalIgnoreCase),

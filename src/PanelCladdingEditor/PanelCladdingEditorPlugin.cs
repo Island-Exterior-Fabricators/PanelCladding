@@ -23,6 +23,7 @@ public sealed class PanelCladdingEditorPlugin : PlugIn
     protected override LoadReturnCode OnLoad(ref string errorMessage)
     {
         LivePanelNamingConventionSync.Register();
+        LivePanelAutoAttributes.Register();
         return LoadReturnCode.Success;
     }
 }

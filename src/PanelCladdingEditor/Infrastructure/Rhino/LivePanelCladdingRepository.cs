@@ -385,6 +385,30 @@ public sealed partial class LivePanelCladdingRepository : ILivePanelCladdingRepo
             });
     }
 
+    // The editor layout's width and height (render-mesh extents in the panel frame), shared with
+    // the auto attribute refresh so CW_2.00-2.02 match what PCEditor and PCSyncSrf write.
+    internal static OperationResponse<(double Width, double Height)> MeasurePanelExtent(Brep brep, double tolerance)
+    {
+        OperationResponse<LocalMesh> local;
+        try
+        {
+            local = BuildLocalMesh(brep, tolerance);
+        }
+        catch (InvalidOperationException exception)
+        {
+            return OperationResponse<(double Width, double Height)>.Fail(exception.Message);
+        }
+        if (!local.Success || local.Data is null)
+        {
+            return OperationResponse<(double Width, double Height)>.Fail(local.Message);
+        }
+        double width = local.Data.XMax - local.Data.XMin;
+        double height = local.Data.YMax - local.Data.YMin;
+        return width <= tolerance || height <= tolerance
+            ? OperationResponse<(double Width, double Height)>.Fail("PANEL_CLADDING_PANEL_EXTENT_INVALID")
+            : OperationResponse<(double Width, double Height)>.Ok((width, height));
+    }
+
     private static OperationResponse<LocalMesh> BuildLocalMesh(Brep brep, double tolerance)
     {
         Mesh[] pieces = Mesh.CreateFromBrep(brep, MeshingParameters.FastRenderMesh);
@@ -552,6 +576,7 @@ public sealed partial class LivePanelCladdingRepository : ILivePanelCladdingRepo
         {
             if (key.StartsWith("CW_2.", StringComparison.OrdinalIgnoreCase) ||
                 key.StartsWith("CW_4.", StringComparison.OrdinalIgnoreCase) ||
+                key.StartsWith("UD_", StringComparison.OrdinalIgnoreCase) ||
                 key.StartsWith("CW_9.", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(key, PanelCladdingKeyService.FrameConfigKey, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(key, PanelCladdingKeyService.FrameTypeKey, StringComparison.OrdinalIgnoreCase))

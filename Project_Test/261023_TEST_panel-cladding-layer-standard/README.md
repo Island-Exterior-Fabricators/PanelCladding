@@ -29,3 +29,5 @@ dotnet run --project Project_Test/261023_TEST_panel-cladding-layer-standard/Pane
 No Rhino native runtime is required. Live command acceptance (PCSpawnCrv/
 PCSpawnSrf/PCUpdate/PCSyncSrf/PCpid in Rhino) needs the 1.0.98 RHP installed and is
 recorded separately in the EXET.
+
+Since 1.2.4 the plug-in reads cladding only from `UD_CLADDING_LOGIC`; this smoke passes its `CW_4.xx` fixtures through `CladdingLogicFixture.WithLogic` (linked from [the logic authority TEST](../261027_TEST_panel-cladding-logic-authority/README.md)), so its assertions are unchanged. Results recorded above predate that change.

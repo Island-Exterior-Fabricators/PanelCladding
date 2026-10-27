@@ -436,7 +436,7 @@ public sealed class PanelCladdingSurfaceSyncPlanningService
             var cellsByLabel = orderedCells.ToDictionary(
                 cell => cell.ShortLabel,
                 StringComparer.OrdinalIgnoreCase);
-            string storedCladdingLogic = GetUserText(
+            string storedCladdingLogic = PanelCladdingKeyService.ReadUserDefinedValue(
                 panel.Layout.SourceUserText,
                 PanelCladdingKeyService.CladdingLogicKey);
             OperationResponse<IReadOnlyDictionary<string, string>> decodedCladdingLogic =
@@ -490,13 +490,16 @@ public sealed class PanelCladdingSurfaceSyncPlanningService
                             curve.ObjectColorChanged
                     });
                 }
-                IReadOnlyDictionary<string, string> curveCellValues = orderedCells.ToDictionary(
-                    cell => cell.UserTextKey,
-                    cell => _keys.NormalizeCladdingValue(cell.Value),
-                    StringComparer.OrdinalIgnoreCase);
-                OperationResponse<string> curveCladdingLogic = _claddingLogic.Encode(
-                    orderedCells,
-                    curveCellValues);
+                bool claddingConfigured = storedCladdingLogic.Trim().Length > 0;
+                IReadOnlyDictionary<string, string> curveCellValues = claddingConfigured
+                    ? orderedCells.ToDictionary(
+                        cell => cell.UserTextKey,
+                        cell => _keys.NormalizeCladdingValue(cell.Value),
+                        StringComparer.OrdinalIgnoreCase)
+                    : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                OperationResponse<string> curveCladdingLogic = claddingConfigured
+                    ? _claddingLogic.Encode(orderedCells, curveCellValues)
+                    : OperationResponse<string>.Ok(string.Empty);
                 if (!curveCladdingLogic.Success || curveCladdingLogic.Data is null)
                 {
                     AddIssue(panel.ObjectId, pid,
@@ -510,6 +513,7 @@ public sealed class PanelCladdingSurfaceSyncPlanningService
                     Layout = panel.Layout,
                     CellValues = curveCellValues,
                     CladdingLogic = curveCladdingLogic.Data,
+                    WritesCladding = claddingConfigured,
                     CladdingChanged = panel.GridChanged || panelCidChanged,
                     NameChanged = panelNameChanged
                 });

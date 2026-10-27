@@ -3,6 +3,7 @@ using PanelCladdingEditor.Application.Interfaces;
 using PanelCladdingEditor.Application.Services.PanelCladding;
 using PanelCladdingEditor.Contracts.Responses;
 using PanelCladdingEditor.Domain.Models.PanelCladding;
+using PanelCladdingTestFixtures;
 
 namespace PanelCladdingMatchSmoke;
 
@@ -380,7 +381,7 @@ internal static class Program
         {
             ObjectId = objectId,
             Geometry = geometry,
-            UserText = new Dictionary<string, string>(userText, StringComparer.OrdinalIgnoreCase)
+            UserText = CladdingLogicFixture.WithLogic(userText)
         };
     }
 

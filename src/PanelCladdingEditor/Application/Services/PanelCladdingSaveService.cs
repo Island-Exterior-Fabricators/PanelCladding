@@ -92,6 +92,15 @@ public sealed class PanelCladdingSaveService
         horizontalOffsets = normalizedEdit.HorizontalOffsets;
         verticalOffsets = normalizedEdit.VerticalOffsets;
         topology = normalizedEdit.Topology;
+        if (!saveCladding && PanelCladdingKeyService.IsCladdingConfigured(layout.SourceUserText) &&
+            (horizontalOffsets.Count != layout.HorizontalOffsets.Count ||
+             verticalOffsets.Count != layout.VerticalOffsets.Count))
+        {
+            // UD_CLADDING_LOGIC names every cell, so a new grid size needs the cladding saved with it.
+            return OperationResponse<PanelCladdingSaveResult>.Fail(
+                "PANEL_CLADDING_LOGIC_REQUIRES_SAVE_BOTH: the grid size changed and this panel has saved " +
+                "cladding. Use Save Both so the cladding logic matches the new grid.");
+        }
         PanelFrameAssignmentState requestedFrameAssignments = saveExtrusions
             ? request.FrameAssignments ?? layout.FrameAssignments
             : layout.FrameAssignments;
@@ -275,7 +284,7 @@ public sealed class PanelCladdingSaveService
         {
             ObjectId = request.ObjectId,
             FrameConfig = writes.GetValueOrDefault(PanelCladdingKeyService.FrameConfigBackupKey) ??
-                GetUserText(layout.SourceUserText, PanelCladdingKeyService.FrameConfigBackupKey),
+                PanelCladdingKeyService.ReadUserDefinedValue(layout.SourceUserText, PanelCladdingKeyService.FrameConfigBackupKey),
             StoredSignature = string.Empty,
             WorkbookPath = request.WorkbookPath,
             SheetName = string.Empty,
@@ -287,11 +296,5 @@ public sealed class PanelCladdingSaveService
             _ => "Panel extrusion and cladding key/value sets saved to Rhino."
         });
     }
-
-    private static string GetUserText(
-        IReadOnlyDictionary<string, string> userText,
-        string requestedKey) =>
-        userText.FirstOrDefault(item =>
-            string.Equals(item.Key, requestedKey, StringComparison.OrdinalIgnoreCase)).Value ?? string.Empty;
 }
 
