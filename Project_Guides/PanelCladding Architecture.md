@@ -20,9 +20,13 @@ installation and must not be shipped in the package.
 
 The assembly-level GUID, plug-in class GUID, package manifest pluginId and HKCU
 registration GUID must agree. Product identity is separate from the repository name.
-Install under `%LOCALAPPDATA%\PanelCladdingEditor\plugin\<version>`, registry-only
-with DirectoryInstall=0 and startup loading; never also install in Package Manager
-discovery. Follow the AGENTS.md independent host attestation gates for activation.
+There are two mutually exclusive install channels; a machine uses one, never both.
+The Yak channel (`Build-PanelCladdingEditorYak.ps1`) publishes a `.yak` to a
+company-internal Package Manager source and Rhino owns install, update and loading.
+The zip channel installs under `%LOCALAPPDATA%\PanelCladdingEditor\plugin\<version>`,
+registry-only with DirectoryInstall=0 and startup loading, and moves any Package
+Manager copy aside. Follow the AGENTS.md independent host attestation gates for
+activating the zip channel.
 
 Historical reports may refer to MCP_Rhino and original GitHub commits. They describe
 the original execution context and are not current build dependencies.

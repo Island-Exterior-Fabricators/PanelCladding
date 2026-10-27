@@ -20,6 +20,9 @@ This is the standalone Rhino 8 PanelCladdingEditor repository. Read
   timestamps after the installer exits. After Rhino starts, verify the exact RHP
   loaded and only root/CommandList timestamps advanced. See the registration and
   attestation EXET records for details.
+- The Yak package (`Build-PanelCladdingEditorYak.ps1`) is a separate install channel.
+  Never publish it to the public McNeel server, and publish to a company source only
+  when the user names that source. The zip and Yak installs must not coexist.
 - Rhino owns the registration root and CommandList. Installer-owned
   `PlugIn\FileName` does not self-heal. Never infer success from a fresh root alone.
 - Do not use Computer Use or Windows UI automation without an explicit request in

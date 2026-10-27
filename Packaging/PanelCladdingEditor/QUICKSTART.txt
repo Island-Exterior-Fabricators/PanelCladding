@@ -21,6 +21,12 @@ Rhino registration is written only to HKEY_CURRENT_USER. Nothing is installed
 to Program Files or HKEY_LOCAL_MACHINE. Do not also copy this plug-in into Rhino's
 Package Manager folders; that would create a duplicate plug-in identity.
 
+PACKAGE MANAGER INSTEAD
+If your team publishes PanelCladdingEditor to an internal Package Manager source,
+install from there instead of this zip: close Rhino, run Uninstall.cmd if this zip
+was installed, add the source folder in Rhino Options > Package Manager > Sources,
+then install PanelCladdingEditor from _PackageManager. See README.md.
+
 REPAIR OR VALIDATE (PowerShell, from this extracted folder)
 powershell -NoProfile -ExecutionPolicy Bypass -File .\Installer\Install-PanelCladdingEditor.ps1 -Mode Repair
 powershell -NoProfile -ExecutionPolicy Bypass -File .\Installer\Install-PanelCladdingEditor.ps1 -Mode Validate

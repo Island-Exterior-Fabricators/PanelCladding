@@ -21,6 +21,11 @@ scripts. Close Rhino and use **Uninstall.cmd** to remove the package.
 The release includes a SHA-256 checksum; repair and validation instructions are
 in the bundled **QUICKSTART.txt**. Do not install a second copy via Package Manager.
 
+Alternatively, when the plug-in is published to a company-internal Package Manager
+source, install and update it from Rhino's **_PackageManager** instead (uninstall the
+zip first). See
+[Package Manager (Yak) installation](Packaging/PanelCladdingEditor/README.md#package-manager-yak-installation).
+
 ## Build
 
 Requires Windows, the .NET 8 SDK, and Rhino 8 at `C:\Program Files\Rhino 8`.
@@ -32,6 +37,7 @@ dotnet build .\PanelCladding.sln -c Release -m:1
 .\Project_Test\261007_TEST_panel-cladding-pid-planar-bounds\Verify-Regression.ps1
 .\Project_Test\260805_TEST_rhino-plugin-assembly-identity\Verify-PluginAssemblyIdentity.ps1 -Configuration Release
 .\Packaging\PanelCladdingEditor\Build-PanelCladdingEditorPackage.ps1
+.\Packaging\PanelCladdingEditor\Build-PanelCladdingEditorYak.ps1
 ```
 
 Build the production project after running DLL-host smoke tests when using its RHP
