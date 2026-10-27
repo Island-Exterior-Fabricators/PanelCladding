@@ -5,7 +5,7 @@ using PanelCladdingEditor.Domain.Models.PanelCladding;
 
 namespace PanelCladdingEditor.Application.Services.PanelCladding;
 
-// Readable, lossless frame configuration stored in CW_9.02_FRAME_CONFIG and the
+// Readable, lossless frame configuration stored in UD_FRAME_CONFIG and the
 // naming-convention sheet: "2H 1V | delete A1 0B | merge A0–1 | hide 0A".
 // Horizontal segments are track letter + bay number and vertical segments track number +
 // bay letter, matching the INT- curve codes; merge runs give the first and last bay.

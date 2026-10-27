@@ -1,3 +1,4 @@
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using PanelCladdingEditor.Contracts.Responses;
 using PanelCladdingEditor.Domain.Models.PanelCladding;
@@ -6,6 +7,12 @@ namespace PanelCladdingEditor.Application.Services.PanelCladding;
 
 public sealed class PanelCladdingLogicService
 {
+    // Material codes stay readable in the stored text (no &-style escapes).
+    private static readonly JsonSerializerOptions SerializerOptions = new()
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    };
+
     public OperationResponse<string> Encode(
         IReadOnlyList<PanelCladdingCell> cells,
         IReadOnlyDictionary<string, string> cellValues)
@@ -30,28 +37,41 @@ public sealed class PanelCladdingLogicService
             }
         }
 
-        var logic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        // Since 1.2.4 the logic is the cladding read source: a cell label is a parent reference and
+        // any other nonblank value is the owner cell's material (the CW_4.xx value rules).
+        var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (PanelCladdingCell cell in orderedCells)
         {
-            string value = GetValue(cellValues, cell.UserTextKey);
-            string parent = PanelCladdingKeyService.IsCellLabelToken(value)
-                ? NormalizeLabel(value)
-                : string.Empty;
-            if (parent.Length > 0 && !labels.Contains(parent))
+            string value = GetValue(cellValues, cell.UserTextKey).Trim();
+            if (PanelCladdingKeyService.IsCellLabelToken(value))
             {
-                return OperationResponse<string>.Fail(
-                    $"PANEL_CLADDING_LOGIC_PARENT_UNKNOWN: {cell.ShortLabel}={parent}");
+                value = NormalizeLabel(value);
+                if (!labels.Contains(value))
+                {
+                    return OperationResponse<string>.Fail(
+                        $"PANEL_CLADDING_LOGIC_PARENT_UNKNOWN: {cell.ShortLabel}={value}");
+                }
             }
-            logic[NormalizeLabel(cell.ShortLabel)] = parent;
+            values[NormalizeLabel(cell.ShortLabel)] = value;
         }
 
-        OperationResponse validated = ValidateGraph(logic);
+        OperationResponse validated = ValidateGraph(ToGraph(values));
         return validated.Success
-            ? OperationResponse<string>.Ok(JsonSerializer.Serialize(logic))
+            ? OperationResponse<string>.Ok(JsonSerializer.Serialize(values, SerializerOptions))
             : OperationResponse<string>.Fail(validated.Message);
     }
 
+    // Ownership graph (label -> parent label, "" for roots); materials read as roots.
     public OperationResponse<IReadOnlyDictionary<string, string>> Decode(string? payload)
+    {
+        OperationResponse<IReadOnlyDictionary<string, string>> values = DecodeValues(payload);
+        return !values.Success || values.Data is null
+            ? values
+            : OperationResponse<IReadOnlyDictionary<string, string>>.Ok(ToGraph(values.Data));
+    }
+
+    // Stored values (label -> material, parent label or ""), with the graph validated.
+    public OperationResponse<IReadOnlyDictionary<string, string>> DecodeValues(string? payload)
     {
         if (string.IsNullOrWhiteSpace(payload))
         {
@@ -81,13 +101,8 @@ public sealed class PanelCladdingLogicService
                     return OperationResponse<IReadOnlyDictionary<string, string>>.Fail(
                         $"PANEL_CLADDING_LOGIC_VALUE_INVALID: {property.Name}");
                 }
-                string parent = NormalizeLabel(property.Value.GetString() ?? string.Empty);
-                if (parent.Length > 0 && !PanelCladdingKeyService.IsCellLabelToken(parent))
-                {
-                    return OperationResponse<IReadOnlyDictionary<string, string>>.Fail(
-                        $"PANEL_CLADDING_LOGIC_PARENT_INVALID: {property.Name}={parent}");
-                }
-                logic[label] = parent;
+                string value = (property.Value.GetString() ?? string.Empty).Trim();
+                logic[label] = PanelCladdingKeyService.IsCellLabelToken(value) ? NormalizeLabel(value) : value;
             }
         }
         catch (JsonException ex)
@@ -96,11 +111,21 @@ public sealed class PanelCladdingLogicService
                 $"PANEL_CLADDING_LOGIC_JSON_INVALID: {ex.Message}");
         }
 
-        OperationResponse validated = ValidateGraph(logic);
+        OperationResponse validated = ValidateGraph(ToGraph(logic));
         return validated.Success
             ? OperationResponse<IReadOnlyDictionary<string, string>>.Ok(logic)
             : OperationResponse<IReadOnlyDictionary<string, string>>.Fail(validated.Message);
     }
+
+    // Logic written before 1.2.4 holds ownership only; its materials are still in CW_4.xx.
+    public static bool HasMaterials(IReadOnlyDictionary<string, string> values) =>
+        values.Values.Any(value => value.Length > 0 && !PanelCladdingKeyService.IsCellLabelToken(value));
+
+    private static Dictionary<string, string> ToGraph(IReadOnlyDictionary<string, string> values) =>
+        values.ToDictionary(
+            item => item.Key,
+            item => PanelCladdingKeyService.IsCellLabelToken(item.Value) ? item.Value : string.Empty,
+            StringComparer.OrdinalIgnoreCase);
 
     public OperationResponse<string> ResolveOwnerLabel(
         IReadOnlyList<string> coveredCellLabels,

@@ -18,10 +18,11 @@ internal static class LivePanelCladdingCidService
             .ToDictionary(key => key!, key => text![key!] ?? string.Empty, StringComparer.Ordinal);
     }
 
-    // Normalizes panel identity (CID, name) and the frame configuration code on a write.
+    // Normalizes UD_ key names, panel identity (CID, name) and the frame configuration code on a write.
     internal static bool Normalize(RhinoDoc document, ObjectAttributes attributes)
     {
-        bool changed = LivePanelFrameConfigCodes.Normalize(document, attributes);
+        bool changed = MigrateUserDefinedKeys(attributes);
+        changed |= LivePanelFrameConfigCodes.Normalize(document, attributes);
         IReadOnlyDictionary<string, string> text = Read(attributes);
         string? cid = PanelCladdingCidService.PanelCidWrite(text);
         if (cid is not null)
@@ -45,6 +46,21 @@ internal static class LivePanelCladdingCidService
             changed = true;
         }
         return changed;
+    }
+
+    // CW_9.xx keys become UD_ keys on the panel's next write.
+    internal static bool MigrateUserDefinedKeys(ObjectAttributes attributes)
+    {
+        var (deletes, writes) = PanelCladdingKeyService.PlanUserDefinedKeyMigration(Read(attributes));
+        foreach (string key in deletes)
+        {
+            attributes.DeleteUserString(key);
+        }
+        foreach ((string key, string value) in writes)
+        {
+            attributes.SetUserString(key, value);
+        }
+        return deletes.Count > 0;
     }
 
     internal static OperationResponse<IReadOnlyList<Change>> Prepare(RhinoDoc document, IEnumerable<Guid> ids)

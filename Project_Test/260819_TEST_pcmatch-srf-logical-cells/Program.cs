@@ -2,6 +2,7 @@ using System.IO;
 using PanelCladdingEditor.Application.Services.PanelCladding;
 using PanelCladdingEditor.Contracts.Responses;
 using PanelCladdingEditor.Domain.Models.PanelCladding;
+using PanelCladdingTestFixtures;
 
 namespace PCMatchSrfLogicalCellsSmoke;
 
@@ -42,7 +43,12 @@ internal static class Program
         {
             MergeRuns = [new(PanelCladdingTopologyAxis.Horizontal, 0, 0, 1)]
         });
-        IReadOnlyDictionary<string, string> sourceText = GridText("40", "30", sourceMasks);
+        IReadOnlyDictionary<string, string> unconfiguredText = GridText("40", "30", sourceMasks);
+        // Since 1.2.4 a source must be configured; a blank source carries an all-blank logic.
+        IReadOnlyDictionary<string, string> sourceText = new Dictionary<string, string>(unconfiguredText, StringComparer.OrdinalIgnoreCase)
+        {
+            [PanelCladdingKeyService.CladdingLogicKey] = "{\"0A\":\"\",\"0B\":\"\",\"1A\":\"\",\"1B\":\"\"}"
+        };
         var targetText = new Dictionary<string, string>(GridText("75", "80", targetMasks), StringComparer.OrdinalIgnoreCase)
         {
             [PanelCladdingKeyService.GetCellKey(0, "A")] = PanelCladdingKeyService.PersistedBlankCellValue,
@@ -51,6 +57,11 @@ internal static class Program
             ["CustomNote"] = "preserve"
         };
 
+        OperationResponse<PanelCladdingMatchPlan> refused = planner.CreatePlan(
+            Snapshot(SourceId, unconfiguredText, width: 100d, height: 100d),
+            [Snapshot(TargetOneId, targetText, width: 160d, height: 240d)]);
+        Require(!refused.Success && refused.Message.StartsWith("PANEL_CLADDING_MATCH_SOURCE_NOT_CONFIGURED", StringComparison.Ordinal),
+            "An unconfigured source was matched.");
         PanelCladdingMatchTargetPlan plan = Required(planner.CreatePlan(
             Snapshot(SourceId, sourceText, width: 100d, height: 100d),
             [Snapshot(TargetOneId, targetText, width: 160d, height: 240d)])).Targets.Single();
@@ -65,6 +76,7 @@ internal static class Program
                 plan.UserTextWrites.ContainsKey(PanelCladdingKeyService.CladdingLogicKey),
             "PCMatchSrf planned a write outside cell assignments and their derived logic.");
         Require(plan.UserTextDeletes.All(key => keys.IsCladdingCellKey(key) ||
+                string.Equals(key, PanelCladdingKeyService.CladdingLogicKey, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(key, PanelCladdingKeyService.SignatureKey, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(key, PanelCladdingKeyService.LegacySignatureKey, StringComparison.OrdinalIgnoreCase)),
             "PCMatchSrf planned a non-cell deletion other than retired Signature keys.");
@@ -111,7 +123,10 @@ internal static class Program
         var planner = new PanelCladdingMatchPlanningService(keys);
         PanelCladdingMatchPanelSnapshot source = Snapshot(
             SourceId,
-            GridText("40", "30", Masks(keys, new PanelCladdingTopologyState())));
+            new Dictionary<string, string>(GridText("40", "30", Masks(keys, new PanelCladdingTopologyState())))
+            {
+                [PanelCladdingKeyService.CladdingLogicKey] = "{\"0A\":\"\",\"0B\":\"\",\"1A\":\"\",\"1B\":\"\"}"
+            });
         PanelCladdingMatchPanelSnapshot compatible = Snapshot(
             TargetOneId,
             GridText("70", "80", Masks(keys, new PanelCladdingTopologyState())));
@@ -140,7 +155,8 @@ internal static class Program
             [Snapshot(TargetOneId, GridText("60", "70", Masks(keys, new PanelCladdingTopologyState()))) ]);
         Require(!rejected.Success &&
                 rejected.Message.Contains("PANEL_CLADDING_MATCH_SOURCE_NOT_CONFIGURED", StringComparison.Ordinal) &&
-                rejected.Message.Contains("REFERENCE_TARGET_NOT_FOUND", StringComparison.Ordinal),
+                // Since 1.2.4 the reference is stored in UD_CLADDING_LOGIC and fails its decode.
+                rejected.Message.Contains("PANEL_CLADDING_LOGIC_PARENT_UNKNOWN", StringComparison.Ordinal),
             "An invalid source parent reference was accepted.");
         Console.WriteLine("[OK] invalid parent references remain fail-closed.");
     }
@@ -187,7 +203,7 @@ internal static class Program
             Height = height,
             ModelTolerance = 0.001d
         },
-        UserText = new Dictionary<string, string>(userText, StringComparer.OrdinalIgnoreCase)
+        UserText = CladdingLogicFixture.WithLogic(userText)
     };
 
     private static T Required<T>(OperationResponse<T> response)

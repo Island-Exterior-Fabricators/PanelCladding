@@ -56,7 +56,8 @@ public sealed class LivePanelCladdingCurveTemplateService : ILivePanelCladdingCu
                 HasMergeMask = layout.Data.Topology.MergeRuns.Count > 0 ||
                     (!layout.Data.SourceUserText.Any(item =>
                         (string.Equals(item.Key, PanelCladdingKeyService.FrameConfigKey, StringComparison.OrdinalIgnoreCase) ||
-                         string.Equals(item.Key, PanelCladdingKeyService.FrameConfigBackupKey, StringComparison.OrdinalIgnoreCase)) &&
+                         string.Equals(item.Key, PanelCladdingKeyService.FrameConfigBackupKey, StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(item.Key, PanelCladdingKeyService.LegacyUserDefinedFrameConfigKey, StringComparison.OrdinalIgnoreCase)) &&
                         !string.IsNullOrWhiteSpace(item.Value)) &&
                      PanelCladdingKeyService.HasNonblankMergeMask(layout.Data.SourceUserText)),
                 Topology = layout.Data.Topology
@@ -118,6 +119,7 @@ public sealed class LivePanelCladdingCurveTemplateService : ILivePanelCladdingCu
                 DeleteUserTextCaseInsensitive(proposed, key);
             }
             proposed.SetUserString(PanelCladdingKeyService.FrameConfigBackupKey, panelPlan.FrameConfig);
+            LivePanelCladdingCidService.MigrateUserDefinedKeys(proposed);
             LivePanelFrameConfigCodes.Normalize(document, proposed);
             if (!string.IsNullOrWhiteSpace(frameType.Data))
             {

@@ -5,6 +5,7 @@ using PanelCladdingEditor.Contracts.Responses;
 using PanelCladdingEditor.Domain.Models.PanelCladding;
 using PanelCladdingEditor.Infrastructure.PanelCladding;
 using S = DocumentFormat.OpenXml.Spreadsheet;
+using PanelCladdingTestFixtures;
 
 namespace PanelCladdingEditor.Smoke;
 
@@ -65,6 +66,7 @@ internal static class Program
                 [PanelCladdingKeyService.GetCellKey(1, "A")] = "stn02",
                 [PanelCladdingKeyService.GetCellKey(1, "B")] = "gl01"
             };
+            userText = CladdingLogicFixture.WithLogic(userText);
             PanelCladdingKeySet keySet = RequireData(keys.Parse(userText, 100d, 100d, 0.001d), "Parse key grid");
             RequirePanelCladding(keySet.Cells.Count == 4, "Expected four cells for one H and one V cut.");
             RequirePanelCladding(keySet.Cells.Select(item => item.ShortLabel).SequenceEqual(new[] { "0A", "0B", "1A", "1B" }),

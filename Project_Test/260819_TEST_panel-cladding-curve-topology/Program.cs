@@ -99,8 +99,9 @@ internal static class Program
         Require(topology.MergeRuns.Count == 0 &&
                 !plan.UserTextWrites.ContainsKey(PanelCladdingKeyService.MergeMaskKey),
             "The continuous full-height vertical guide must remain segmented around partial horizontal tracks.");
-        Require(plan.UserTextWrites.Keys.Count(keys.IsCladdingCellKey) == 5,
-            "The screenshot topology must persist five surviving logical blank cells.");
+        // Since 1.2.4 PCCreate writes no blank cell placeholders; the topology alone defines the cells.
+        Require(!plan.UserTextWrites.Keys.Any(keys.IsCladdingCellKey),
+            "PCCreate must not generate cladding cell placeholders.");
         Require(plan.UserTextDeletes.Contains(PanelCladdingKeyService.SegmentMaskKey, StringComparer.OrdinalIgnoreCase) &&
                 plan.UserTextDeletes.Contains(PanelCladdingKeyService.MergeMaskKey, StringComparer.OrdinalIgnoreCase) &&
                 plan.UserTextDeletes.Contains(PanelCladdingKeyService.HideMaskKey, StringComparer.OrdinalIgnoreCase) &&

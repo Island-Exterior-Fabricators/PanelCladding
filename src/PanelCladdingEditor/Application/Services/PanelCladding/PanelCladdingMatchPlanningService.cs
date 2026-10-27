@@ -157,6 +157,10 @@ public sealed partial class PanelCladdingMatchPlanningService : IPanelCladdingMa
         {
             return SourceNotConfigured(source.ObjectId, parsed.Message);
         }
+        if (!parsed.Data.CladdingConfigured)
+        {
+            return SourceNotConfigured(source.ObjectId, $"no {PanelCladdingKeyService.CladdingLogicKey}");
+        }
 
         OperationResponse<PanelCladdingRegionSet> regions = _regions.Resolve(
             parsed.Data.Cells,
@@ -183,16 +187,12 @@ public sealed partial class PanelCladdingMatchPlanningService : IPanelCladdingMa
             // merge topology and remaps parent references to their surviving representatives.
             writes[key] = PanelCladdingKeyService.EncodeCellValueForStorage(value);
         }
-        var explicitSourceCellKeys = source.UserText.Keys
-            .Where(_keys.IsCladdingCellKey)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
         foreach (PanelCladdingCell cell in parsed.Data.Cells.Where(cell =>
-            explicitSourceCellKeys.Contains(cell.UserTextKey)))
+            writes.ContainsKey(cell.UserTextKey) || physicalValues[cell.UserTextKey].Length > 0))
         {
-            // PCMatchSrf is cell-only: an explicitly persisted source cell is configuration
-            // truth even when extrusion topology would otherwise hide that physical cell.
-            // This keeps parent tokens such as 1A=0A from being silently discarded while
-            // still omitting topology-hidden cells that are genuinely absent from source text.
+            // PCMatchSrf is cell-only: the source logic's value is configuration truth even when
+            // extrusion topology hides that physical cell, so parent tokens such as 1A=0A are not
+            // silently discarded. Unassigned hidden cells stay absent.
             writes[cell.UserTextKey] = PanelCladdingKeyService.EncodeCellValueForStorage(
                 physicalValues[cell.UserTextKey]);
         }
@@ -273,6 +273,9 @@ public sealed partial class PanelCladdingMatchPlanningService : IPanelCladdingMa
         return CladdingCellRegex().IsMatch(key) || string.Equals(
             key,
             PanelCladdingKeyService.CladdingLogicKey,
+            StringComparison.OrdinalIgnoreCase) || string.Equals(
+            key,
+            PanelCladdingKeyService.LegacyUserDefinedCladdingLogicKey,
             StringComparison.OrdinalIgnoreCase);
     }
 

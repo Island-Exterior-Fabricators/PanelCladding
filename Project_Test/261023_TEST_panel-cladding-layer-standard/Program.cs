@@ -3,6 +3,7 @@ using System.Text.Json;
 using PanelCladdingEditor.Application.Services.PanelCladding;
 using PanelCladdingEditor.Contracts.Responses;
 using PanelCladdingEditor.Domain.Models.PanelCladding;
+using PanelCladdingTestFixtures;
 
 namespace PanelCladdingLayerStandardSmoke;
 
@@ -332,7 +333,7 @@ internal static class Program
             ["CW_2.13_CLADDING_LOGIC"] = "{\"0A\":\"\",\"0B\":\"\",\"0C\":\"\",\"1A\":\"0A\",\"1B\":\"0B\",\"1C\":\"0C\"}"
         };
         var keys = new PanelCladdingKeyService();
-        PanelCladdingKeySet keySet = Required(keys.Parse(userText, 90d, 224.625d, 0.001d), "parse ABC E2-03-02");
+        PanelCladdingKeySet keySet = Required(keys.Parse(CladdingLogicFixture.WithLogic(userText), 90d, 224.625d, 0.001d), "parse ABC E2-03-02");
         PanelCladdingSpawnPlan plan = Required(
             new PanelCladdingSpawnPlanningService(keys).CreatePlan(
                 userText, keySet, 90d, 224.625d, PanelBranch + "::Surfaces - WT_11"),

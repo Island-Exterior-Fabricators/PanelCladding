@@ -1,6 +1,7 @@
 using PanelCladdingEditor.Application.Services.PanelCladding;
 using PanelCladdingEditor.Contracts.Responses;
 using PanelCladdingEditor.Domain.Models.PanelCladding;
+using PanelCladdingTestFixtures;
 
 namespace PanelCladdingLayoutReconciliationSmoke;
 
@@ -421,7 +422,7 @@ internal static class Program
                 Height = height,
                 ModelTolerance = 0.001d
             },
-            UserText = text
+            UserText = CladdingLogicFixture.WithLogic(text)
         };
 
     private static T Required<T>(OperationResponse<T> response)

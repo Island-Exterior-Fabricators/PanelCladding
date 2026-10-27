@@ -17,3 +17,5 @@ Run from the repository root:
 dotnet run --project .\Project_Test\260819_TEST_panel-cladding-logic-persistence\PanelCladdingLogicPersistenceSmoke.csproj -c Debug
 dotnet run --project .\Project_Test\260819_TEST_panel-cladding-logic-persistence\PanelCladdingLogicPersistenceSmoke.csproj -c Release
 ```
+
+Since 1.2.4 the logic carries owner materials (`{"0A":"MPL-001","1A":"0A"}`), `PCCreate` writes no logic and a `PCMatchSrf` source needs logic; the expected payloads were updated (see [the logic authority TEST](../261027_TEST_panel-cladding-logic-authority/README.md)). Results recorded above predate that change.

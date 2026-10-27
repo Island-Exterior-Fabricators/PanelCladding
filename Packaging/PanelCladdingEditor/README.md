@@ -24,10 +24,15 @@ Since 1.1.0, panel attributes follow the project naming convention workbook
 | `CW_1.06_UNIT_TYPE` | `C` Curved, `F` Flat, `L` Two Face, `Z` Three Face |
 | `CW_1.08_FRAME_CONFIG` | code in the project's Frame-Config format (`AA`, `AB`, … by default; no `I`/`O`) |
 | `CW_5.00_DEFINITION_A` | role: `Parent`, `Child`, `Child 1`, `Child 2` |
-| `CW_9.01_CLADDING_LOGIC` | cell ownership JSON (formerly `CW_2.13_CLADDING_LOGIC`) |
-| `CW_9.02_FRAME_CONFIG` | readable configuration, e.g. `2H 1V \| delete A1 0B \| merge B0–1 \| hide 0A` |
+| `UD_CLADDING_LOGIC` | cell cladding JSON, e.g. `{"0A":"AL-01","0B":"0A","1A":""}` (ownership only before 1.2.4; `CW_9.01_CLADDING_LOGIC` in 1.1.0–1.2.1, `CW_2.13_CLADDING_LOGIC` before) |
+| `UD_FRAME_CONFIG` | readable configuration, e.g. `2H 1V \| delete A1 0B \| merge B0–1 \| hide 0A` (`CW_9.02_FRAME_CONFIG` in 1.1.0–1.2.1) |
 
-`CW_9.02` is authoritative and lets the plug-in read a coded panel even when the workbook
+Since 1.2.2 the user-defined `CW_9.xx` series is `UD_XXX`. Panels that still carry
+`CW_9.01`/`CW_9.02` are read as before, and the keys are renamed to `UD_` the next time a
+cladding command writes the panel (`PCEditor` save, `PCCreate`, `PCMatch*`, `PCSyncSrf`,
+`PCCrvTemplate`, `PCSpawn*`/`PCUpdate`), in the same Undo step.
+
+`UD_FRAME_CONFIG` is authoritative and lets the plug-in read a coded panel even when the workbook
 is unavailable. `2H 1V` is the number of horizontal and vertical intermediates; horizontal
 segments are track letter + bay number and vertical segments track number + bay letter,
 as in the `INT-` curve codes. Codes are assigned per document when a configuration is first
@@ -37,6 +42,23 @@ Only `L` and `Z` panels take a CID role suffix (`_P`, `_C`, `_C1`, `_C2`) from D
 `C` and `F` panels are `Parent` without a suffix. PCpid reserves Definition A, moving
 existing definitions down (adding `E`, `F`, … as needed). The former JSON frame
 configuration and `flat`/`corner_parent`/`corner_child` values must be migrated.
+
+Since 1.2.3 the plug-in keeps these values current on every panel of
+`<PROJECT>-IEF-Wireframe::Surfaces - PNL` and its sublayers (it replaces the AutoATT script; the
+`AUTO_panel=1` mark is no longer needed and is left as it is). It is always on:
+
+| Attribute | Value (90 × 305 in panel, `CW_6.01_PSF` = 85) |
+| --- | --- |
+| `CW_2.00_UNIT_DIMENSION` | `90.00000x305.00000` |
+| `CW_2.01_UNIT_WIDTH` | `90.00000` (model units) |
+| `CW_2.02_UNIT_HEIGHT` | `305.00000` (model units) |
+| `CW_2.07_UNIT_AREA` | `190.625 sqf` (surface area in square feet) |
+| `CW_6.02_UNIT_WEIGHT` | `16203.125` (`CW_6.01` × area; blank without a numeric `CW_6.01`) |
+
+Width and height are the same measurement `PCEditor` and `PCSyncSrf` use. Values refresh after a
+panel is added, copied, edited or moved onto the branch, after `CW_6.01` changes, and for all
+panels when a model opens (which marks the model modified if any value changed). The refresh runs
+when no command is active and is not a separate Undo step; Undo restores the previous values.
 
 Every save of the project's main model, `<PROJECT> - Wireframe.3dm` (the whole file name, any
 case), updates three tables in the PNL sheet. Since 1.2.1 other models of the project, such as
@@ -204,7 +226,8 @@ at any of the four prompts exits before attributes are written.
 version 1.0.80 it also writes `CW_2.00_UNIT_DIMENSION`, `CW_2.01_UNIT_WIDTH`, and
 `CW_2.02_UNIT_HEIGHT` from each panel's local extents, using invariant five-decimal
 values (`widthxheight` for the combined dimension). Existing dimension values are
-refreshed. Rerunning PCCreate still resets generated grid and cell assignments.
+refreshed. Rerunning PCCreate resets the generated grid; since 1.2.4 it no longer writes or deletes cell
+assignments (see *Cladding configuration* below).
 Since version 1.0.81, its intermediate tracks start segmented even when a guide
 spans multiple cells. Guide coverage still determines missing segments; guide
 continuity does not create a merge mask. Merge explicitly in PCEditor or apply
@@ -247,9 +270,28 @@ Managed extrusion curves use object colors by planned type: main-frame curves ar
 intermediate curves are DarkGreen (`RGB 0,100,0`). `PCSpawnCrv` applies the colors to new curves,
 while `PCUpdate` and `PCSyncCrv` correct existing curves within the selected-panel scope.
 
-Panel cladding saves persist material-independent cell ownership under
-`CW_9.01_CLADDING_LOGIC` (`CW_2.13_CLADDING_LOGIC` before 1.1.0). This key stores ownership
-JSON, separate from the hidden segments in `CW_9.02_FRAME_CONFIG`. `PCSyncSrf` combines that saved owner graph with current Rhino surface
+Panel cladding saves persist cell ownership and materials under
+`UD_CLADDING_LOGIC` (`CW_9.01_CLADDING_LOGIC` in 1.1.0–1.2.1, `CW_2.13_CLADDING_LOGIC` before).
+This key stores the cladding JSON, separate from the hidden segments in `UD_FRAME_CONFIG`.
+
+### Cladding configuration (1.2.4)
+
+`UD_CLADDING_LOGIC` is the only cladding the plug-in reads. Each cell holds its material code
+(owner cell), its owner's label (member cell) or `""` (unassigned). The `CW_4.xx_CLADDING_*` keys
+are still written on every cladding save, as output for schedules and scripts, but are never read:
+their number or content cannot stop a panel from loading.
+
+- Unconfigured panel (no `UD_CLADDING_LOGIC`): it loads from the `CW_2.03`/`CW_2.04` offsets
+  alone, with blank cells. `PCCreate` writes no `CW_4` placeholders or logic and leaves any
+  `CW_4` keys already on the panel untouched; `PCSyncCrv` leaves its cladding keys alone;
+  `PCMatchSrf` refuses it as a source.
+- Configured panel: the logic must name exactly the cells of the H/V grid
+  (`PANEL_CLADDING_LOGIC_GRID_MISMATCH` otherwise), and `UD_FRAME_CONFIG` must fit H/V as before.
+  Rerunning `PCCreate` keeps the logic when the grid size is unchanged and deletes it when the
+  grid size changed. In `PCEditor`, a grid-size change on a configured panel must be saved with
+  Save Both.
+- Logic saved before 1.2.4 holds ownership only; such a panel takes its owner materials from its
+  `CW_4` keys once, and the next cladding write stores them in the logic. `PCSyncSrf` combines that saved owner graph with current Rhino surface
 coverage and material layers, while edited splits and merges remain geometry-authoritative.
 
 Since version 1.0.85, panel roles come from `CW_1.06_UNIT_TYPE` (since 1.1.0 together
@@ -312,7 +354,8 @@ The old identity/workbook utilities remain dormant for a future design decision.
 
 From 1.0.96 to 1.0.99, frame configuration was stored as versioned JSON in
 `CW_1.08_FRAME_CONFIG`: `{"v":1,"delete":"<mask>","merge":"<mask>","hide":"<mask>"}`.
-Since 1.1.0 it is the readable `CW_9.02_FRAME_CONFIG` text plus the `CW_1.08` code; the JSON
+Since 1.1.0 it is the readable `UD_FRAME_CONFIG` text (`CW_9.02_FRAME_CONFIG` before 1.2.2)
+plus the `CW_1.08` code; the JSON
 form is still read and is converted the next time the panel is written.
 Each field retains the existing mask encoding and grid dimensions, including the
 delete mask's original polarity. A saved default grid also gets a complete config.

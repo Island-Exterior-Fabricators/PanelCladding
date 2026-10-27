@@ -21,12 +21,18 @@ public sealed partial class PanelCladdingKeyService
     public const string SegmentMaskKey = "CW_2.12_DELETE_MASK";
     public const string MergeMaskKey = "CW_2.10_MERGE_MASK";
     public const string HideMaskKey = "CW_2.11_HIDE_MASK";
-    public const string CladdingLogicKey = "CW_9.01_CLADDING_LOGIC";
+    public const string CladdingLogicKey = "UD_CLADDING_LOGIC";
     public const string LegacyCladdingLogicKey = "CW_2.13_CLADDING_LOGIC";
-    public const string FrameConfigBackupKey = "CW_9.02_FRAME_CONFIG";
+    public const string FrameConfigBackupKey = "UD_FRAME_CONFIG";
+    // The UD_ series replaced CW_9.xx in 1.2.2; panels not written since still carry these.
+    public const string LegacyUserDefinedCladdingLogicKey = "CW_9.01_CLADDING_LOGIC";
+    public const string LegacyUserDefinedFrameConfigKey = "CW_9.02_FRAME_CONFIG";
     public const string UnitDimensionKey = "CW_2.00_UNIT_DIMENSION";
     public const string UnitWidthKey = "CW_2.01_UNIT_WIDTH";
     public const string UnitHeightKey = "CW_2.02_UNIT_HEIGHT";
+    public const string UnitAreaKey = "CW_2.07_UNIT_AREA";
+    public const string PsfKey = "CW_6.01_PSF";
+    public const string UnitWeightKey = "CW_6.02_UNIT_WEIGHT";
     public const string WorkbookPathDocumentKey = "PanelCladdingEditor.WorkbookPath";
     public const string PersistedBlankCellValue = " ";
     private const byte TopologyPayloadVersion = 1;
@@ -70,16 +76,30 @@ public sealed partial class PanelCladdingKeyService
             return OperationResponse<PanelCladdingKeySet>.Fail(vertical.Message);
         }
 
+        OperationResponse<IReadOnlyDictionary<string, string>> cellValues = ReadCladdingCellValues(userText);
+        if (!cellValues.Success || cellValues.Data is null)
+        {
+            return OperationResponse<PanelCladdingKeySet>.Fail(cellValues.Message);
+        }
         OperationResponse<PanelCladdingKeySet> keySet = CreateKeySet(
             horizontal.Data,
             vertical.Data,
-            userText,
+            cellValues.Data,
             panelWidth,
             panelHeight,
             tolerance);
         if (!keySet.Success || keySet.Data is null)
         {
             return keySet;
+        }
+        bool claddingConfigured = IsCladdingConfigured(userText);
+        if (claddingConfigured && !cellValues.Data.Keys.ToHashSet(StringComparer.OrdinalIgnoreCase)
+                .SetEquals(keySet.Data.Cells.Select(cell => cell.UserTextKey)))
+        {
+            return OperationResponse<PanelCladdingKeySet>.Fail(
+                $"PANEL_CLADDING_LOGIC_GRID_MISMATCH: {CladdingLogicKey} has {cellValues.Data.Count} cells but the " +
+                $"{horizontal.Data.Count}H {vertical.Data.Count}V grid has {keySet.Data.Cells.Count}. " +
+                "Save cladding in PCEditor, or re-run PCCreate to clear the stale logic.");
         }
         OperationResponse<PanelCladdingTopologyState> topology = DecodeTopology(
             userText,
@@ -105,8 +125,39 @@ public sealed partial class PanelCladdingKeyService
             VerticalOffsets = keySet.Data.VerticalOffsets,
             Cells = keySet.Data.Cells,
             Topology = topology.Data,
-            FrameAssignments = frameAssignments.Data
+            FrameAssignments = frameAssignments.Data,
+            CladdingConfigured = claddingConfigured
         });
+    }
+
+    // A panel's cladding is configured once a plug-in write stored UD_CLADDING_LOGIC (or CW_9.01).
+    public static bool IsCladdingConfigured(IReadOnlyDictionary<string, string> userText) =>
+        ReadUserDefinedValue(userText, CladdingLogicKey).Length > 0;
+
+    // Cell values keyed by CW_4.xx name, read from UD_CLADDING_LOGIC; empty while unconfigured.
+    // CW_4.xx is output only. The one exception is logic written before 1.2.4, which holds no
+    // materials: each root cell then takes its material from its own CW_4.xx key until rewritten.
+    public OperationResponse<IReadOnlyDictionary<string, string>> ReadCladdingCellValues(
+        IReadOnlyDictionary<string, string> userText)
+    {
+        OperationResponse<IReadOnlyDictionary<string, string>> logic =
+            new PanelCladdingLogicService().DecodeValues(ReadUserDefinedValue(userText, CladdingLogicKey));
+        if (!logic.Success || logic.Data is null)
+        {
+            return logic;
+        }
+        bool legacy = !PanelCladdingLogicService.HasMaterials(logic.Data);
+        var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach ((string label, string value) in logic.Data)
+        {
+            Match cell = CellLabelPartsRegex().Match(label);
+            string key = GetCellKey(int.Parse(cell.Groups[1].Value, CultureInfo.InvariantCulture), cell.Groups[2].Value);
+            string legacyMaterial = legacy && value.Length == 0
+                ? userText.FirstOrDefault(item => string.Equals(item.Key, key, StringComparison.OrdinalIgnoreCase)).Value?.Trim() ?? string.Empty
+                : string.Empty;
+            values[key] = legacyMaterial.Length > 0 && !IsCellLabelToken(legacyMaterial) ? legacyMaterial : value;
+        }
+        return OperationResponse<IReadOnlyDictionary<string, string>>.Ok(values);
     }
 
     public OperationResponse<PanelCladdingKeySet> CreateKeySet(
@@ -195,6 +246,7 @@ public sealed partial class PanelCladdingKeyService
             string.Equals(key, LegacySignatureKey, StringComparison.OrdinalIgnoreCase) ||
             string.Equals(key, CladdingLogicKey, StringComparison.OrdinalIgnoreCase) ||
             string.Equals(key, LegacyCladdingLogicKey, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(key, LegacyUserDefinedCladdingLogicKey, StringComparison.OrdinalIgnoreCase) ||
             string.Equals(key, FrameTypeKey, StringComparison.OrdinalIgnoreCase) ||
             string.Equals(key, LegacyFrameAssignmentsKey, StringComparison.OrdinalIgnoreCase) ||
             string.Equals(key, LegacyFrameTypologyKey, StringComparison.OrdinalIgnoreCase) ||
@@ -215,6 +267,7 @@ public sealed partial class PanelCladdingKeyService
     public static bool IsTopologyKey(string key) =>
         string.Equals(key, FrameConfigKey, StringComparison.OrdinalIgnoreCase) ||
         string.Equals(key, FrameConfigBackupKey, StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(key, LegacyUserDefinedFrameConfigKey, StringComparison.OrdinalIgnoreCase) ||
         string.Equals(key, SegmentMaskKey, StringComparison.OrdinalIgnoreCase) ||
         string.Equals(key, MergeMaskKey, StringComparison.OrdinalIgnoreCase) ||
         string.Equals(key, HideMaskKey, StringComparison.OrdinalIgnoreCase);
@@ -378,8 +431,9 @@ public sealed partial class PanelCladdingKeyService
         IReadOnlyDictionary<string, string> userText,
         IReadOnlyDictionary<string, string> expectedWrites)
     {
-        // CW_1.08 holds the code derived from CW_9.02 on write, so only the configuration is compared.
-        foreach (string topologyKey in new[] { FrameConfigBackupKey, SegmentMaskKey, MergeMaskKey, HideMaskKey })
+        // CW_1.08 holds the code derived from UD_FRAME_CONFIG on write, so only the configuration is
+        // compared. A stored CW_9.02 is never expected, so a legacy panel is rewritten (and renamed).
+        foreach (string topologyKey in new[] { FrameConfigBackupKey, LegacyUserDefinedFrameConfigKey, SegmentMaskKey, MergeMaskKey, HideMaskKey })
         {
             KeyValuePair<string, string>[] stored = userText
                 .Where(item => string.Equals(item.Key, topologyKey, StringComparison.OrdinalIgnoreCase))
@@ -974,5 +1028,8 @@ public sealed partial class PanelCladdingKeyService
 
     [GeneratedRegex(@"^\d+[A-Z]+$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex CellLabelRegex();
+
+    [GeneratedRegex(@"^(\d+)([A-Z]+)$", RegexOptions.CultureInvariant)]
+    private static partial Regex CellLabelPartsRegex();
 }
 

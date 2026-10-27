@@ -2,6 +2,7 @@ using System.Text.Json;
 using PanelCladdingEditor.Application.Services.PanelCladding;
 using PanelCladdingEditor.Contracts.Responses;
 using PanelCladdingEditor.Domain.Models.PanelCladding;
+using PanelCladdingTestFixtures;
 
 namespace CladdingSurfaceCoverageMetadataSmoke;
 
@@ -45,7 +46,7 @@ internal static class Program
         mergedText[PanelCladdingKeyService.GetCellKey(0, "A")] = "GLS-005";
         mergedText[PanelCladdingKeyService.GetCellKey(1, "A")] = "0A";
         PanelCladdingKeySet mergedKeys = RequireData(
-            keys.Parse(mergedText, 90d, 198d, 0.001d),
+            keys.Parse(CladdingLogicFixture.WithLogic(mergedText), 90d, 198d, 0.001d),
             "Parse merged coverage grid");
         PanelCladdingSpawnPlan merged = RequireData(
             planner.CreatePlan(mergedText, mergedKeys),
@@ -58,7 +59,7 @@ internal static class Program
         var singleText = BasePanelText();
         singleText[PanelCladdingKeyService.GetCellKey(0, "A")] = "GLS-005";
         PanelCladdingKeySet singleKeys = RequireData(
-            keys.Parse(singleText, 90d, 198d, 0.001d),
+            keys.Parse(CladdingLogicFixture.WithLogic(singleText), 90d, 198d, 0.001d),
             "Parse single-cell grid");
         PanelCladdingSpawnPlan single = RequireData(
             planner.CreatePlan(singleText, singleKeys),

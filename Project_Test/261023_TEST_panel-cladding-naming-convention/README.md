@@ -46,3 +46,6 @@ dotnet run --project Project_Test/261023_TEST_panel-cladding-naming-convention/P
 
 No Rhino native runtime is required. The save hook (`LivePanelNamingConventionSync`), the
 per-document code table and the ABC migration run inside Rhino and are recorded in the EXET.
+
+Since 1.2.2 these keys are `UD_CLADDING_LOGIC` and `UD_FRAME_CONFIG` (the smoke asserts the new
+cladding-logic name); see [the UD_ key TEST](../261027_TEST_panel-cladding-ud-keys/README.md).

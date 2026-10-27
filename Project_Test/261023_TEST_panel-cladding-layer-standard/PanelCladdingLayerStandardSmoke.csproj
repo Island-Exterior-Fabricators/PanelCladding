@@ -12,4 +12,7 @@
                       AdditionalProperties="PanelCladdingTestHost=true" />
     <None Include="abc-layer-standard.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\261027_TEST_panel-cladding-logic-authority\CladdingLogicFixture.cs" Link="CladdingLogicFixture.cs" />
+  </ItemGroup>
 </Project>

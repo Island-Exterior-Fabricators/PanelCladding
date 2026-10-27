@@ -3,6 +3,7 @@ using PanelCladdingEditor.Application.Interfaces;
 using PanelCladdingEditor.Application.Services.PanelCladding;
 using PanelCladdingEditor.Contracts.Responses;
 using PanelCladdingEditor.Domain.Models.PanelCladding;
+using PanelCladdingTestFixtures;
 
 namespace PanelCladdingSpawnSmoke;
 
@@ -29,7 +30,7 @@ internal static class Program
             [PanelCladdingKeyService.GetCellKey(1, "B")] = string.Empty
         };
 
-        PanelCladdingKeySet keySet = RequireData(keys.Parse(panelText, 100d, 100d, 0.001d), "Parse grid");
+        PanelCladdingKeySet keySet = RequireData(keys.Parse(CladdingLogicFixture.WithLogic(panelText), 100d, 100d, 0.001d), "Parse grid");
         PanelCladdingSpawnPlan plan = RequireData(planner.CreatePlan(panelText, keySet), "Create spawn plan");
         Require(plan.PanelId == "W3-06-42", "PID was not normalized for CID authority.");
         Require(plan.Regions.Count == 3, "Blank cladding cells must not create surfaces.");
@@ -122,7 +123,7 @@ internal static class Program
         {
             [PanelCladdingKeyService.GetCellKey(0, "A")] = "GL::01"
         };
-        PanelCladdingKeySet invalidKeySet = RequireData(keys.Parse(invalidMaterial, 100d, 100d, 0.001d), "Parse invalid layer fixture");
+        PanelCladdingKeySet invalidKeySet = RequireData(keys.Parse(CladdingLogicFixture.WithLogic(invalidMaterial), 100d, 100d, 0.001d), "Parse invalid layer fixture");
         OperationResponse<PanelCladdingSpawnPlan> invalidMaterialResult = planner.CreatePlan(invalidMaterial, invalidKeySet);
         Require(!invalidMaterialResult.Success &&
             invalidMaterialResult.Message.Contains("MATERIAL_LAYER_NAME_INVALID", StringComparison.Ordinal),

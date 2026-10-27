@@ -1,6 +1,7 @@
 using PanelCladdingEditor.Application.Services.PanelCladding;
 using PanelCladdingEditor.Contracts.Responses;
 using PanelCladdingEditor.Domain.Models.PanelCladding;
+using PanelCladdingTestFixtures;
 
 namespace PanelCladdingMatchTopologyMasksSmoke;
 
@@ -139,7 +140,7 @@ internal static class Program
             Height = 100d,
             ModelTolerance = 0.001d
         },
-        UserText = new Dictionary<string, string>(userText, StringComparer.OrdinalIgnoreCase)
+        UserText = CladdingLogicFixture.WithLogic(userText)
     };
 
     private static bool IsOffsetKey(string key) =>

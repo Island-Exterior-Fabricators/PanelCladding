@@ -14,7 +14,7 @@ namespace PanelCladdingEditor.Infrastructure.Rhino.Live.PanelCladding;
 
 // Updates the PNL sheet of "<PROJECT> - Naming Convention.xlsx" after every save of the main
 // model "<PROJECT> - Wireframe.3dm". Other models of the project only read the sheet (format and
-// reserved codes). The model keeps the codes (CW_1.08 + CW_9.02 backup), so a locked sheet only
+// reserved codes). The model keeps the codes (CW_1.08 + UD_FRAME_CONFIG backup), so a locked sheet only
 // delays the update to the next save. The document is never modified from here.
 internal static class LivePanelNamingConventionSync
 {
@@ -156,9 +156,9 @@ internal static class LivePanelNamingConventionSync
                 string.Equals(item.Key, key, StringComparison.OrdinalIgnoreCase)).Value ?? string.Empty).Trim();
             string unitType = Value(PanelCladdingCidService.UnitTypeUserTextKey).ToUpperInvariant();
             if (PanelNamingConventionService.UnitTypeCodes.Any(item => item.Code == unitType)) unitTypes.Add(unitType);
-            // The configuration is authoritative: a panel uses the code of its CW_9.02 text.
+            // The configuration is authoritative: a panel uses the code of its UD_FRAME_CONFIG text.
             string frameCode = Value(PanelCladdingKeyService.FrameConfigKey);
-            string config = Value(PanelCladdingKeyService.FrameConfigBackupKey);
+            string config = PanelCladdingKeyService.ReadUserDefinedValue(userText, PanelCladdingKeyService.FrameConfigBackupKey).Trim();
             if (PanelFrameConfigFormat.IsFormatted(config) && registry.TryGetCode(config, out string configCode))
             {
                 frameCodes.Add(configCode);

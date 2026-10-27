@@ -24,4 +24,7 @@
       <Private>true</Private>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\261027_TEST_panel-cladding-logic-authority\CladdingLogicFixture.cs" Link="CladdingLogicFixture.cs" />
+  </ItemGroup>
 </Project>

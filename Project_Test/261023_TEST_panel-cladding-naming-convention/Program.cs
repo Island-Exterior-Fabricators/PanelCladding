@@ -85,12 +85,12 @@ internal static partial class Program
 
         IReadOnlyDictionary<string, string> writes = Required(new PanelCladdingKeyService().EncodeFrameConfigurationUserText(topology, 2, 1));
         Require(writes.Count == 1 && writes[PanelCladdingKeyService.FrameConfigBackupKey] == text,
-            "Planners write the readable configuration to CW_9.02_FRAME_CONFIG only.");
+            "Planners write the readable configuration to UD_FRAME_CONFIG only.");
         Require(PanelCladdingKeyService.TopologyPersistenceMatches(
                 new Dictionary<string, string> { [PanelCladdingKeyService.FrameConfigBackupKey] = text, [PanelCladdingKeyService.FrameConfigKey] = "AA" },
                 writes),
             "The derived CW_1.08 code does not count as a topology mismatch.");
-        Console.WriteLine("[OK] CW_9.02 holds a readable lossless frame config: " + text);
+        Console.WriteLine("[OK] UD_FRAME_CONFIG holds a readable lossless frame config: " + text);
     }
 
     private static void VerifyLegacyFrameConfigConversion()
@@ -114,14 +114,14 @@ internal static partial class Program
         {
             [PanelCladdingKeyService.FrameConfigKey] = "AA", [PanelCladdingKeyService.FrameConfigBackupKey] = "1H 1V | delete A1"
         };
-        Require(Same(Required(service.DecodeTopology(coded, 1, 1)), topology), "A coded panel decodes from its CW_9.02 backup.");
+        Require(Same(Required(service.DecodeTopology(coded, 1, 1)), topology), "A coded panel decodes from its UD_FRAME_CONFIG backup.");
         RequireFailure(service.DecodeTopology(coded, 2, 1), "PANEL_FRAME_CONFIG_GRID_MISMATCH");
         RequireFailure(service.DecodeTopology(new Dictionary<string, string> { [PanelCladdingKeyService.FrameConfigKey] = "AA" }, 1, 1),
             "PANEL_FRAME_CONFIG_BACKUP_MISSING");
         Require(service.IsClearableCladdingAssignmentKey(PanelCladdingKeyService.LegacyCladdingLogicKey) &&
-                PanelCladdingKeyService.CladdingLogicKey == "CW_9.01_CLADDING_LOGIC",
-            "Cladding logic moved to CW_9.01; the retired CW_2.13 key is cleaned up.");
-        Console.WriteLine("[OK] JSON configs convert, codes read from CW_9.02, cladding logic is CW_9.01");
+                PanelCladdingKeyService.CladdingLogicKey == "UD_CLADDING_LOGIC",
+            "Cladding logic moved to UD_CLADDING_LOGIC (1.2.2); the retired CW_2.13 key is cleaned up.");
+        Console.WriteLine("[OK] JSON configs convert, codes read from UD_FRAME_CONFIG, cladding logic is UD_CLADDING_LOGIC");
     }
 
     private static void VerifyNamingFormat()

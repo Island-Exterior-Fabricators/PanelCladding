@@ -416,7 +416,7 @@ public sealed class LivePanelCladdingSurfaceSyncRepository : ILivePanelCladdingS
                 horizontalOffsets,
                 verticalOffsets,
                 scope == PanelCladdingObjectScope.Curves
-                    ? panel.UserText
+                    ? _keys.ReadCladdingCellValues(panel.UserText).Data ?? new Dictionary<string, string>()
                     : new Dictionary<string, string>(),
                 panel.Layout.Width,
                 panel.Layout.Height,
@@ -922,7 +922,8 @@ public sealed class LivePanelCladdingSurfaceSyncRepository : ILivePanelCladdingS
             string?[] existingKeys = proposed.GetUserStrings()?.AllKeys ?? Array.Empty<string?>();
             foreach (string? key in existingKeys)
             {
-                if (key is not null && (_keys.IsOffsetKey(key) || _keys.IsCladdingCellKey(key) ||
+                if (key is not null && (_keys.IsOffsetKey(key) ||
+                    (panelWrite.WritesCladding && _keys.IsCladdingCellKey(key)) ||
                     PanelCladdingKeyService.IsTopologyKey(key) ||
                     PanelCladdingKeyService.IsRetiredFrameKey(key) ||
                     string.Equals(key, PanelCladdingKeyService.FrameTypeKey, StringComparison.OrdinalIgnoreCase) ||
@@ -952,14 +953,17 @@ public sealed class LivePanelCladdingSurfaceSyncRepository : ILivePanelCladdingS
                     PanelCladdingKeyService.GetVerticalOffsetKey(index),
                     PanelCladdingKeyService.FormatOffset(panelWrite.VerticalOffsets[index]));
             }
-            foreach ((string key, string value) in panelWrite.CellValues)
+            if (panelWrite.WritesCladding)
             {
-                proposed.SetUserString(key, value);
+                foreach ((string key, string value) in panelWrite.CellValues)
+                {
+                    proposed.SetUserString(key, value);
+                }
+                DeleteUserTextCaseInsensitive(proposed, PanelCladdingKeyService.CladdingLogicKey);
+                proposed.SetUserString(
+                    PanelCladdingKeyService.CladdingLogicKey,
+                    panelWrite.CladdingLogic);
             }
-            DeleteUserTextCaseInsensitive(proposed, PanelCladdingKeyService.CladdingLogicKey);
-            proposed.SetUserString(
-                PanelCladdingKeyService.CladdingLogicKey,
-                panelWrite.CladdingLogic);
             foreach ((string key, string value) in topology.Data)
             {
                 proposed.SetUserString(key, value);

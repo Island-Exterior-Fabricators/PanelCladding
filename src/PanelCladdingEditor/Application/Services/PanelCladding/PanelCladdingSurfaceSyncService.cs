@@ -84,6 +84,11 @@ public sealed class PanelCladdingSurfaceSyncService : IPanelCladdingSurfaceSyncS
             {
                 return OperationResponse<PanelCladdingSurfaceSyncResult>.Fail(topology.Message);
             }
+            if (!panel.WritesCladding)
+            {
+                persistedCellValues[panel.ObjectId] = new Dictionary<string, string>();
+                continue;
+            }
             OperationResponse<PanelCladdingRegionSet> regions = _regions.Resolve(panel.Layout.Cells, panel.CellValues);
             if (!regions.Success)
             {
@@ -114,6 +119,7 @@ public sealed class PanelCladdingSurfaceSyncService : IPanelCladdingSurfaceSyncS
                 // Preserve the exact geometry-derived owner/parent graph produced by PCSyncSrf.
                 CellValues = persistedCellValues[panel.ObjectId],
                 CladdingLogic = panel.CladdingLogic,
+                WritesCladding = panel.WritesCladding,
                 UnitWidth = PanelCladdingKeyService.FormatUnitDimension(panel.Layout.Width),
                 UnitHeight = PanelCladdingKeyService.FormatUnitDimension(panel.Layout.Height),
                 UnitDimension = $"{PanelCladdingKeyService.FormatUnitDimension(panel.Layout.Width)}x{PanelCladdingKeyService.FormatUnitDimension(panel.Layout.Height)}"
@@ -180,6 +186,10 @@ public sealed class PanelCladdingSurfaceSyncService : IPanelCladdingSurfaceSyncS
                     $"PANEL_CLADDING_SURFACE_SYNC_CELL_WRITE_MISMATCH: {key}: " +
                     $"expected '{expected}', actual '{value ?? "<missing>"}'");
             }
+        }
+        if (!plannedWrite.WritesCladding)
+        {
+            return OperationResponse.Ok();
         }
         if (!actual.TryGetValue(PanelCladdingKeyService.CladdingLogicKey, out string? logic) ||
             !string.Equals(logic, plannedWrite.CladdingLogic, StringComparison.Ordinal))
