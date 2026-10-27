@@ -138,7 +138,7 @@ internal static class Program
             DocumentRuntimeSerialNumber = 1,
             DocumentPath = "C:/test/blank-cell-persistence.3dm",
             ObjectName = "BLANK_CELL_TEST",
-            LayerFullPath = "01_CW Panels::Surfaces-PNL::WT-01",
+            LayerFullPath = "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - WT-01",
             SystemCode = "WT01",
             GeometryFingerprint = "blank-cell-persistence-fingerprint",
             GeometryClass = PanelGeometryClass.Planar,

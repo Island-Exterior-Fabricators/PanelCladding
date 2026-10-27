@@ -9,7 +9,7 @@ internal static class Program
 {
     private static readonly Guid PanelId =
         Guid.Parse("54000000-0000-0000-0000-000000000001");
-    private const string Pid = "PID_PARENT_PERSISTENCE_01";
+    private const string Pid = "PID-PARENT-PERSISTENCE-01";
     private const string Material = "MPL-001";
 
     private static void Main()
@@ -126,7 +126,7 @@ internal static class Program
                 {
                     ObjectId = PanelId,
                     PanelId = Pid,
-                    PanelCid = "CID_PARENT_PERSISTENCE_01",
+                    PanelCid = "CID-PARENT-PERSISTENCE-01",
                     Layout = layout,
                     GridChanged = true
                 }

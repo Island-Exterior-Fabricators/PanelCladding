@@ -22,7 +22,8 @@ internal static class Program
             ["PanelCladdingSyncCrvCommand"] = "PCSyncCrv",
             ["PanelCladdingSyncSrfCommand"] = "PCSyncSrf",
             ["PanelCladdingUpdateCommand"] = "PCUpdate",
-            ["PanelCladdingPidCommand"] = "PCpid"
+            ["PanelCladdingPidCommand"] = "PCpid",
+            ["PanelCladdingTemplatePnlCommand"] = "PCtemplatePNL"
         };
 
     private static int Main()
@@ -34,7 +35,7 @@ internal static class Program
             VerifyRegisteredNames(repositoryRoot);
             VerifyPackageMetadata(repositoryRoot);
 
-            Console.WriteLine("[OK] All twelve user-facing PanelCladdingEditor Rhino commands use the PC prefix.");
+            Console.WriteLine("[OK] All thirteen user-facing PanelCladdingEditor Rhino commands use the PC prefix.");
             Console.WriteLine("[OK] No legacy PanelCladding-prefixed command alias remains registered.");
             Console.WriteLine("[OK] Command GUIDs remain explicit and unique, and package metadata names PCEditor only.");
             return 0;

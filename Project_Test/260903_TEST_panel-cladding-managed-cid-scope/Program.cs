@@ -14,40 +14,44 @@ internal static class Program
     private static void VerifyManagedLayerPredicates()
     {
         Require(
-            PanelCladdingSpawnPlanningService.IsManagedSurfaceLayerPath("04_STEP Surfaces"),
+            PanelCladdingSpawnPlanningService.IsManagedSurfaceLayerPath("Reference::Surfaces - STEP"),
             "The canonical STEP root must be managed.");
         Require(
             PanelCladdingSpawnPlanningService.IsManagedSurfaceLayerPath(
-                "04_STEP Surfaces::Surfaces-Glass::GL01"),
+                "Reference::Surfaces - STEP::Surfaces - GLS::GLS-001"),
             "A canonical STEP descendant must be managed.");
         Require(
             !PanelCladdingSpawnPlanningService.IsManagedSurfaceLayerPath(
-                "03_Material Surfaces (STEP)::Surfaces-Glass::GL01"),
-            "The legacy STEP tree must no longer participate in live sync or CID conflicts.");
+                "04_STEP Surfaces::Surfaces-Glass::GL01"),
+            "The retired STEP tree must no longer participate in live sync or CID conflicts.");
         Require(
             !PanelCladdingSpawnPlanningService.IsManagedSurfaceLayerPath(
-                "04_STEP Surfaces Detail::GL01"),
+                "Reference::Surfaces - STEP Detail::GLS-001"),
             "A similar surface-layer prefix must not cross the segment boundary.");
         Require(
             !PanelCladdingSpawnPlanningService.IsManagedSurfaceLayerPath(
-                "05_Detail Geometry::Panels"),
-            "A detail-modeling layer must not be managed surface output.");
+                "ABC-IEF-Wireframe::Surfaces - GLS::GLS-001"),
+            "Wireframe material surfaces must not be managed surface output.");
 
         Require(
-            PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath("02_CW Extrusions"),
+            PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath("ABC-IEF-Wireframe::Curves - PNL"),
             "The canonical extrusion root must be managed.");
         Require(
             PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath(
-                "02_CW Extrusions::Curves-PNL::WT-04"),
+                "ABC-IEF-Wireframe::Curves - PNL::Curves - WT_04"),
             "A canonical extrusion descendant must be managed.");
         Require(
             !PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath(
-                "02_CW Extrusions Detail::WT-04"),
+                "ABC-IEF-Wireframe::Curves - PNL Detail::Curves - WT_04"),
             "A similar extrusion-layer prefix must not cross the segment boundary.");
         Require(
             !PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath(
-                "05_Detail Geometry::Extrusions"),
-            "A detail-modeling layer must not be managed extrusion output.");
+                "02_CW Extrusions::Curves-PNL::WT-04"),
+            "The retired extrusion tree must not be managed extrusion output.");
+        Require(
+            !PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath(
+                "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04"),
+            "Source panel layers must not be managed extrusion output.");
         Console.WriteLine("[OK] managed layer predicates accept only canonical roots and descendants");
     }
 
@@ -72,7 +76,7 @@ internal static class Program
             "Surface CID conflicts are not limited by geometry class and managed STEP layer.");
         Require(
             source.Contains("PanelCladdingObjectScope.Curves => rhinoObject.Geometry is Curve", StringComparison.Ordinal) &&
-            source.Contains("IsManagedExtrusionLayerPath(layerPath)", StringComparison.Ordinal),
+            source.Contains("IsManagedExtrusionLayerPath(layerPath,", StringComparison.Ordinal),
             "Curve CID conflicts are not limited by geometry class and managed extrusion layer.");
         Console.WriteLine("[OK] spawn CID conflicts are filtered by scope, geometry class, and managed root");
     }
@@ -92,12 +96,12 @@ internal static class Program
             source.Contains("IsManagedSurfaceLayerPath(layerPath)", StringComparison.Ordinal),
             "Live surface sync does not use the canonical STEP managed-root predicate.");
         Require(
-            source.Contains("IsManagedExtrusionLayerPath(layerPath)", StringComparison.Ordinal),
+            source.Contains("IsManagedExtrusionLayerPath(layerPath,", StringComparison.Ordinal),
             "Live curve sync does not use the canonical extrusion managed-root predicate.");
         Require(
             !source.Contains("IsUnderMaterialSurfaceRoot", StringComparison.Ordinal),
             "Legacy material-root discovery remains in the live sync repository.");
-        Console.WriteLine("[OK] sync discovery is restricted to 04_STEP Surfaces and 02_CW Extrusions");
+        Console.WriteLine("[OK] sync discovery is restricted to Reference::Surfaces - STEP and <PROJECT>-IEF-Wireframe::Curves - PNL");
     }
 
     private static string FindRepositoryRoot()

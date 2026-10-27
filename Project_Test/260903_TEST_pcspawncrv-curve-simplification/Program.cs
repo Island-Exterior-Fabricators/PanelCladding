@@ -36,29 +36,29 @@ internal static class Program
     {
         string wallTypeLayer = Required(
             PanelCladdingExtrusionPlanningService.ResolveCurveLayerPath(
-                "01_CW Panels::Surfaces-PNL::WT-04"),
-            "resolve WT-04 curve layer");
+                "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04"),
+            "resolve WT_04 curve layer");
         Require(
-            wallTypeLayer == "02_CW Extrusions::Curves-PNL::WT-04",
-            $"Unexpected WT-04 curve layer: {wallTypeLayer}");
+            wallTypeLayer == "ABC-IEF-Wireframe::Curves - PNL::Curves - WT_04",
+            $"Unexpected WT_04 curve layer: {wallTypeLayer}");
 
         string nestedLayer = Required(
             PanelCladdingExtrusionPlanningService.ResolveCurveLayerPath(
-                "01_CW Panels::Surfaces-PNL::Tower A::WT-09"),
+                "ABC-IEF-Wireframe::Surfaces - PNL::Tower A::Surfaces - WT_09"),
             "resolve nested curve layer");
         Require(
-            nestedLayer == "02_CW Extrusions::Curves-PNL::Tower A::WT-09",
+            nestedLayer == "ABC-IEF-Wireframe::Curves - PNL::Tower A::Curves - WT_09",
             $"Nested panel layer suffix was not preserved: {nestedLayer}");
 
         Require(
             !PanelCladdingExtrusionPlanningService.ResolveCurveLayerPath(
-                "01_CW Panels::Surfaces-PNL").Success,
+                "ABC-IEF-Wireframe::Surfaces - PNL").Success,
             "The root-only panel layer must not silently become an untyped curve layer.");
         Require(
             !PanelCladdingExtrusionPlanningService.ResolveCurveLayerPath(
-                "01_CW Panels::Other::WT-04").Success,
+                "ABC-IEF-Wireframe::Other::Surfaces - WT_04").Success,
             "An unrelated panel layer must not be accepted.");
-        Console.WriteLine("[OK] panel Surfaces-PNL suffix maps to the corresponding Curves-PNL suffix");
+        Console.WriteLine("[OK] panel Surfaces - PNL type layers map to the corresponding Curves - PNL type layers");
     }
 
     private static void VerifyPlanLayerAssignment()
@@ -72,18 +72,18 @@ internal static class Program
         };
         IReadOnlyList<PanelCladdingExtrusionCurvePlan> plan = Required(
             new PanelCladdingExtrusionPlanningService().CreatePlan(
-                "PID_TEST",
-                "CID_TEST",
+                "PID-TEST",
+                "CID-TEST",
                 100d,
                 80d,
                 keySet,
-                "01_CW Panels::Surfaces-PNL::WT-04"),
-            "plan WT-04 curves");
+                "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04"),
+            "plan WT_04 curves");
         Require(plan.Count == 4, $"Expected four frame curves, got {plan.Count}.");
         Require(
-            plan.All(item => item.LayerPath == "02_CW Extrusions::Curves-PNL::WT-04"),
+            plan.All(item => item.LayerPath == "ABC-IEF-Wireframe::Curves - PNL::Curves - WT_04"),
             "Not every planned curve received the source panel's corresponding type layer.");
-        Console.WriteLine("[OK] every planned curve carries its corresponding Curves-PNL type layer");
+        Console.WriteLine("[OK] every planned curve carries its corresponding Curves - PNL type layer");
     }
 
     private static void VerifyControlPointReduction()

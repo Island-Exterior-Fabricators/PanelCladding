@@ -27,7 +27,8 @@ Check(blankWrites.Count(p => p.Value == " ") == 23 && blankWrites.All(p => p.Val
 Console.WriteLine("[OK] all 30 keys, 23 persisted blanks and seven generated values");
 
 var text = expectedKeys.ToDictionary(k => k.ToLowerInvariant(), k => "preserve:" + k);
-text["cw_1.06_unit_type"] = " CORNER_CHILD ";
+text["cw_1.06_unit_type"] = " l ";
+text["cw_5.00_definition_a"] = "Child";
 text["cw_1.05_lot"] = " Lot 12 ";
 text["CW_1.05_LOT"] = "";
 text["unrelated"] = "keep";
@@ -38,7 +39,7 @@ var writes = Required(setup.CreateWrites(assignment, panel));
 string[] generated = ["CW_1.01_PID", "CW_1.02_CID", "CW_1.03_ELEVATION", "CW_1.04_LEVEL",
     "CW_2.00_UNIT_DIMENSION", "CW_2.01_UNIT_WIDTH", "CW_2.02_UNIT_HEIGHT"];
 Check(expectedKeys.Except(generated).All(k => writes[k] == text[k.ToLowerInvariant()]), "Existing non-generated values preserved byte-for-byte");
-Check(writes["CW_1.02_CID"] == "CID_ABC_N1_01_01-C", "CID agrees with retained unit role");
+Check(writes["CW_1.02_CID"] == "CID-ABC-N1-01-01_C", "CID agrees with retained unit role");
 Check(!writes.ContainsKey("unrelated") && before == JsonSerializer.Serialize(panel), "Unrelated text is outside writes and source is immutable");
 var applied = Apply(text, writes);
 Check(expectedKeys.All(applied.ContainsKey) && applied.Count == 31 && applied["unrelated"] == "keep", "Canonical merge retains all keys plus unrelated text");
@@ -48,9 +49,19 @@ Check(Same(applied, Apply(applied, repeatWrites)), "Repeat is idempotent");
 var conflict = panel with { UserText = new Dictionary<string, string>(text) { ["CW_1.05_LOT"] = "different" } };
 Check(!setup.CreateWrites(Plan(conflict), conflict).Success, "Conflicting case variants rejected");
 var ambiguousRole = panel with { UserText = new Dictionary<string, string>
-    { ["CW_1.06_UNIT_TYPE"] = "", ["cw_1.06_unit_type"] = "corner_parent" } };
+    { ["CW_1.06_UNIT_TYPE"] = "", ["cw_1.06_unit_type"] = "L", ["CW_5.00_DEFINITION_A"] = "Parent" } };
 Check(!setup.CreateWrites(Plan(ambiguousRole), ambiguousRole).Success, "Canonicalized role cannot silently disagree with CID");
-Console.WriteLine("[OK] existing values, role CID, canonical casing, repeat stability and conflict preflight");
+var flat = panel with { UserText = new Dictionary<string, string>(text) { ["cw_1.06_unit_type"] = "F", ["cw_5.00_definition_a"] = "Glass note" } };
+var flatWrites = Required(setup.CreateWrites(Plan(flat), flat));
+Check(flatWrites["CW_5.00_DEFINITION_A"] == "Parent" && flatWrites["CW_5.00_DEFINITION_B"] == "Glass note" &&
+    flatWrites["CW_5.00_DEFINITION_C"] == text["cw_5.00_definition_b"] &&
+    flatWrites["CW_5.00_DEFINITION_E"] == text["cw_5.00_definition_d"] && flatWrites["CW_1.02_CID"] == "CID-ABC-N1-01-01",
+    "A flat panel is Parent; a taken Definition A moves the definitions down to E");
+var formerChild = panel with { UserText = new Dictionary<string, string>(text) { ["cw_1.06_unit_type"] = "F" } };
+var formerChildWrites = Required(setup.CreateWrites(Plan(formerChild), formerChild));
+Check(formerChildWrites["CW_5.00_DEFINITION_A"] == "Parent" && !formerChildWrites.ContainsKey("CW_5.00_DEFINITION_E"),
+    "A panel changed to flat becomes Parent");
+Console.WriteLine("[OK] existing values, role CID, Definition A reservation, canonical casing, repeat stability and conflict preflight");
 
 CultureInfo previous = CultureInfo.CurrentCulture;
 try
@@ -80,7 +91,7 @@ before = JsonSerializer.Serialize(context);
 var partial = Required(planner.CreatePlan(new("ABC", [upper.ObjectId], lower.ObjectId, lower.ObjectId), context, .00001, Math.PI / 180));
 Check(partial.Panels.Count == 1 && partial.Panels[0].ObjectId == upper.ObjectId, "Only selected panel enters mutation preparation");
 writes = Required(setup.CreateWrites(partial.Panels[0], upper));
-Check(writes.Count == 30 && writes["CW_1.01_PID"] == "PID_ABC_N1_02_01" && writes["CW_2.00_UNIT_DIMENSION"] == "30.00000x20.00000", "Setup uses full-context numbering with selected dimensions");
+Check(writes.Count == 30 && writes["CW_1.01_PID"] == "PID-ABC-N1-02-01" && writes["CW_2.00_UNIT_DIMENSION"] == "30.00000x20.00000", "Setup uses full-context numbering with selected dimensions");
 Check(JsonSerializer.Serialize(context) == before, "Selected and unselected snapshots are unchanged");
 Console.WriteLine("PASS: PCpid setup metadata and dimensions");
 

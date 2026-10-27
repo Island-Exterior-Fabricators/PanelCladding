@@ -26,7 +26,7 @@ public sealed class LivePanelCladdingPidService : ILivePanelCladdingPidService
         if (document is null) return OperationResponse<IReadOnlyList<Guid>>.Fail("The target document is closed.");
         var ids = ReadContextPanels(document).Select(p => p.Id).ToArray();
         return ids.Length == 0
-            ? OperationResponse<IReadOnlyList<Guid>>.Fail($"PCpid: no panel surfaces found under {PanelCladdingPidPlanningService.PanelLayerRoot} or its sublayers.")
+            ? OperationResponse<IReadOnlyList<Guid>>.Fail($"PCpid: no panel surfaces found under {Scope(document)} or its sublayers.")
             : OperationResponse<IReadOnlyList<Guid>>.Ok(ids);
     }
 
@@ -47,7 +47,7 @@ public sealed class LivePanelCladdingPidService : ILivePanelCladdingPidService
             var contextPanels = ReadContextPanels(document);
             var contextIds = contextPanels.Select(p => p.Id).ToHashSet();
             if (selectedIds.Count == 0 || !selectedIds.IsSubsetOf(contextIds))
-                return Fail($"Select panel surfaces under {PanelCladdingPidPlanningService.PanelLayerRoot} or its sublayers.");
+                return Fail($"Select panel surfaces under {Scope(document)} or its sublayers.");
             var snapshots = new List<PanelCladdingPidPanel>();
             foreach (var panel in contextPanels)
             {
@@ -166,7 +166,12 @@ public sealed class LivePanelCladdingPidService : ILivePanelCladdingPidService
             NormalObjects = true, LockedObjects = true, HiddenObjects = true,
             ActiveObjects = true, ReferenceObjects = true,
             ObjectTypeFilter = ObjectType.Surface | ObjectType.Brep
-        }).Where(obj => PanelCladdingPidPlanningService.IsPanelLayerPath(LayerPath(document, obj.Attributes))).ToArray();
+        }).Where(obj => PanelCladdingPidPlanningService.IsPanelLayerPath(LayerPath(document, obj.Attributes), Project(document))).ToArray();
+
+    // The project root comes from the file name: ABC - Wireframe.3dm works under ABC-IEF-Wireframe.
+    private static string Project(RhinoDoc document) => PanelCladdingProjectService.CodeFromDocumentPath(document.Path);
+
+    private static string Scope(RhinoDoc document) => PanelCladdingProjectService.PanelLayerScope(Project(document));
 
     private static string LayerPath(RhinoDoc document, ObjectAttributes attributes) =>
         attributes.LayerIndex >= 0 ? document.Layers[attributes.LayerIndex]?.FullPath ?? "" : "";
@@ -175,7 +180,7 @@ public sealed class LivePanelCladdingPidService : ILivePanelCladdingPidService
     {
         string layer = LayerPath(document, attributes);
         return PanelCladdingSpawnPlanningService.IsManagedSurfaceLayerPath(layer) ||
-            PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath(layer);
+            PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath(layer, Project(document));
     }
 
     private static string ReadIdentity(ObjectAttributes attributes, string key) =>

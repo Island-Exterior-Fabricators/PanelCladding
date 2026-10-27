@@ -52,7 +52,7 @@ internal static class Program
         var keys = new PanelCladdingKeyService();
         var userText = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            [PanelCladdingSpawnPlanningService.PanelIdUserTextKey] = "PID_MERGE_MARK_01",
+            [PanelCladdingSpawnPlanningService.PanelIdUserTextKey] = "PID-MERGE-MARK-01",
             [PanelCladdingSpawnPlanningService.ReleaseUserTextKey] = "R1",
             [PanelCladdingSpawnPlanningService.WallTypeUserTextKey] = "WT01",
             [PanelCladdingKeyService.GetVerticalOffsetKey(0)] = "45",
@@ -128,7 +128,7 @@ internal static class Program
         string coverageValue,
         string legacyCoverageValue)
     {
-        const string panelPid = "PID_MERGE_MARK_01";
+        const string panelPid = "PID-MERGE-MARK-01";
         const string material = "GLS-005";
         return new PanelCladdingSurfaceSyncSnapshot
         {

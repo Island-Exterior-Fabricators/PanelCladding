@@ -5,9 +5,11 @@ namespace PanelCladdingEditor.Application.Services.PanelCladding;
 
 public sealed class PanelCladdingSpawnPlanningService
 {
-    public const string MaterialSurfaceRootLayer = "04_STEP Surfaces";
-    public const string LegacyMaterialSurfaceRootLayer = "03_Material Surfaces (STEP)";
-    public const string ExtrusionRootLayer = "02_CW Extrusions";
+    // Cladding surfaces live on Reference::Surfaces - STEP::Surfaces - <prefix>::<material>,
+    // where <prefix> is the material code's leading letters (GLS-001 -> Surfaces - GLS).
+    public const string MaterialSurfaceRootLayer = "Reference::Surfaces - STEP";
+    public const string MaterialFamilyLayerPrefix = "Surfaces - ";
+    public const string FallbackMaterialFamilyLayer = MaterialFamilyLayerPrefix + "Other";
     public const string PanelIdUserTextKey = "CW_1.01_PID";
     public const string CidUserTextKey = "CW_1.02_CID";
     // Internal release models are retained; lot is the canonical stored metadata.
@@ -56,7 +58,8 @@ public sealed class PanelCladdingSpawnPlanningService
         PanelCladdingKeySet keySet,
         double panelWidth,
         double panelHeight,
-        string sourcePanelLayerPath)
+        string sourcePanelLayerPath,
+        string? projectCode = null)
     {
         return CreatePlanCore(
             panelUserText,
@@ -64,7 +67,8 @@ public sealed class PanelCladdingSpawnPlanningService
             panelWidth,
             panelHeight,
             sourcePanelLayerPath,
-            allowEmptyRegions: false);
+            allowEmptyRegions: false,
+            projectCode);
     }
 
     private OperationResponse<PanelCladdingSpawnPlan> CreatePlanCore(
@@ -73,7 +77,8 @@ public sealed class PanelCladdingSpawnPlanningService
         double? panelWidth,
         double? panelHeight,
         string? sourcePanelLayerPath,
-        bool allowEmptyRegions)
+        bool allowEmptyRegions,
+        string? projectCode = null)
     {
         OperationResponse<KeyValuePair<string, string>> panelId = FindRequiredMetadata(
             panelUserText,
@@ -154,7 +159,7 @@ public sealed class PanelCladdingSpawnPlanningService
                 Cells = region.Cells,
                 CladdingCode = material,
                 Cid = cid,
-                LayerPath = $"{MaterialSurfaceRootLayer}::{ResolveMaterialFamilyLayer(material)}::{material}",
+                LayerPath = BuildMaterialLayerPath(material),
                 LayerColor = _configuredMaterialColors.TryGetValue(material, out PanelColorRgb configuredColor)
                     ? configuredColor
                     : ResolveMaterialLayerColor(material),
@@ -192,7 +197,8 @@ public sealed class PanelCladdingSpawnPlanningService
                     panelHeight.Value,
                     keySet,
                     sourcePanelLayerPath ?? string.Empty,
-                    release.Data.Value);
+                    release.Data.Value,
+                    projectCode);
             if (!extrusionPlan.Success || extrusionPlan.Data is null)
             {
                 return OperationResponse<PanelCladdingSpawnPlan>.Fail(extrusionPlan.Message);
@@ -210,50 +216,61 @@ public sealed class PanelCladdingSpawnPlanningService
 
     public static string ResolveMaterialFamilyLayer(string materialCode)
     {
-        string code = new string((materialCode ?? string.Empty)
+        string prefix = MaterialCodePrefix(materialCode);
+        return prefix.Length == 0
+            ? FallbackMaterialFamilyLayer
+            : MaterialFamilyLayerPrefix + prefix;
+    }
+
+    public static string BuildMaterialLayerPath(string materialCode) =>
+        $"{MaterialSurfaceRootLayer}::{ResolveMaterialFamilyLayer(materialCode)}::{materialCode}";
+
+    // Layer names follow the code prefix; the category only drives default colours and
+    // catalogue descriptions. Unrecognised prefixes have no category.
+    public static string? ResolveMaterialCategory(string materialCode)
+    {
+        string code = MaterialCodePrefix(materialCode);
+        if (code.StartsWith("GL", StringComparison.Ordinal))
+        {
+            return "Glass";
+        }
+        if (code is "AL" or "ALU" or "ACM" or "ACP" or "MPL" or "MTL" or "SS" or "STL")
+        {
+            return "Metal";
+        }
+        if (code is "STN" or "STONE" or "GR" or "GRANITE" or "MAR" or "MARBLE")
+        {
+            return "Stone";
+        }
+        if (code is "TER" or "TC" or "TERRA" or "TERRACOTTA")
+        {
+            return "Terracotta";
+        }
+        if (code is "CON" or "CONC" or "GFRC" or "GRC")
+        {
+            return "Concrete";
+        }
+        if (code is "WD" or "WOOD" or "TIM" or "TIMBER")
+        {
+            return "Wood";
+        }
+        return null;
+    }
+
+    private static string MaterialCodePrefix(string materialCode) =>
+        new string((materialCode ?? string.Empty)
             .Trim()
             .ToUpperInvariant()
             .TakeWhile(char.IsLetter)
             .ToArray());
-        if (code.StartsWith("GL", StringComparison.Ordinal))
-        {
-            return "Surfaces-Glass";
-        }
-        if (code is "AL" or "ALU" or "ACM" or "ACP" or "MPL" or "MTL" or "SS" or "STL")
-        {
-            return "Surfaces-Metal";
-        }
-        if (code is "STN" or "STONE" or "GR" or "GRANITE" or "MAR" or "MARBLE")
-        {
-            return "Surfaces-Stone";
-        }
-        if (code is "TER" or "TC" or "TERRA" or "TERRACOTTA")
-        {
-            return "Surfaces-Terracotta";
-        }
-        if (code is "CON" or "CONC" or "GFRC" or "GRC")
-        {
-            return "Surfaces-Concrete";
-        }
-        if (code is "WD" or "WOOD" or "TIM" or "TIMBER")
-        {
-            return "Surfaces-Wood";
-        }
-        return "Surfaces-Other";
-    }
-
-    public static bool IsSupportedMaterialSurfaceRoot(string layerName)
-    {
-        string normalized = layerName?.Trim() ?? string.Empty;
-        return string.Equals(normalized, MaterialSurfaceRootLayer, StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(normalized, LegacyMaterialSurfaceRootLayer, StringComparison.OrdinalIgnoreCase);
-    }
 
     public static bool IsManagedSurfaceLayerPath(string layerPath) =>
         IsAtOrBelowLayerRoot(layerPath, MaterialSurfaceRootLayer);
 
-    public static bool IsManagedExtrusionLayerPath(string layerPath) =>
-        IsAtOrBelowLayerRoot(layerPath, ExtrusionRootLayer);
+    public static bool IsManagedExtrusionLayerPath(string layerPath) => IsManagedExtrusionLayerPath(layerPath, null);
+
+    public static bool IsManagedExtrusionLayerPath(string layerPath, string? projectCode) =>
+        PanelCladdingExtrusionPlanningService.IsCurveLayerPath(layerPath, projectCode);
 
     private static bool IsAtOrBelowLayerRoot(string layerPath, string rootLayer)
     {
@@ -262,18 +279,15 @@ public sealed class PanelCladdingSpawnPlanningService
             normalized.StartsWith(rootLayer + "::", StringComparison.OrdinalIgnoreCase);
     }
 
-    public static string BuildSurfaceCid(string panelId, string cellLabel)
-    {
-        string cidBase = PanelCladdingCidService.FromPanelId(panelId);
-        return $"{cidBase}-{(cellLabel ?? string.Empty).Trim()}";
-    }
+    public static string BuildSurfaceCid(string panelId, string cellLabel) =>
+        PanelCladdingCidService.Component(PanelCladdingCidService.FromPanelId(panelId), cellLabel);
 
     public static PanelColorRgb ResolveMaterialLayerColor(string materialCode)
     {
         const int variationCount = 5;
         int variantIndex = ResolveMaterialVariantIndex(materialCode, variationCount);
-        string family = ResolveMaterialFamilyLayer(materialCode);
-        if (family == "Surfaces-Glass")
+        string? category = ResolveMaterialCategory(materialCode);
+        if (category == "Glass")
         {
             PanelColorRgb[] glassPalette =
             {
@@ -286,13 +300,13 @@ public sealed class PanelCladdingSpawnPlanningService
             return glassPalette[variantIndex];
         }
 
-        PanelColorRgb baseColor = family switch
+        PanelColorRgb baseColor = category switch
         {
-            "Surfaces-Metal" => new PanelColorRgb(110, 119, 128),
-            "Surfaces-Stone" => new PanelColorRgb(150, 132, 109),
-            "Surfaces-Terracotta" => new PanelColorRgb(158, 87, 56),
-            "Surfaces-Concrete" => new PanelColorRgb(128, 133, 130),
-            "Surfaces-Wood" => new PanelColorRgb(139, 91, 52),
+            "Metal" => new PanelColorRgb(110, 119, 128),
+            "Stone" => new PanelColorRgb(150, 132, 109),
+            "Terracotta" => new PanelColorRgb(158, 87, 56),
+            "Concrete" => new PanelColorRgb(128, 133, 130),
+            "Wood" => new PanelColorRgb(139, 91, 52),
             _ => new PanelColorRgb(120, 105, 143)
         };
         double[] lightnessOffsets = { 0.07d, -0.07d, 0.18d, -0.18d, 0d };

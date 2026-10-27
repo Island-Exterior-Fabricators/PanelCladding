@@ -48,7 +48,7 @@ internal static class Program
         IReadOnlyList<PanelCladdingExtrusionCurvePlan> curves = Required(
             new PanelCladdingExtrusionPlanningService().CreatePlan(
                 "PANEL-01", "CID-01", 100d, 200d, parsed,
-                PanelCladdingExtrusionPlanningService.PanelSurfaceLayerRootPath + "::TEST", "01"));
+                "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - TEST", "01"));
         PanelCladdingExtrusionCurvePlan[] segments = curves
             .Where(curve => curve.Kind == PanelCladdingExtrusionCurveKind.Segment).ToArray();
         Require(curves.Count == 16 && segments.Length == 12 &&
@@ -174,7 +174,7 @@ internal static class Program
                 MatchSnapshot(SourceId, sourceText, 100d, 100d),
                 [MatchSnapshot(TargetId, targetText, 180d, 240d)])).Targets.Single();
         Require(targetPlan.UserTextWrites.Count == 1 &&
-                targetPlan.UserTextWrites[PanelCladdingKeyService.FrameConfigKey] ==
+                targetPlan.UserTextWrites[PanelCladdingKeyService.FrameConfigBackupKey] ==
                     Required(keys.EncodeFrameConfiguration(sourceTopology, 2, 1)),
             "PCMatchCrv did not write the source's combined frame configuration.");
         Require(targetPlan.UserTextDeletes.All(PanelCladdingKeyService.IsTopologyKey),
@@ -233,8 +233,8 @@ internal static class Program
         {
             FrameAssignments = new Dictionary<string, IReadOnlyList<string>>
             {
-                ["FRM_0"] = ["1D-H0579", "0D-FIX", "0D-SPACED"],
-                ["FRM_3"] = ["1D-H0579"]
+                ["FRM-0"] = ["1D-H0579", "0D-FIX", "0D-SPACED"],
+                ["FRM-3"] = ["1D-H0579"]
             },
             SegmentAssignments =
             [
@@ -265,7 +265,7 @@ internal static class Program
             },
             CurveModifiers = new Dictionary<string, double>
             {
-                ["FRM_0"] = 4d,
+                ["FRM-0"] = 4d,
                 [PanelFrameAssignmentService.SegmentKey(h0)] = -2d,
                 [PanelFrameAssignmentService.SegmentKey(h1)] = -2d
             }
@@ -282,7 +282,7 @@ internal static class Program
             "20", "160", "65", Required(keys.EncodeTopology(new(), 2, 1))))
         {
             [PanelCladdingKeyService.FrameTypeKey.ToLowerInvariant()] =
-                "{\"v\":1,\"f\":{\"FRM_2\":[\"1D-OLD\"]},\"s\":[{\"a\":\"H\",\"t\":1,\"b\":1,\"c\":[\"1D-OLD\"]}]}",
+                "{\"v\":1,\"f\":{\"FRM-2\":[\"1D-OLD\"]},\"s\":[{\"a\":\"H\",\"t\":1,\"b\":1,\"c\":[\"1D-OLD\"]}]}",
             [PanelCladdingKeyService.LegacyFrameTypologyKey.ToLowerInvariant()] = "TARGET-STALE",
             [PanelCladdingKeyService.SignatureKey] = "STALE-SIGNATURE",
             [PanelCladdingKeyService.LegacySignatureKey] = "STALE-LEGACY",
@@ -304,7 +304,7 @@ internal static class Program
         PanelCladdingMatchTargetPlan migrated = Required(planner.CreatePlan(
             MatchSnapshot(SourceId, legacyFrameText, 100d, 100d), [targets[0]])).Targets.Single();
         Require(migrated.UserTextWrites[PanelCladdingKeyService.FrameTypeKey] == encoded &&
-                migrated.UserTextWrites.ContainsKey(PanelCladdingKeyService.FrameConfigKey) &&
+                migrated.UserTextWrites.ContainsKey(PanelCladdingKeyService.FrameConfigBackupKey) &&
                 !migrated.UserTextWrites.Keys.Any(PanelCladdingKeyService.IsRetiredFrameKey),
             "PCMatchCrv must migrate an older source to the new frame keys.");
         foreach (PanelCladdingMatchTargetPlan targetPlan in plan.Targets)
@@ -332,15 +332,15 @@ internal static class Program
             Require(!applied.ContainsKey(PanelCladdingKeyService.SignatureKey) &&
                     !applied.ContainsKey(PanelCladdingKeyService.LegacySignatureKey),
                 "PCMatchCrv retained stale signatures.");
-            Require(applied[PanelCladdingKeyService.FrameConfigKey] ==
+            Require(applied[PanelCladdingKeyService.FrameConfigBackupKey] ==
                     Required(keys.EncodeFrameConfiguration(topology, 2, 1)) &&
                     !applied.ContainsKey(PanelCladdingKeyService.LegacyFrameTypologyKey),
                 "PCMatchCrv must copy topology configuration and retire frame typology.");
             IReadOnlyList<PanelCladdingExtrusionCurvePlan> curves = Required(
                 new PanelCladdingExtrusionPlanningService().CreatePlan(
                     "TARGET-PID", "TARGET-CID", target.Geometry.Width, target.Geometry.Height, parsed,
-                    PanelCladdingExtrusionPlanningService.PanelSurfaceLayerRootPath + "::" + target.SystemCode));
-            PanelCladdingExtrusionCurvePlan frame = curves.Single(curve => curve.Code == "FRM_0");
+                    "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - " + target.SystemCode));
+            PanelCladdingExtrusionCurvePlan frame = curves.Single(curve => curve.Code == "FRM-0");
             PanelCladdingExtrusionCurvePlan merged = curves.Single(curve => curve.Kind == PanelCladdingExtrusionCurveKind.Merged);
             Require(frame.End == target.Geometry.Width && frame.AssignedExtrusionCodes.Count == 3 &&
                     frame.UserTextWrites["1D-H0579"] == "(LL+4)*2" &&
@@ -371,7 +371,7 @@ internal static class Program
 
         var legacySourceText = new Dictionary<string, string>(emptySourceText)
         {
-            [PanelCladdingKeyService.FrameTypeKey] = "{\"v\":1,\"f\":{\"FRM_0\":[\"1D-LEGACY\"]},\"s\":[]}"
+            [PanelCladdingKeyService.FrameTypeKey] = "{\"v\":1,\"f\":{\"FRM-0\":[\"1D-LEGACY\"]},\"s\":[]}"
         };
         PanelCladdingMatchTargetPlan legacyPlan = Required(planner.CreatePlan(
             MatchSnapshot(SourceId, legacySourceText, 100d, 100d), [targets[0]])).Targets.Single();

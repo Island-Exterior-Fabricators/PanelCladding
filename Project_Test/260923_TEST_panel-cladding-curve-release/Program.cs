@@ -2,11 +2,11 @@ using PanelCladdingEditor.Application.Services.PanelCladding;
 using PanelCladdingEditor.Contracts.Responses;
 using PanelCladdingEditor.Domain.Models.PanelCladding;
 
-const string pid = "PID_RELEASE_01";
-const string cid = "CID_RELEASE_01-P";
+const string pid = "PID-RELEASE-01";
+const string cid = "CID-RELEASE-01_P";
 const string releaseKey = PanelCladdingSpawnPlanningService.ReleaseUserTextKey;
 Check(releaseKey == "CW_1.05_LOT", "Curve metadata must use the canonical lot key");
-const string layer = "01_CW Panels::Surfaces-PNL::WT01";
+const string layer = "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - WT01";
 var keys = new PanelCladdingKeyService();
 var baseGrid = Required(keys.CreateKeySet([25d], [40d], new Dictionary<string, string>(), 100, 80, 0.001));
 var mergedGrid = new PanelCladdingKeySet
@@ -66,7 +66,7 @@ foreach (PanelCladdingObjectScope scope in Enum.GetValues<PanelCladdingObjectSco
             ObjectId = panelObjectId, Width = 100, Height = 80, ModelTolerance = 0.001,
             Cells = grid.Cells, SourceUserText = text
         };
-        string desiredCode = "FRM_0";
+        string desiredCode = "FRM-0";
         var sync = Required(new PanelCladdingSurfaceSyncPlanningService(keys).CreatePlan(
             new PanelCladdingSurfaceSyncSnapshot
             {
@@ -78,7 +78,7 @@ foreach (PanelCladdingObjectScope scope in Enum.GetValues<PanelCladdingObjectSco
                 Surfaces = [new PanelCladdingSurfaceSyncSurfaceSnapshot
                 {
                     ObjectId = Guid.NewGuid(), PanelObjectId = panelObjectId, PanelId = pid,
-                    Cid = cid + "-0A", LayerPath = "04_STEP Surfaces::Surfaces-Glass::GL01",
+                    Cid = cid + "_0A", LayerPath = "Reference::Surfaces - STEP::Surfaces - GL::GL01",
                     CladdingValue = "GL01", CoveredCellLabels = ["0A"]
                 }],
                 Curves = [new PanelCladdingSurfaceSyncCurveSnapshot
@@ -92,7 +92,7 @@ foreach (PanelCladdingObjectScope scope in Enum.GetValues<PanelCladdingObjectSco
         var planned = sync.Curves.Single();
         Check(planned.DesiredReleaseNumber == (sourceRelease?.Trim() ?? ""), "Sync release must come from panel");
         Check(planned.MetadataChanged == expectedChange, $"Release-only change detection failed: {scope}/{sourceRelease}/{existingRelease}");
-        Check(planned.DesiredCid == cid + "-FRM_0", "Sync preserves role CID");
+        Check(planned.DesiredCid == cid + "_FRM-0", "Sync preserves role CID");
     }
 }
 Console.WriteLine("[OK] both sync scopes repair missing/stale release, preserve current values, and clear removed source release");

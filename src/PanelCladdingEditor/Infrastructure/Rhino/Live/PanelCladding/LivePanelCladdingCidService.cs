@@ -18,11 +18,12 @@ internal static class LivePanelCladdingCidService
             .ToDictionary(key => key!, key => text![key!] ?? string.Empty, StringComparer.Ordinal);
     }
 
-    internal static bool Normalize(ObjectAttributes attributes)
+    // Normalizes panel identity (CID, name) and the frame configuration code on a write.
+    internal static bool Normalize(RhinoDoc document, ObjectAttributes attributes)
     {
+        bool changed = LivePanelFrameConfigCodes.Normalize(document, attributes);
         IReadOnlyDictionary<string, string> text = Read(attributes);
         string? cid = PanelCladdingCidService.PanelCidWrite(text);
-        bool changed = false;
         if (cid is not null)
         {
             string key = PanelCladdingSpawnPlanningService.CidUserTextKey;
@@ -57,7 +58,7 @@ internal static class LivePanelCladdingCidService
                 return OperationResponse<IReadOnlyList<Change>>.Fail($"PANEL_CLADDING_CID_PANEL_MISSING: {id:D}");
             }
             ObjectAttributes proposed = panel.Attributes.Duplicate();
-            if (Normalize(proposed))
+            if (Normalize(document, proposed))
             {
                 changes.Add(new Change(panel, panel.Attributes.Duplicate(), proposed));
             }

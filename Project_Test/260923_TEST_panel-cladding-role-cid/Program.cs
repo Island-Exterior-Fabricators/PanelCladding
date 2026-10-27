@@ -3,23 +3,23 @@ using PanelCladdingEditor.Application.Services.PanelCladding;
 using PanelCladdingEditor.Contracts.Responses;
 using PanelCladdingEditor.Domain.Models.PanelCladding;
 
-const string pid = "PID_ABC_W1_03_01";
-const string cid = "CID_ABC_W1_03_01";
+const string pid = "PID-ABC-W1-03-01";
+const string cid = "CID-ABC-W1-03-01";
 var keys = new PanelCladdingKeyService();
-foreach ((string role, string suffix) in new[] { ("corner_parent", "-P"), ("corner_child", "-C"), ("flat", ""), ("", "") })
+foreach ((string role, string suffix) in new[] { ("L:Parent", "_P"), ("L:Child", "_C"), ("Z:Child 2", "_C2"), ("F:Parent", ""), ("C:Parent", ""), ("", "") })
 {
     var text = Text(role);
-    if (role.Length > 0) text[PanelCladdingSpawnPlanningService.CidUserTextKey] = "CID_STALE-P";
+    if (role.Length > 0) text[PanelCladdingSpawnPlanningService.CidUserTextKey] = "CID-STALE_P";
     // Conflicting legacy flags must not affect any command path, even when type is absent.
     text["parent"] = "1";
     text["child"] = "1";
     var keySet = Required(keys.CreateKeySet([20d, 40d], [50d], text, 100d, 80d, 0.001d));
     var planner = new PanelCladdingSpawnPlanningService(keys);
     var spawn = Required(planner.CreatePlan(text, keySet, 100d, 80d,
-        PanelCladdingExtrusionPlanningService.PanelSurfaceLayerRootPath + "::WT01"));
-    Check(spawn.Regions.Single(region => region.OwnerCellLabel == "0A").Cid == cid + suffix + "-0A",
+        "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - WT01"));
+    Check(spawn.Regions.Single(region => region.OwnerCellLabel == "0A").Cid == cid + suffix + "_0A",
         "Exact surface example: " + role);
-    Check(spawn.Curves.Any(curve => curve.Cid == cid + suffix + "-INT_B1"), "Exact curve example: " + role);
+    Check(spawn.Curves.Any(curve => curve.Cid == cid + suffix + "_INT-B1"), "Exact curve example: " + role);
     Check(spawn.Regions.All(region => region.UserTextWrites[PanelCladdingSpawnPlanningService.PanelIdUserTextKey] == pid),
         "Surface PID must remain unchanged");
     Check(spawn.Curves.All(curve => curve.UserTextWrites[PanelCladdingSpawnPlanningService.PanelIdUserTextKey] == pid),
@@ -71,14 +71,14 @@ foreach ((string role, string suffix) in new[] { ("corner_parent", "-P"), ("corn
         var surfaces = keySet.Cells.Select(cell => new PanelCladdingSurfaceSyncSurfaceSnapshot
         {
             ObjectId = Guid.NewGuid(), PanelObjectId = layout.ObjectId, PanelId = pid,
-            Cid = cid + outputSuffix + "-" + cell.ShortLabel,
-            LayerPath = "04_STEP Surfaces::Surfaces-Glass::GL01", CladdingValue = "GL01"
+            Cid = cid + outputSuffix + "_" + cell.ShortLabel,
+            LayerPath = "Reference::Surfaces - STEP::Surfaces - GL::GL01", CladdingValue = "GL01"
             // No coverage payload: exercise legacy CID-to-cell resolution as well.
         }).ToArray();
         var curve = new PanelCladdingSurfaceSyncCurveSnapshot
         {
             ObjectId = Guid.NewGuid(), PanelObjectId = layout.ObjectId, PanelId = pid,
-            Cid = cid + outputSuffix + "-INT_B1", CurveCode = "INT_B1", DesiredCode = "INT_B1"
+            Cid = cid + outputSuffix + "_INT-B1", CurveCode = "INT-B1", DesiredCode = "INT-B1"
         };
         foreach (PanelCladdingObjectScope scope in Enum.GetValues<PanelCladdingObjectScope>())
         {
@@ -94,8 +94,8 @@ foreach ((string role, string suffix) in new[] { ("corner_parent", "-P"), ("corn
                     Surfaces = surfaces, Curves = [curve]
                 }));
             Check(sync.Issues.Count == 0, string.Join(";", sync.Issues.Select(issue => issue.Message)));
-            Check(sync.Curves.Single().DesiredCid == cid + suffix + "-INT_B1", "Sync curve CID");
-            Check(sync.Surfaces.All(surface => surface.DesiredCid.StartsWith(cid + suffix + "-")), "Sync surface CID");
+            Check(sync.Curves.Single().DesiredCid == cid + suffix + "_INT-B1", "Sync curve CID");
+            Check(sync.Surfaces.All(surface => surface.DesiredCid.StartsWith(cid + suffix + "_")), "Sync surface CID");
             if (role.Length > 0)
             {
                 Check(sync.Panels.Single().CladdingChanged, "CID-only panel change must be committed during sync");
@@ -108,8 +108,8 @@ foreach ((string role, string suffix) in new[] { ("corner_parent", "-P"), ("corn
         Check(PanelCladdingCidService.ResolvePanelCid(pid, text) == cid + suffix, "Repeated execution is idempotent");
         text.Remove(PanelCladdingSpawnPlanningService.CidUserTextKey);
         var missingCid = Required(planner.CreatePlan(text, keySet, 100d, 80d,
-            PanelCladdingExtrusionPlanningService.PanelSurfaceLayerRootPath + "::WT01"));
-        Check(missingCid.Curves.All(curve => curve.Cid.StartsWith(cid + suffix + "-")), "Typed panel missing CID");
+            "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - WT01"));
+        Check(missingCid.Curves.All(curve => curve.Cid.StartsWith(cid + suffix + "_")), "Typed panel missing CID");
     }
     Console.WriteLine($"[OK] {(role.Length > 0 ? role : "ordinary")}: spawn, update planning, all save scopes, create, and both sync scopes");
 }
@@ -119,19 +119,26 @@ mixed["PaReNt"] = " 1 ";
 mixed["CHILD"] = "1";
 Check(PanelCladdingCidService.RoleSuffix(mixed) == "" && PanelCladdingCidService.PanelCidWrite(mixed) is null &&
     PanelCladdingCidService.ResolvePanelCid(pid, mixed) == cid, "Legacy flags alone cannot activate a role");
-mixed["cw_1.06_unit_type"] = "  CORNER_PARENT  ";
-Check(PanelCladdingCidService.ResolvePanelCid(pid, mixed) == cid + "-P", "Case-insensitive key/value and whitespace");
-mixed[PanelCladdingSpawnPlanningService.CidUserTextKey] = cid + "-P";
-mixed["cw_1.06_unit_type"] = "corner_child";
-Check(PanelCladdingCidService.ResolvePanelCid(pid, mixed) == cid + "-C", "Role change replaces suffix");
-mixed[PanelCladdingSpawnPlanningService.CidUserTextKey] = cid + "-C";
-mixed["cw_1.06_unit_type"] = " flat ";
+mixed["cw_1.06_unit_type"] = "  l  ";
+mixed["cw_5.00_definition_a"] = " parent ";
+Check(PanelCladdingCidService.ResolvePanelCid(pid, mixed) == cid + "_P", "Case-insensitive key/value and whitespace");
+mixed[PanelCladdingSpawnPlanningService.CidUserTextKey] = cid + "_P";
+mixed["cw_5.00_definition_a"] = "Child";
+Check(PanelCladdingCidService.ResolvePanelCid(pid, mixed) == cid + "_C", "Role change replaces suffix");
+mixed[PanelCladdingSpawnPlanningService.CidUserTextKey] = cid + "_C";
+mixed["cw_1.06_unit_type"] = " f ";
 Check(PanelCladdingCidService.PanelCidWrite(mixed) == cid &&
-    PanelCladdingCidService.ResolvePanelCid(pid, mixed) == cid, "Flat removes a previous corner suffix despite old flags");
-foreach (string unsupported in new[] { "parent", "child", "1", "corner", "corner-parent", "", "   " })
+    PanelCladdingCidService.ResolvePanelCid(pid, mixed) == cid, "Flat removes a previous role suffix despite old flags");
+mixed["cw_1.06_unit_type"] = "L";
+mixed.Remove("cw_5.00_definition_a");
+mixed[PanelCladdingSpawnPlanningService.CidUserTextKey] = cid + "_C";
+Check(PanelCladdingCidService.PanelCidWrite(mixed) is null && PanelCladdingCidService.ResolvePanelCid(pid, mixed) == cid + "_C",
+    "A multi-face panel without a Definition A role keeps its stored CID");
+mixed["cw_5.00_definition_a"] = "Child";
+foreach (string unsupported in new[] { "parent", "child", "1", "corner", "corner-parent", "flat", "corner_parent", "corner_child", "", "   " })
 {
     mixed["cw_1.06_unit_type"] = unsupported;
-    foreach (string stored in new[] { "CUSTOM-CID", cid + "-P", cid + "-C" })
+    foreach (string stored in new[] { "CUSTOM-CID", cid + "_P", cid + "_C" })
     {
         mixed[PanelCladdingSpawnPlanningService.CidUserTextKey] = stored;
         Check(PanelCladdingCidService.RoleSuffix(mixed) == "" &&
@@ -142,16 +149,16 @@ foreach (string unsupported in new[] { "parent", "child", "1", "corner", "corner
     mixed.Remove(PanelCladdingSpawnPlanningService.CidUserTextKey);
     Check(PanelCladdingCidService.ResolvePanelCid(pid, mixed) == cid, "Missing CID retains base identity fallback");
 }
-foreach (string role in new[] { "flat", "corner_parent", "corner_child" })
+foreach (string role in new[] { "F:Parent", "L:Parent", "L:Child" })
 {
     var noPid = Text(role);
     noPid.Remove(PanelCladdingSpawnPlanningService.PanelIdUserTextKey);
     Check(PanelCladdingCidService.PanelCidWrite(noPid) is null, "No panel CID write without PID");
 }
-Check(PanelCladdingCidService.IncludesDependency(pid, cid + "-P", cid + "-P-0A"), "Own role is in update scope");
-Check(!PanelCladdingCidService.IncludesDependency(pid, cid + "-P", cid + "-C-0A"), "Sibling role excluded from update");
-Check(!PanelCladdingCidService.IncludesDependency(pid, cid + "-C", cid + "-P-INT_B1"), "Parent curves excluded from child update");
-Check(PanelCladdingCidService.IncludesDependency(pid, cid + "-P", cid + "-0A"), "Legacy output can migrate");
+Check(PanelCladdingCidService.IncludesDependency(pid, cid + "_P", cid + "_P_0A"), "Own role is in update scope");
+Check(!PanelCladdingCidService.IncludesDependency(pid, cid + "_P", cid + "_C_0A"), "Sibling role excluded from update");
+Check(!PanelCladdingCidService.IncludesDependency(pid, cid + "_C", cid + "_P_INT-B1"), "Parent curves excluded from child update");
+Check(PanelCladdingCidService.IncludesDependency(pid, cid + "_P", cid + "_0A"), "Legacy output can migrate");
 Console.WriteLine("[OK] unit types, ignored legacy flags, casing, role transitions, missing/unknown types, custom IDs, and sibling update isolation");
 
 Dictionary<string, string> Text(string role)
@@ -166,7 +173,12 @@ Dictionary<string, string> Text(string role)
         ["CW_4.02_CLADDING_0C"] = "GL01", ["CW_4.03_CLADDING_1A"] = "GL01",
         ["CW_4.04_CLADDING_1B"] = "GL01", ["CW_4.05_CLADDING_1C"] = "GL01"
     };
-    if (role.Length > 0) text["CW_1.06_UNIT_TYPE"] = role;
+    if (role.Length > 0)
+    {
+        string[] parts = role.Split(':');
+        text["CW_1.06_UNIT_TYPE"] = parts[0];
+        text["CW_5.00_DEFINITION_A"] = parts[1];
+    }
     return text;
 }
 

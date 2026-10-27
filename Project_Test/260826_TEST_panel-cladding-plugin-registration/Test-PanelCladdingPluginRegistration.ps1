@@ -55,6 +55,7 @@ $expectedCommands = @(
     'PCSpawnSrf',
     'PCSyncCrv',
     'PCSyncSrf',
+    'PCtemplatePNL',
     'PCUpdate'
 )
 

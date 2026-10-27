@@ -9,7 +9,7 @@ var panel = new PanelCladdingPidPanel(id, fixture.Normal, fixture.Points, new Di
 var planner = new PanelCladdingPidPlanningService();
 var request = new PanelCladdingPidRequest("TST", [id], id, id);
 var plan = planner.CreatePlan(request, [panel], fixture.Tolerance, Math.PI / 1800);
-Check(plan.Success && plan.Data!.Panels.Single().Pid == "PID_TST_N1_01_01", plan.Message);
+Check(plan.Success && plan.Data!.Panels.Single().Pid == "PID-TST-N1-01-01", plan.Message);
 var setup = new PanelCladdingPidSetupService().CreateWrites(plan.Data!.Panels.Single(), panel);
 Check(setup.Success && setup.Data!["CW_2.00_UNIT_DIMENSION"] == "90.00000x180.00000", "Reported live panel dimensions");
 Check(setup.Data!.Count == 30, "All setup keys");

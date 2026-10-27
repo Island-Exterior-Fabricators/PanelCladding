@@ -128,7 +128,8 @@ public sealed class LivePanelCladdingSurfaceSyncRepository : ILivePanelCladdingS
                 continue;
             }
             if (rhinoObject.Geometry is Curve curveGeometry &&
-                PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath(layerPath))
+                PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath(layerPath,
+                    PanelCladdingProjectService.CodeFromDocumentPath(document.Path)))
             {
                 discoveredCurves.Add(new CurveReadCandidate(
                     rhinoObject,
@@ -543,7 +544,8 @@ public sealed class LivePanelCladdingSurfaceSyncRepository : ILivePanelCladdingS
                     inferredLayout.Data.Height,
                     keySet,
                     panel.Layout.LayerFullPath,
-                    GetCanonicalUserText(panel.Object.Attributes, PanelCladdingSpawnPlanningService.ReleaseUserTextKey));
+                    GetCanonicalUserText(panel.Object.Attributes, PanelCladdingSpawnPlanningService.ReleaseUserTextKey),
+                    PanelCladdingProjectService.CodeFromDocumentPath(document.Path));
                 if (!expectedCurves.Success || expectedCurves.Data is null)
                 {
                     AddPanelIssue(panel, expectedCurves.Message);
@@ -965,7 +967,7 @@ public sealed class LivePanelCladdingSurfaceSyncRepository : ILivePanelCladdingS
             proposed.SetUserString(PanelCladdingKeyService.UnitWidthKey, panelWrite.UnitWidth);
             proposed.SetUserString(PanelCladdingKeyService.UnitHeightKey, panelWrite.UnitHeight);
             proposed.SetUserString(PanelCladdingKeyService.UnitDimensionKey, panelWrite.UnitDimension);
-            LivePanelCladdingCidService.Normalize(proposed);
+            LivePanelCladdingCidService.Normalize(document, proposed);
             prepared.Add(new PreparedObject(rhinoObject, original, proposed, panelWrite));
         }
 

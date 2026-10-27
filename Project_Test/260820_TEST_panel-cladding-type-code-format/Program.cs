@@ -86,7 +86,7 @@ internal static class Program
             ObjectId = Guid.Parse("A8200000-0000-0000-0000-000000000301"),
             DocumentRuntimeSerialNumber = 1,
             DocumentPath = "C:/test/panel-type-code-format.3dm",
-            ObjectName = "PID_TYPE_CODE",
+            ObjectName = "PID-TYPE-CODE",
             LayerFullPath = "01_CW Panels::WT-01",
             SystemCode = string.Empty,
             GeometryFingerprint = "type-code-format-fixture",

@@ -33,10 +33,10 @@ internal static class Program
             [30d], [40d], new Dictionary<string, string>(), 100d, 80d, 0.001d));
         IReadOnlyList<PanelCladdingExtrusionCurvePlan> curves = Required(
             new PanelCladdingExtrusionPlanningService().CreatePlan(
-                "PID_SAMPLE", "CID_SAMPLE", 100d, 80d, blankGrid,
-                "01_CW Panels::Surfaces-PNL::WT-01"));
+                "PID-SAMPLE", "CID-SAMPLE", 100d, 80d, blankGrid,
+                "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - WT-01"));
         Require(curves.Count > 4 && curves.All(curve =>
-                curve.LayerPath == "02_CW Extrusions::Curves-PNL::WT-01"),
+                curve.LayerPath == "ABC-IEF-Wireframe::Curves - PNL::Curves - WT-01"),
             "Curve planning did not work independently of cladding assignments.");
 
         Require(Enum.GetValues<PanelCladdingObjectScope>().SequenceEqual(

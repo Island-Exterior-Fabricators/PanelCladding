@@ -24,17 +24,19 @@ var subsetIds = new[] { Label("4"), Label("7"), Label("10") };
 var partial = Required(Plan(context, request with { PanelObjectIds = subsetIds }));
 Check(partial.Panels.Select(p => p.ObjectId).ToHashSet().SetEquals(subsetIds), "Write set equals explicit selection");
 Check(partial.Panels.All(p => fullById[p.ObjectId] == p), "Unselected floors, planes and bays retain numbering");
-Check(partial.Panels.Single(p => p.ObjectId == Label("4")).Pid == "PID_ABC_N2_02_01", "Unselected N1 defines N2 ordinal");
-Check(partial.Panels.Single(p => p.ObjectId == Label("10")).Pid == "PID_ABC_E1_02_03", "Unselected lower/left panels define level02 bay03");
+Check(partial.Panels.Single(p => p.ObjectId == Label("4")).Pid == "PID-ABC-N2-02-01", "Unselected N1 defines N2 ordinal");
+Check(partial.Panels.Single(p => p.ObjectId == Label("10")).Pid == "PID-ABC-E1-02-03", "Unselected lower/left panels define level02 bay03");
 Check(JsonSerializer.Serialize(context) == before, "Neither selected nor unselected snapshot attributes are mutated by planning");
 Check(!Plan(context, request with { PanelObjectIds = [Guid.NewGuid()] }).Success, "Out-of-context selection rejected");
 Check(!Plan(context, request with { NorthPanelObjectId = Guid.NewGuid() }).Success, "Out-of-context reference rejected");
 Console.WriteLine("[OK] all 20 singleton selections and a partial batch retain full-context numbering; only selected IDs enter the write plan");
 
-string root = PanelCladdingPidPlanningService.PanelLayerRoot;
-foreach (var path in new[] { root, root + "::WT-01", root + "::Tower::L2::WT-02", root.ToLowerInvariant() + "::nested" })
+string root = "ABC-IEF-Wireframe::Surfaces - PNL";
+foreach (var path in new[] { root, root + "::Surfaces - WT_01", root + "::Tower::L2::Surfaces - WT_02", root.ToLowerInvariant() + "::nested",
+             "QRS-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_01" })
     Check(PanelCladdingPidPlanningService.IsPanelLayerPath(path), "Include scope: " + path);
-foreach (var path in new[] { "", "01_CW Panels", "Surfaces-PNL", root + "-Other", root + "2::WT-01", "Other::" + root, "01_CW Panels::Other::Surfaces-PNL" })
+foreach (var path in new[] { "", "ABC-IEF-Wireframe", "Surfaces - PNL", root + "-Other", root + "2::WT-01", "Other::" + root,
+             "ABC-IEF-Wireframe::Other::Surfaces - PNL", "01_CW Panels::Surfaces-PNL::WT-01" })
     Check(!PanelCladdingPidPlanningService.IsPanelLayerPath(path), "Exclude scope: " + path);
 Console.WriteLine("[OK] exact root, arbitrary nested sublayers and case-insensitive path boundaries; lookalike/unrelated branches excluded");
 
@@ -45,7 +47,7 @@ Check(planner.ValidateDocumentIdentities(partial, stored, identities).Success, "
 
 // Two unselected objects with an unrelated duplicate PID now fail the whole-scope audit.
 var duplicated = stored.Select(p => p.ObjectId == Label("5") || p.ObjectId == Label("6")
-    ? p with { UserText = new Dictionary<string, string>(p.UserText) { ["CW_1.01_PID"] = p.ObjectId == Label("5") ? "PID_OLD_DUP" : " pid_old_dup " } }
+    ? p with { UserText = new Dictionary<string, string>(p.UserText) { ["CW_1.01_PID"] = p.ObjectId == Label("5") ? "PID-OLD-DUP" : " pid-old-dup " } }
     : p).ToArray();
 var duplicateCheck = planner.ValidateDocumentIdentities(partial, duplicated, []);
 Check(!duplicateCheck.Success && duplicateCheck.Message.Contains("duplicate PID", StringComparison.OrdinalIgnoreCase) &&

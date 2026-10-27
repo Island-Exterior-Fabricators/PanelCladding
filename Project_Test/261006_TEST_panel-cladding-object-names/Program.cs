@@ -3,25 +3,26 @@ using PanelCladdingEditor.Application.Services.PanelCladding;
 using PanelCladdingEditor.Contracts.Responses;
 using PanelCladdingEditor.Domain.Models.PanelCladding;
 
-const string pid = "PID_ABC_S1_06_14";
-const string cid = "CID_ABC_S1_06_14";
-const string shortName = "S1_06_14";
+const string pid = "PID-ABC-S1-06-14";
+const string cid = "CID-ABC-S1-06-14";
+const string shortName = "S1-06-14";
 var keys = new PanelCladdingKeyService();
 foreach (var (input, expected) in new[]
 {
-    (cid, shortName), (cid + "-P", shortName + "-P"),
-    (cid + "-C-0A", shortName + "-C-0A"), (cid + "-P-INT_B1", shortName + "-P-INT_B1"),
-    (cid + "-FRM_0", shortName + "-FRM_0"), (" cid_abc_S1_06_14 ", shortName),
-    ("CID_OTHER_S1_06_14", "OTHER_S1_06_14"), ("CUSTOM-CID", "CUSTOM-CID"),
-    ("CID_ABC_", "CID_ABC_"), ("", "")
+    (cid, shortName), (cid + "_P", shortName + "_P"),
+    (cid + "_C_0A", shortName + "_C_0A"), (cid + "_P_INT-B1", shortName + "_P_INT-B1"),
+    (cid + "_FRM-0", shortName + "_FRM-0"), (" cid-abc-S1-06-14 ", shortName),
+    ("CID-OTHER-S1-06-14", "OTHER-S1-06-14"), ("CUSTOM-CID", "CUSTOM-CID"),
+    ("CID-ABC-", "CID-ABC-"), ("", "")
 })
     Check(PanelCladdingCidService.ShortName(input) == expected, "Short name: " + input);
-foreach (var (type, suffix) in new[] { ("flat", ""), ("corner_parent", "-P"), ("corner_child", "-C") })
+foreach (var (type, role, suffix) in new[] { ("F", "Parent", ""), ("L", "Parent", "_P"), ("L", "Child", "_C"), ("Z", "Child 1", "_C1") })
 {
     var text = Text(type);
-    text[PanelCladdingSpawnPlanningService.CidUserTextKey] = "CID_STALE";
+    text[PanelCladdingCidService.RoleDefinitionKey] = role;
+    text[PanelCladdingSpawnPlanningService.CidUserTextKey] = "CID-STALE";
     Check(PanelCladdingCidService.PanelNameWrite(text) == shortName + suffix, "Name follows corrected unit-type CID");
-    Check(text[PanelCladdingSpawnPlanningService.CidUserTextKey] == "CID_STALE", "Name planning never mutates metadata");
+    Check(text[PanelCladdingSpawnPlanningService.CidUserTextKey] == "CID-STALE", "Name planning never mutates metadata");
 }
 var untyped = Text("");
 Check(PanelCladdingCidService.PanelNameWrite(untyped) == shortName, "Untyped panel names use existing CID");
@@ -59,7 +60,7 @@ foreach (var (stalePanel, staleSurface, staleCurve) in new[]
     Check(commit.SurfaceWrites.Count == (scope == PanelCladdingObjectScope.Surfaces && staleSurface ? 1 : 0),
         "Surface name-only changes must reach live commit in surface scope");
     Check(commit.CurveWrites.Count == (staleCurve ? 1 : 0), "Curve name-only changes must reach live commit");
-    Check(plan.Curves.Single().DesiredCid == cid + "-FRM_0", "Full curve CID remains unchanged");
+    Check(plan.Curves.Single().DesiredCid == cid + "_FRM-0", "Full curve CID remains unchanged");
 }
 Console.WriteLine("[OK] both sync scopes commit isolated/all name-only changes and make no writes when names already match");
 
@@ -98,7 +99,7 @@ Dictionary<string, string> Text(string type) => new()
 
 PanelCladdingSurfaceSyncSnapshot Snapshot(PanelCladdingObjectScope scope, bool stalePanel, bool staleSurface, bool staleCurve)
 {
-    var text = Text("flat");
+    var text = Text("F");
     var grid = Required(keys.CreateKeySet([], [], text, 100d, 80d, 0.001d));
     text[PanelCladdingKeyService.CladdingLogicKey] = Required(new PanelCladdingLogicService().Encode(grid.Cells, text));
     var layout = new PanelCladdingLayout
@@ -117,14 +118,14 @@ PanelCladdingSurfaceSyncSnapshot Snapshot(PanelCladdingObjectScope scope, bool s
         }],
         Surfaces = [new PanelCladdingSurfaceSyncSurfaceSnapshot
         {
-            ObjectId = Guid.NewGuid(), PanelObjectId = layout.ObjectId, PanelId = pid, Cid = cid + "-0A",
-            ObjectName = staleSurface ? cid + "-0A" : shortName + "-0A", CladdingValue = "GL01",
-            LayerPath = "04_STEP Surfaces::Surfaces-Glass::GL01", CoverageValue = "0A", CoveredCellLabels = ["0A"]
+            ObjectId = Guid.NewGuid(), PanelObjectId = layout.ObjectId, PanelId = pid, Cid = cid + "_0A",
+            ObjectName = staleSurface ? cid + "_0A" : shortName + "_0A", CladdingValue = "GL01",
+            LayerPath = "Reference::Surfaces - STEP::Surfaces - GL::GL01", CoverageValue = "0A", CoveredCellLabels = ["0A"]
         }],
         Curves = [new PanelCladdingSurfaceSyncCurveSnapshot
         {
-            ObjectId = Guid.NewGuid(), PanelObjectId = layout.ObjectId, PanelId = pid, Cid = cid + "-FRM_0",
-            ObjectName = staleCurve ? "FRM_0" : shortName + "-FRM_0", CurveCode = "FRM_0", DesiredCode = "FRM_0",
+            ObjectId = Guid.NewGuid(), PanelObjectId = layout.ObjectId, PanelId = pid, Cid = cid + "_FRM-0",
+            ObjectName = staleCurve ? "FRM-0" : shortName + "_FRM-0", CurveCode = "FRM-0", DesiredCode = "FRM-0",
             UsesObjectColor = true, ObjectColor = new(0, 0, 255), DesiredObjectColor = new(0, 0, 255)
         }]
     };

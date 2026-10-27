@@ -173,7 +173,7 @@ internal static class Program
         {
             FrameAssignments = new Dictionary<string, IReadOnlyList<string>>
             {
-                ["FRM_0"] = [ExpectedProfile, "1D-H0677"]
+                ["FRM-0"] = [ExpectedProfile, "1D-H0677"]
             },
             SegmentAssignments =
             [
@@ -185,7 +185,7 @@ internal static class Program
         };
         string payload = Required(assignments.Encode(state, 1, 1, layout.Topology), "encode assignments");
         PanelFrameAssignmentState decoded = Required(assignments.Decode(payload, 1, 1, layout.Topology), "decode assignments");
-        Require(decoded.FrameAssignments["FRM_0"].Count == 2, "Multiple frame codes were not retained.");
+        Require(decoded.FrameAssignments["FRM-0"].Count == 2, "Multiple frame codes were not retained.");
         Require(Required(assignments.Encode(decoded, 1, 1, layout.Topology), "re-encode assignments") == payload,
             "Assignment payload was not deterministic.");
 
@@ -268,7 +268,14 @@ internal static class Program
             "Live snapshots must reject conflicting names before case-insensitive dictionary normalization.");
         Require(!keys.DecodeTopology(new Dictionary<string, string> { [PanelCladdingKeyService.FrameConfigKey] = config }, 2, 1).Success,
             "Combined configuration must still validate grid dimensions.");
-        foreach (string malformed in new[] { "{\"v\":2}", "{\"v\":1}", config.Replace("\"v\":1", "\"v\":1,\"v\":1") })
+        string legacyJson = $"{{\"v\":1,\"delete\":\"{masks.SegmentMask}\",\"merge\":\"{masks.MergeMask}\",\"hide\":\"{masks.HideMask}\"}}";
+        Require(keys.DecodeTopology(new Dictionary<string, string> { [PanelCladdingKeyService.FrameConfigKey] = legacyJson }, 1, 1).Success,
+            "Former JSON configuration must still decode.");
+        foreach (string malformed in new[]
+                 {
+                     "{\"v\":2}", "{\"v\":1}", legacyJson.Replace("\"v\":1", "\"v\":1,\"v\":1"),
+                     "1H 1V | split A0", "1H 1V | delete A0 | delete A1", "1H 1V | delete Q9", "1H 1V | merge A0–0"
+                 })
         {
             Require(!keys.DecodeTopology(new Dictionary<string, string> { [PanelCladdingKeyService.FrameConfigKey] = malformed }, 1, 1).Success,
                 "Invalid configuration schema was accepted.");
@@ -287,7 +294,7 @@ internal static class Program
         PanelAttributeCommitRequest commit = repository.LastCommit!;
         Require(legacy.Keys.Where(PanelCladdingKeyService.IsRetiredFrameKey)
                     .All(key => commit.UserTextDeletes.Contains(key, StringComparer.OrdinalIgnoreCase)) &&
-                commit.UserTextWrites[PanelCladdingKeyService.FrameConfigKey] == config &&
+                commit.UserTextWrites[PanelCladdingKeyService.FrameConfigBackupKey] == config &&
                 commit.UserTextWrites[PanelCladdingKeyService.FrameTypeKey] == typePayload,
             "Extrusion save failed to migrate legacy data and delete retired attributes.");
         Console.WriteLine("[OK] New frame keys round-trip; legacy/blank fallback, precedence, malformed/conflict rejection and save migration pass.");
@@ -321,7 +328,7 @@ internal static class Program
             throw new InvalidOperationException("Assigned extrusion save did not commit panel attributes.");
         Require(commit.UserTextWrites.ContainsKey(PanelCladdingKeyService.FrameTypeKey),
             "Assigned extrusion save omitted CW_1.09_FRAME_TYPE.");
-        Require(commit.UserTextWrites.TryGetValue(PanelCladdingKeyService.FrameConfigKey, out string? storedConfig) &&
+        Require(commit.UserTextWrites.TryGetValue(PanelCladdingKeyService.FrameConfigBackupKey, out string? storedConfig) &&
                 storedConfig == saveResult.FrameConfig &&
                 keys.DecodeTopology(commit.UserTextWrites, 1, 1).Success &&
                 !commit.UserTextWrites.Keys.Any(PanelCladdingKeyService.IsRetiredFrameKey),
@@ -388,7 +395,7 @@ internal static class Program
         {
             FrameAssignments = new Dictionary<string, IReadOnlyList<string>>
             {
-                ["FRM_0"] = [ExpectedProfile, "1D-H0677"]
+                ["FRM-0"] = [ExpectedProfile, "1D-H0677"]
             },
             SegmentAssignments =
             [
@@ -407,10 +414,10 @@ internal static class Program
         };
         IReadOnlyList<PanelCladdingExtrusionCurvePlan> curves = Required(
             new PanelCladdingExtrusionPlanningService().CreatePlan(
-                "PID_FRAME_01", "CID_FRAME_01", layout.Width, layout.Height, keySet,
-                "01_CW Panels::Surfaces-PNL::WT-01"),
+                "PID-FRAME-01", "CID-FRAME-01", layout.Width, layout.Height, keySet,
+                "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - WT-01"),
             "plan assigned extrusion curves");
-        PanelCladdingExtrusionCurvePlan frame = curves.Single(curve => curve.Code == "FRM_0");
+        PanelCladdingExtrusionCurvePlan frame = curves.Single(curve => curve.Code == "FRM-0");
         Require(frame.UserTextWrites[PanelCladdingExtrusionPlanningService.AssignedExtrusionsUserTextKey] ==
                 "1D-H0651;1D-H0677",
             "Baked frame curve did not receive sorted additive take-off codes.");
@@ -439,9 +446,9 @@ internal static class Program
         };
         var state = new PanelFrameAssignmentState
         {
-            FrameAssignments = new Dictionary<string, IReadOnlyList<string>> { ["FRM_3"] = codes },
+            FrameAssignments = new Dictionary<string, IReadOnlyList<string>> { ["FRM-3"] = codes },
             Definitions = definitions,
-            CurveModifiers = new Dictionary<string, double> { ["FRM_3"] = 4d }
+            CurveModifiers = new Dictionary<string, double> { ["FRM-3"] = 4d }
         };
         var assignments = new PanelFrameAssignmentService();
         string payload = Required(assignments.Encode(state, 1, 1, layout.Topology), "encode configured profiles");
@@ -458,10 +465,10 @@ internal static class Program
         };
         PanelCladdingExtrusionCurvePlan curve = Required(
                 new PanelCladdingExtrusionPlanningService().CreatePlan(
-                    "PID_FORMULA", "CID_FORMULA", layout.Width, layout.Height, keySet,
-                    "01_CW Panels::Surfaces-PNL::WT-01"),
+                    "PID-FORMULA", "CID-FORMULA", layout.Width, layout.Height, keySet,
+                    "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - WT-01"),
                 "plan configured formulas")
-            .Single(item => item.Code == "FRM_3");
+            .Single(item => item.Code == "FRM-3");
         Require(curve.UserTextWrites["1D-H0579"] == "(LL+4)*2", "1D quantity formula is incorrect.");
         Require(curve.UserTextWrites["1D-H0651"] == "LL+4", "1D default formula is incorrect.");
         Require(curve.UserTextWrites["0D-H0652"] == "2", "0D fixed formula is incorrect.");
@@ -505,7 +512,7 @@ internal static class Program
         Render(root, 1440, 900, Path.Combine(outputDirectory, "extrusion-assignment-main-extrusion-view.png"));
         Require(Descendants<Image>(root).Count(image => image.Source is not null) >= 4,
             "Extrusion view did not render the four configured ready profiles.");
-        SelectExtrusions(window, "FRM_0");
+        SelectExtrusions(window, "FRM-0");
         Render(root, 1440, 900, Path.Combine(outputDirectory, "extrusion-assignment-selected.png"));
         var assignedItems = (ItemsControl)window.FindName("SelectedExtrusionAssignments");
         var availableItems = (ItemsControl)window.FindName("ExtrusionLegend");
@@ -532,7 +539,7 @@ internal static class Program
         };
         InvokePrivate(window, "ApplyCurveModifier", modifierInput, false);
         var modifiers = (Dictionary<string, double>)RequiredPrivateField(window, "_frameCurveModifiers");
-        Require(modifiers.TryGetValue("FRM_0", out double modifier) && modifier == 4d,
+        Require(modifiers.TryGetValue("FRM-0", out double modifier) && modifier == 4d,
             "The inline assigned-card modifier did not update the selected curve modifier.");
 
         var setup = new ExtrusionSetupDialog(
@@ -647,7 +654,7 @@ internal static class Program
         {
             FrameAssignments = new Dictionary<string, IReadOnlyList<string>>
             {
-                ["FRM_0"] = [ExpectedProfile]
+                ["FRM-0"] = [ExpectedProfile]
             }
         },
         WorkbookPath = workbookPath

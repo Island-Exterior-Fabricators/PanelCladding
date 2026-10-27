@@ -9,7 +9,7 @@ namespace PanelCladdingRegionsSmoke;
 internal static class Program
 {
     private static readonly Guid PanelId = Guid.Parse("11111111-2222-3333-4444-555555555555");
-    private const string Pid = "PID_ABC_REGION_01";
+    private const string Pid = "PID-ABC-REGION-01";
 
     private static void Main()
     {
@@ -57,7 +57,7 @@ internal static class Program
             grid,
             keySet.Cells.Take(2).ToArray(),
             0.001d,
-            "CID_ABC_REGION_01-0A"
+            "CID-ABC-REGION-01_0A"
         }) ?? throw new InvalidOperationException("CreateRegionSurface returned null.");
         using Brep joined = (Brep)RequireReflectedData(joinResponse, "Join two atomic cells");
         using AreaMassProperties? joinedArea = AreaMassProperties.Compute(joined);
@@ -75,7 +75,7 @@ internal static class Program
             joined,
             grid,
             0.001d,
-            "CID_ABC_REGION_01-0A"
+            "CID-ABC-REGION-01_0A"
         }) ?? throw new InvalidOperationException("ResolveCoveredCellLabels returned null.");
         string[] covered = ((IEnumerable<string>)RequireReflectedData(
             coverageResponse,
@@ -154,7 +154,7 @@ internal static class Program
         Require(plan.Regions.Count == 2,
             "GLS-001 / 0A / GLS-002 must plan two Rhino cladding objects.");
         Require(plan.Regions.Select(region => region.Cid).SequenceEqual(new[]
-            { "CID_ABC_REGION_01-0A", "CID_ABC_REGION_01-2A" }),
+            { "CID-ABC-REGION-01_0A", "CID-ABC-REGION-01_2A" }),
             "Spawn CIDs must use canonical owner suffixes.");
         Require(plan.Regions[0].Cells.Select(cell => cell.ShortLabel).SequenceEqual(new[] { "0A", "1A" }),
             "The first spawn region must include both referenced atomic cells.");
@@ -229,8 +229,8 @@ internal static class Program
                 panel.CellValues[CellKey(2)] == "GLS-002",
             "Surface coverage did not reconstruct owner/reference panel values.");
         PanelCladdingSurfaceSyncSurfacePlan normalizedSurface = merged.Surfaces[0];
-        Require(normalizedSurface.ExpectedCid.EndsWith("-1A", StringComparison.Ordinal) &&
-                normalizedSurface.DesiredCid.EndsWith("-0A", StringComparison.Ordinal) &&
+        Require(normalizedSurface.ExpectedCid.EndsWith("_1A", StringComparison.Ordinal) &&
+                normalizedSurface.DesiredCid.EndsWith("_0A", StringComparison.Ordinal) &&
                 normalizedSurface.CidChanged,
             "Merged surface CID must normalize to its canonical owner.");
 
@@ -254,7 +254,7 @@ internal static class Program
                 Surface("2A", "GLS-002", "2A")
             })),
             "Plan exploded duplicate-CID surface sync");
-        Require(exploded.Surfaces.Count == 3 && exploded.Surfaces[1].DesiredCid.EndsWith("-1A", StringComparison.Ordinal),
+        Require(exploded.Surfaces.Count == 3 && exploded.Surfaces[1].DesiredCid.EndsWith("_1A", StringComparison.Ordinal),
             "Geometry coverage must repair duplicate CIDs inherited by separated surfaces.");
 
         PanelCladdingSurfaceSyncPlan missingCid = RequireData(
@@ -265,7 +265,7 @@ internal static class Program
             })),
             "Plan missing-CID normalization");
         Require(missingCid.Surfaces[0].ExpectedCid.Length == 0 &&
-                missingCid.Surfaces[0].DesiredCid.EndsWith("-0A", StringComparison.Ordinal) &&
+                missingCid.Surfaces[0].DesiredCid.EndsWith("_0A", StringComparison.Ordinal) &&
                 missingCid.Surfaces[0].CidChanged,
             "Geometry coverage must recover and normalize a missing surface CID.");
 

@@ -190,7 +190,7 @@ internal static class Program
             ObjectId = Guid.Parse("A0427000-0000-0000-0000-000000000031"),
             DocumentRuntimeSerialNumber = 31,
             DocumentPath = "C:/design/canvas-alignment.3dm",
-            ObjectName = "W3_05_13",
+            ObjectName = "W3-05-13",
             LayerFullPath = "01_CW Panels::Surface",
             SystemCode = "WT03",
             GeometryFingerprint = "canvas-alignment-fixture",

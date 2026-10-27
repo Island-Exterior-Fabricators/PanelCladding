@@ -131,7 +131,7 @@ internal static class Program
             new PanelCladdingSpawnPlanningService(keys, colors).CreatePlan(
                 new Dictionary<string, string>
                 {
-                    [PanelCladdingSpawnPlanningService.PanelIdUserTextKey] = "PID_COLOR_TEST",
+                    [PanelCladdingSpawnPlanningService.PanelIdUserTextKey] = "PID-COLOR-TEST",
                     [PanelCladdingSpawnPlanningService.ReleaseUserTextKey] = "R1",
                     [PanelCladdingSpawnPlanningService.WallTypeUserTextKey] = "WT01"
                 },
@@ -146,7 +146,7 @@ internal static class Program
             new PanelCladdingSpawnPlanningService(keys).CreatePlan(
                 new Dictionary<string, string>
                 {
-                    [PanelCladdingSpawnPlanningService.PanelIdUserTextKey] = "PID_COLOR_FALLBACK",
+                    [PanelCladdingSpawnPlanningService.PanelIdUserTextKey] = "PID-COLOR-FALLBACK",
                     [PanelCladdingSpawnPlanningService.ReleaseUserTextKey] = "R1",
                     [PanelCladdingSpawnPlanningService.WallTypeUserTextKey] = "WT01"
                 },
@@ -192,7 +192,7 @@ internal static class Program
                 grid,
                 Select(cells, "0A", "1A"),
                 Tolerance,
-                "CID_BOUNDARY-0A"
+                "CID-BOUNDARY_0A"
             }) ?? throw new InvalidOperationException("CreateRegionSurface returned null.");
             using Brep region = (Brep)RequireReflectedData(regionResponse, "Create 0A/1A surface");
             Require(region.Faces.Count == 1,
@@ -207,7 +207,7 @@ internal static class Program
                 region,
                 grid,
                 Tolerance,
-                "CID_BOUNDARY-0A"
+                "CID-BOUNDARY_0A"
             }) ?? throw new InvalidOperationException("ResolveCoveredCellLabels returned null.");
             string[] coverage = ((IEnumerable<string>)RequireReflectedData(
                 coverageResponse,

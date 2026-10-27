@@ -21,7 +21,9 @@ public sealed partial class PanelCladdingKeyService
     public const string SegmentMaskKey = "CW_2.12_DELETE_MASK";
     public const string MergeMaskKey = "CW_2.10_MERGE_MASK";
     public const string HideMaskKey = "CW_2.11_HIDE_MASK";
-    public const string CladdingLogicKey = "CW_2.13_CLADDING_LOGIC";
+    public const string CladdingLogicKey = "CW_9.01_CLADDING_LOGIC";
+    public const string LegacyCladdingLogicKey = "CW_2.13_CLADDING_LOGIC";
+    public const string FrameConfigBackupKey = "CW_9.02_FRAME_CONFIG";
     public const string UnitDimensionKey = "CW_2.00_UNIT_DIMENSION";
     public const string UnitWidthKey = "CW_2.01_UNIT_WIDTH";
     public const string UnitHeightKey = "CW_2.02_UNIT_HEIGHT";
@@ -192,6 +194,7 @@ public sealed partial class PanelCladdingKeyService
             string.Equals(key, SignatureKey, StringComparison.OrdinalIgnoreCase) ||
             string.Equals(key, LegacySignatureKey, StringComparison.OrdinalIgnoreCase) ||
             string.Equals(key, CladdingLogicKey, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(key, LegacyCladdingLogicKey, StringComparison.OrdinalIgnoreCase) ||
             string.Equals(key, FrameTypeKey, StringComparison.OrdinalIgnoreCase) ||
             string.Equals(key, LegacyFrameAssignmentsKey, StringComparison.OrdinalIgnoreCase) ||
             string.Equals(key, LegacyFrameTypologyKey, StringComparison.OrdinalIgnoreCase) ||
@@ -211,6 +214,7 @@ public sealed partial class PanelCladdingKeyService
 
     public static bool IsTopologyKey(string key) =>
         string.Equals(key, FrameConfigKey, StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(key, FrameConfigBackupKey, StringComparison.OrdinalIgnoreCase) ||
         string.Equals(key, SegmentMaskKey, StringComparison.OrdinalIgnoreCase) ||
         string.Equals(key, MergeMaskKey, StringComparison.OrdinalIgnoreCase) ||
         string.Equals(key, HideMaskKey, StringComparison.OrdinalIgnoreCase);
@@ -374,7 +378,8 @@ public sealed partial class PanelCladdingKeyService
         IReadOnlyDictionary<string, string> userText,
         IReadOnlyDictionary<string, string> expectedWrites)
     {
-        foreach (string topologyKey in new[] { FrameConfigKey, SegmentMaskKey, MergeMaskKey, HideMaskKey })
+        // CW_1.08 holds the code derived from CW_9.02 on write, so only the configuration is compared.
+        foreach (string topologyKey in new[] { FrameConfigBackupKey, SegmentMaskKey, MergeMaskKey, HideMaskKey })
         {
             KeyValuePair<string, string>[] stored = userText
                 .Where(item => string.Equals(item.Key, topologyKey, StringComparison.OrdinalIgnoreCase))
@@ -413,6 +418,26 @@ public sealed partial class PanelCladdingKeyService
         if (!dimensions.Success)
         {
             return OperationResponse<PanelCladdingTopologyState>.Fail(dimensions.Message);
+        }
+        OperationResponse<PanelFrameConfigFormat.Parsed?> readable = ReadReadableFrameConfiguration(userText);
+        if (!readable.Success)
+        {
+            return OperationResponse<PanelCladdingTopologyState>.Fail(readable.Message);
+        }
+        if (readable.Data is not null)
+        {
+            if (readable.Data.HorizontalTrackCount != horizontalTrackCount ||
+                readable.Data.VerticalTrackCount != verticalTrackCount)
+            {
+                return OperationResponse<PanelCladdingTopologyState>.Fail(
+                    $"PANEL_FRAME_CONFIG_GRID_MISMATCH: configuration is {readable.Data.HorizontalTrackCount}H " +
+                    $"{readable.Data.VerticalTrackCount}V but the panel has {horizontalTrackCount}H {verticalTrackCount}V.");
+            }
+            OperationResponse<PanelCladdingTopologyPayloads> validated = EncodeTopology(
+                readable.Data.Topology, horizontalTrackCount, verticalTrackCount);
+            return validated.Success
+                ? OperationResponse<PanelCladdingTopologyState>.Ok(readable.Data.Topology)
+                : OperationResponse<PanelCladdingTopologyState>.Fail(validated.Message);
         }
         int columnCount = verticalTrackCount + 1;
         int rowCount = horizontalTrackCount + 1;
