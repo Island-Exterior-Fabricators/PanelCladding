@@ -54,8 +54,10 @@ public sealed class LivePanelCladdingCurveTemplateService : ILivePanelCladdingCu
                 HorizontalTrackCount = layout.Data.HorizontalOffsets.Count,
                 VerticalTrackCount = layout.Data.VerticalOffsets.Count,
                 HasMergeMask = layout.Data.Topology.MergeRuns.Count > 0 ||
-                    (string.IsNullOrWhiteSpace(layout.Data.SourceUserText.FirstOrDefault(item =>
-                        string.Equals(item.Key, PanelCladdingKeyService.FrameConfigKey, StringComparison.OrdinalIgnoreCase)).Value) &&
+                    (!layout.Data.SourceUserText.Any(item =>
+                        (string.Equals(item.Key, PanelCladdingKeyService.FrameConfigKey, StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(item.Key, PanelCladdingKeyService.FrameConfigBackupKey, StringComparison.OrdinalIgnoreCase)) &&
+                        !string.IsNullOrWhiteSpace(item.Value)) &&
                      PanelCladdingKeyService.HasNonblankMergeMask(layout.Data.SourceUserText)),
                 Topology = layout.Data.Topology
             });
@@ -111,11 +113,12 @@ public sealed class LivePanelCladdingCurveTemplateService : ILivePanelCladdingCu
             foreach (string key in ReadUserText(original).Keys.Where(key =>
                          PanelCladdingKeyService.IsRetiredFrameKey(key) ||
                          string.Equals(key, PanelCladdingKeyService.FrameTypeKey, StringComparison.OrdinalIgnoreCase) ||
-                         string.Equals(key, PanelCladdingKeyService.FrameConfigKey, StringComparison.OrdinalIgnoreCase)))
+                         PanelCladdingKeyService.IsTopologyKey(key)))
             {
                 DeleteUserTextCaseInsensitive(proposed, key);
             }
-            proposed.SetUserString(PanelCladdingKeyService.FrameConfigKey, panelPlan.FrameConfig);
+            proposed.SetUserString(PanelCladdingKeyService.FrameConfigBackupKey, panelPlan.FrameConfig);
+            LivePanelFrameConfigCodes.Normalize(document, proposed);
             if (!string.IsNullOrWhiteSpace(frameType.Data))
             {
                 proposed.SetUserString(PanelCladdingKeyService.FrameTypeKey, frameType.Data);

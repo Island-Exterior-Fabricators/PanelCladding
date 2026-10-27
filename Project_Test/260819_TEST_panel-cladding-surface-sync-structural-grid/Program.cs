@@ -10,7 +10,7 @@ internal static class Program
 {
     private static readonly Guid PanelObjectId =
         Guid.Parse("51000000-0000-0000-0000-000000000001");
-    private const string Pid = "PID_STRUCTURAL_GRID_01";
+    private const string Pid = "PID-STRUCTURAL-GRID-01";
     private const string Material = "MPL-001";
 
     private static void Main()
@@ -75,7 +75,7 @@ internal static class Program
         Require(source.Contains(
                 "if (rhinoObject.Geometry is Curve curveGeometry &&",
                 StringComparison.Ordinal) && source.Contains(
-                "PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath(layerPath)", StringComparison.Ordinal),
+                "PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath(layerPath,", StringComparison.Ordinal),
             "The shared sync-object scan must collect extrusion curves in surface scope.");
     }
 

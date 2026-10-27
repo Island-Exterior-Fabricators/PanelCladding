@@ -8,11 +8,12 @@ public sealed class PanelCladdingPidPlanningService
 {
     public const string ElevationKey = "CW_1.03_ELEVATION";
     public const string LevelKey = "CW_1.04_LEVEL";
-    public const string PanelLayerRoot = PanelCladdingExtrusionPlanningService.PanelSurfaceLayerRootPath;
+    public const string PanelLayerScope = PanelCladdingExtrusionPlanningService.PanelSurfaceLayerPattern;
 
-    public static bool IsPanelLayerPath(string layerPath) =>
-        string.Equals(layerPath, PanelLayerRoot, StringComparison.OrdinalIgnoreCase) ||
-        layerPath.StartsWith(PanelLayerRoot + "::", StringComparison.OrdinalIgnoreCase);
+    public static bool IsPanelLayerPath(string layerPath) => IsPanelLayerPath(layerPath, null);
+
+    public static bool IsPanelLayerPath(string layerPath, string? projectCode) =>
+        PanelCladdingExtrusionPlanningService.IsPanelLayerPath(layerPath, projectCode);
 
     public static bool IsProjectCode(string code) =>
         code.Trim().Length == 3 && code.Trim().All(c => c is >= 'A' and <= 'Z' or >= 'a' and <= 'z');
@@ -106,7 +107,8 @@ public sealed class PanelCladdingPidPlanningService
                 {
                     string level = levels[panel.Panel.ObjectId];
                     string bay = Number(bayIndex + 1);
-                    string pid = $"PID_{request.ProjectCode.Trim().ToUpperInvariant()}_{elevation}_{level}_{bay}";
+                    string pid = PanelCladdingCidService.PanelIdPrefix + string.Join(PanelCladdingCidService.IdSeparator,
+                        request.ProjectCode.Trim().ToUpperInvariant(), elevation, level, bay);
                     string cid = PanelCladdingCidService.FromPanelId(pid) + PanelCladdingCidService.RoleSuffix(panel.Panel.UserText);
                     assignments.Add(new(panel.Panel.ObjectId, elevation, level, bay, pid, cid));
                 }
@@ -135,7 +137,7 @@ public sealed class PanelCladdingPidPlanningService
             .Where(p => !string.IsNullOrWhiteSpace(p.Pid))
             .GroupBy(p => p.Pid.Trim(), StringComparer.OrdinalIgnoreCase).FirstOrDefault(g => g.Count() > 1);
         if (duplicate is not null)
-            return OperationResponse.Fail($"PCpid: duplicate PID {duplicate.Key} in {PanelLayerRoot}: " +
+            return OperationResponse.Fail($"PCpid: duplicate PID {duplicate.Key} in {PanelLayerScope}: " +
                 $"{string.Join(", ", duplicate.Select(p => p.ObjectId))}. No IDs were assigned; select these panels for correction.");
         var otherObjects = existing.Where(p => !selectedIds.Contains(p.ObjectId)).ToArray();
         var pidLookup = otherObjects.Where(p => p.Pid.Trim().Length > 0).ToLookup(p => p.Pid.Trim(), StringComparer.OrdinalIgnoreCase);
@@ -152,7 +154,7 @@ public sealed class PanelCladdingPidPlanningService
             {
                 var dependency = otherObjects.FirstOrDefault(p => p.IsManagedDependency &&
                     ((oldPid.Length > 0 && Equal(p.Pid, oldPid)) ||
-                     (oldCid.Length > 0 && p.Cid.StartsWith(oldCid + "-", StringComparison.OrdinalIgnoreCase))));
+                     (oldCid.Length > 0 && p.Cid.StartsWith(oldCid + PanelCladdingCidService.ComponentSeparator, StringComparison.OrdinalIgnoreCase))));
                 if (dependency is not null)
                     return OperationResponse.Fail($"PCpid: panel {assignment.ObjectId} already has generated dependencies ({dependency.ObjectId}). Clear those dependencies before initial ID setup.");
             }

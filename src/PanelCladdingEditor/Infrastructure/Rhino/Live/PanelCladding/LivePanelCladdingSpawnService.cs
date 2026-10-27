@@ -308,7 +308,8 @@ public sealed partial class LivePanelCladdingSpawnService : ILivePanelCladdingSp
                     layout.Height,
                     keySet,
                     layout.LayerFullPath,
-                    GetRequiredUserText(userText, PanelCladdingSpawnPlanningService.ReleaseUserTextKey));
+                    GetRequiredUserText(userText, PanelCladdingSpawnPlanningService.ReleaseUserTextKey),
+                    PanelCladdingProjectService.CodeFromDocumentPath(document.Path));
             if (!curvePlan.Success || curvePlan.Data is null)
             {
                 return OperationResponse<PreparedPanel>.Fail(curvePlan.Message);
@@ -450,7 +451,8 @@ public sealed partial class LivePanelCladdingSpawnService : ILivePanelCladdingSp
             PanelCladdingObjectScope.Surfaces => rhinoObject.Geometry is Brep &&
                 PanelCladdingSpawnPlanningService.IsManagedSurfaceLayerPath(layerPath),
             PanelCladdingObjectScope.Curves => rhinoObject.Geometry is Curve &&
-                PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath(layerPath),
+                PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath(layerPath,
+                    PanelCladdingProjectService.CodeFromDocumentPath(document.Path)),
             _ => false
         };
     }

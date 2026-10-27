@@ -247,18 +247,18 @@ internal static partial class LivePanelCladdingGeometryPartitionService
         {
             sourceCells = plan.Code switch
             {
-                "FRM_0" => grid.Cells.Where(cell => cell.Cell.Row == 0),
-                "FRM_1" => grid.Cells.Where(cell => cell.Cell.Row == grid.Cells.Max(item => item.Cell.Row)),
-                "FRM_2" => grid.Cells.Where(cell => cell.Cell.Column == 0),
-                "FRM_3" => grid.Cells.Where(cell => cell.Cell.Column == grid.Cells.Max(item => item.Cell.Column)),
+                "FRM-0" => grid.Cells.Where(cell => cell.Cell.Row == 0),
+                "FRM-1" => grid.Cells.Where(cell => cell.Cell.Row == grid.Cells.Max(item => item.Cell.Row)),
+                "FRM-2" => grid.Cells.Where(cell => cell.Cell.Column == 0),
+                "FRM-3" => grid.Cells.Where(cell => cell.Cell.Column == grid.Cells.Max(item => item.Cell.Column)),
                 _ => Array.Empty<LivePanelCladdingGeometryCell>()
             };
             target = plan.Code switch
             {
-                "FRM_0" => grid.YMin,
-                "FRM_1" => grid.YMax,
-                "FRM_2" => grid.XMin,
-                "FRM_3" => grid.XMax,
+                "FRM-0" => grid.YMin,
+                "FRM-1" => grid.YMax,
+                "FRM-2" => grid.XMin,
+                "FRM-3" => grid.XMax,
                 _ => double.NaN
             };
         }
@@ -435,11 +435,11 @@ internal static partial class LivePanelCladdingGeometryPartitionService
             string frameCode = string.Empty;
             if (Math.Abs(primary) <= axisTolerance)
             {
-                frameCode = horizontal ? "FRM_0" : "FRM_2";
+                frameCode = horizontal ? "FRM-0" : "FRM-2";
             }
             else if (Math.Abs(primary - primaryExtent) <= axisTolerance)
             {
-                frameCode = horizontal ? "FRM_1" : "FRM_3";
+                frameCode = horizontal ? "FRM-1" : "FRM-3";
             }
             if (frameCode.Length > 0)
             {
@@ -505,7 +505,7 @@ internal static partial class LivePanelCladdingGeometryPartitionService
             });
         }
 
-        string[] missingFrames = new[] { "FRM_0", "FRM_1", "FRM_2", "FRM_3" }
+        string[] missingFrames = new[] { "FRM-0", "FRM-1", "FRM-2", "FRM-3" }
             .Where(code => !frameCodes.Contains(code))
             .ToArray();
         if (missingFrames.Length > 0)

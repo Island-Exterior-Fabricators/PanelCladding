@@ -1270,17 +1270,7 @@ public sealed class OpenXmlPanelCladdingWorkbookRepository : IPanelCladdingWorkb
 
     private static PanelCladdingMaterialCatalogItem CreateDefaultMaterialCatalogItem(string code)
     {
-        string family = PanelCladdingSpawnPlanningService.ResolveMaterialFamilyLayer(code);
-        string category = family switch
-        {
-            "Surfaces-Glass" => "Glass",
-            "Surfaces-Stone" => "Stone",
-            "Surfaces-Terracotta" => "Terracotta",
-            "Surfaces-Metal" => "Metal",
-            "Surfaces-Concrete" => "Concrete",
-            "Surfaces-Wood" => "Wood",
-            _ => "Composite"
-        };
+        string category = PanelCladdingSpawnPlanningService.ResolveMaterialCategory(code) ?? "Composite";
         PanelColorRgb color = PanelCladdingSpawnPlanningService.ResolveMaterialLayerColor(code);
         return new PanelCladdingMaterialCatalogItem
         {

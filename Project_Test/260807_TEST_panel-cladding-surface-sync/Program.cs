@@ -44,8 +44,8 @@ internal static class Program
                     surface.PanelId,
                     CellLabelForKey(plan, surface.CellKey))),
             "Every mapped surface CID must use the shared PID-to-CID derivation plus cell label.");
-        Require(plan.Surfaces.Any(surface => surface.DesiredCid.StartsWith("CID_", StringComparison.Ordinal)),
-            "Prefixed production PIDs must map to CID_-prefixed surface identifiers.");
+        Require(plan.Surfaces.Any(surface => surface.DesiredCid.StartsWith("CID-", StringComparison.Ordinal)),
+            "Prefixed production PIDs must map to CID- prefixed surface identifiers.");
         Console.WriteLine("[OK] exact PID/CID mapping, layer authority, surface refresh, and panel change detection");
 
         VerifySurfaceOnlyRefresh(planner);
@@ -143,7 +143,7 @@ internal static class Program
             own[0].ObjectId,
             own[0].PanelId,
             own[0].Cid,
-            "04_STEP Surfaces::Surfaces-Metal::GL01",
+            "Reference::Surfaces - STEP::Surfaces - MPL::GL01",
             own[0].CladdingValue);
         RequireIsolatedIssue(
             planner.CreatePlan(Snapshot(new[] { panel }, new[] { wrongFamily }.Concat(own.Skip(1)).ToArray())),
@@ -401,13 +401,13 @@ internal static class Program
 
             PanelCladdingSurfaceSyncPanelSnapshot[] unchangedPanels =
             {
-                Panel(PanelOneId, "PID_PANEL_01", BuildLayout(PanelOneId, FinalMaterials)),
-                Panel(PanelTwoId, "PID_PANEL_02", BuildLayout(PanelTwoId, FinalMaterials))
+                Panel(PanelOneId, "PID-PANEL-01", BuildLayout(PanelOneId, FinalMaterials)),
+                Panel(PanelTwoId, "PID-PANEL-02", BuildLayout(PanelTwoId, FinalMaterials))
             };
             PanelCladdingSurfaceSyncSnapshot unchangedSnapshot = Snapshot(
                 unchangedPanels,
-                BuildSurfaces("PID_PANEL_01", FinalMaterials)
-                    .Concat(BuildSurfaces("PID_PANEL_02", FinalMaterials))
+                BuildSurfaces("PID-PANEL-01", FinalMaterials)
+                    .Concat(BuildSurfaces("PID-PANEL-02", FinalMaterials))
                     .ToArray(),
                 unchangedPanels.Select(panel => new PanelCladdingWorkbookTypeReference
                 {
@@ -611,7 +611,7 @@ internal static class Program
         string[] originalsOne = { "GL01", "GL02", "STN01", "TER01" };
         string[] originalsTwo = { "GL03", "GL03", "STN01", "TER02" };
         PanelCladdingSurfaceSyncSurfaceSnapshot[] surfacesOne =
-            BuildSurfaces("PID_PANEL_01", FinalMaterials);
+            BuildSurfaces("PID-PANEL-01", FinalMaterials);
         surfacesOne[2] = Surface(
             surfacesOne[2].ObjectId,
             surfacesOne[2].PanelId,
@@ -619,7 +619,7 @@ internal static class Program
             surfacesOne[2].LayerPath,
             "STN01");
         PanelCladdingSurfaceSyncSurfaceSnapshot[] surfacesTwo =
-            BuildSurfaces("PID_PANEL_02", FinalMaterials);
+            BuildSurfaces("PID-PANEL-02", FinalMaterials);
         surfacesTwo[0] = Surface(
             surfacesTwo[0].ObjectId,
             surfacesTwo[0].PanelId,
@@ -629,8 +629,8 @@ internal static class Program
         return Snapshot(
             new[]
             {
-                Panel(PanelOneId, "PID_PANEL_01", BuildLayout(PanelOneId, originalsOne)),
-                Panel(PanelTwoId, "PID_PANEL_02", BuildLayout(PanelTwoId, originalsTwo))
+                Panel(PanelOneId, "PID-PANEL-01", BuildLayout(PanelOneId, originalsOne)),
+                Panel(PanelTwoId, "PID-PANEL-02", BuildLayout(PanelTwoId, originalsTwo))
             },
             surfacesOne.Concat(surfacesTwo).ToArray());
     }
@@ -763,7 +763,7 @@ internal static class Program
         string layerPath,
         string claddingValue)
     {
-        string cellLabel = cid[(cid.LastIndexOf('-') + 1)..].Trim().ToUpperInvariant();
+        string cellLabel = cid[(cid.LastIndexOf('_') + 1)..].Trim().ToUpperInvariant();
         return new PanelCladdingSurfaceSyncSurfaceSnapshot
         {
             ObjectId = objectId,

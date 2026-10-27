@@ -81,10 +81,43 @@ public sealed class PanelCladdingPidSetupService
             // same persisted blank convention used by the editor's unassigned cells.
             writes[key] = values.Length == 1 ? values[0] : PanelCladdingKeyService.PersistedBlankCellValue;
         }
+        ReserveRoleDefinition(writes, panel.UserText);
         if (assignment.Cid != PanelCladdingCidService.FromPanelId(assignment.Pid) + PanelCladdingCidService.RoleSuffix(writes))
             return Fail(panel, "Unit-type case variants disagree with the planned CID; consolidate CW_1.06_UNIT_TYPE before running PCpid.");
         return OperationResponse<IReadOnlyDictionary<string, string>>.Ok(writes);
     }
+
+    // Definition A is reserved for the panel role. A non-role value moves the existing
+    // definitions down one letter (adding E, F, ... as needed); flat and curved panels are
+    // always Parent, multi-face panels keep their role.
+    public static void ReserveRoleDefinition(IDictionary<string, string> writes, IReadOnlyDictionary<string, string> userText)
+    {
+        string Value(string key) => writes.TryGetValue(key, out string? written) ? written
+            : userText.FirstOrDefault(item => string.Equals(item.Key, key, StringComparison.OrdinalIgnoreCase)).Value ?? string.Empty;
+        int count = Enumerable.Range(0, 26)
+            .Select(index => DefinitionKey(index))
+            .TakeWhile((key, index) => index < 4 || writes.ContainsKey(key) ||
+                userText.Keys.Any(existing => string.Equals(existing, key, StringComparison.OrdinalIgnoreCase)))
+            .Count();
+        var values = Enumerable.Range(0, count).Select(index => Value(DefinitionKey(index))).ToList();
+        if (!string.IsNullOrWhiteSpace(values[0]) && !PanelCladdingCidService.IsRole(values[0]))
+        {
+            values.Insert(0, PanelCladdingKeyService.PersistedBlankCellValue);
+        }
+        string unitType = Value(PanelCladdingCidService.UnitTypeUserTextKey).Trim().ToUpperInvariant();
+        if (unitType is PanelCladdingCidService.FlatUnitType or PanelCladdingCidService.CurvedUnitType)
+        {
+            values[0] = PanelCladdingCidService.ParentRole;
+        }
+        for (int index = 0; index < values.Count; index++)
+        {
+            writes[DefinitionKey(index)] = string.IsNullOrWhiteSpace(values[index])
+                ? PanelCladdingKeyService.PersistedBlankCellValue
+                : values[index];
+        }
+    }
+
+    private static string DefinitionKey(int index) => "CW_5.00_DEFINITION_" + (char)('A' + index);
 
     private static bool Finite(PanelPoint3 p) => double.IsFinite(p.X) && double.IsFinite(p.Y) && double.IsFinite(p.Z);
     private static double Dot(PanelPoint3 a, PanelPoint3 b) => a.X * b.X + a.Y * b.Y + a.Z * b.Z;

@@ -12,8 +12,12 @@ or modify a Rhino document. The fixture's document name is an identifier only.
 
 Coverage:
 
+- Since 1.1.0 the fixture uses unit types `L`/`Z`/`F`/`C` with the `CW_5.00_DEFINITION_A`
+  role (`L` Parent `_P`, `L` Child `_C`, `Z` Child 2 `_C2`, `F`/`C` no suffix) and checks
+  that the retired `flat`/`corner_*` values and an `L` panel without a role keep stored CIDs.
+  See [the naming-convention TEST](../261023_TEST_panel-cladding-naming-convention/README.md).
 - Exact corner_parent, corner_child, and flat panel/surface/curve CIDs, including
-  `-0A` and `-INT_B1`, driven only by `CW_1.06_UNIT_TYPE`.
+  `-0A` and `-INT_B1`, driven only by `CW_1.06_UNIT_TYPE` (before 1.1.0).
 - Unchanged PID inheritance and unchanged behavior for absent unit types.
 - Spawn and update surface plans, all three editor save scopes, and PCCreate writes.
 - Both sync scopes, with legacy and already suffixed surface CIDs and no coverage payload.

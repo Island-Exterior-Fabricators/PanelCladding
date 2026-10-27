@@ -61,8 +61,8 @@ internal static class NativePointOrderSmoke
 
         using var doc = RhinoDoc.CreateHeadless(null);
         doc.ModelAbsoluteTolerance = 1e-5; doc.UndoRecordingEnabled = true;
-        int root = doc.Layers.Add("01_CW Panels", System.Drawing.Color.Black);
-        int layer = doc.Layers.Add(new Layer { Name = "Surfaces-PNL", ParentLayerId = doc.Layers[root].Id });
+        int root = doc.Layers.Add("ABC-IEF-Wireframe", System.Drawing.Color.Black);
+        int layer = doc.Layers.Add(new Layer { Name = "Surfaces - PNL", ParentLayerId = doc.Layers[root].Id });
         using var source = MakePanel(); source.Faces[0].Transpose(true);
         using var attributes = new ObjectAttributes { LayerIndex = layer, Name = "original-name" };
         attributes.SetUserString("unrelated", "keep");
@@ -87,8 +87,8 @@ internal static class NativePointOrderSmoke
         using (var restored = Required(service.Prepare((Brep)doc.Objects.FindId(id).Geometry, 1e-5))) Check(restored.Changed, "Undo restores original point order");
 
         using var updateAttributes = doc.Objects.FindId(id).Attributes.Duplicate();
-        updateAttributes.SetUserString("CW_1.01_PID", "PID_ABC_N1_01_01");
-        updateAttributes.SetUserString("CW_1.06_UNIT_TYPE", "flat");
+        updateAttributes.SetUserString("CW_1.01_PID", "PID-ABC-N1-01-01");
+        updateAttributes.SetUserString("CW_1.06_UNIT_TYPE", "F");
         Check(doc.Objects.ModifyAttributes(id, updateAttributes, true), "Seed update identity");
         var observer = new FailingLayout(doc, service);
         var keys = new PanelCladdingKeyService();

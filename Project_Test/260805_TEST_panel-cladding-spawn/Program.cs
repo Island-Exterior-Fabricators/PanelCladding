@@ -16,7 +16,7 @@ internal static class Program
         {
             ["CW_2.03_OFFSET_H0"] = "50",
             ["CW_2.04_OFFSET_V0"] = "50",
-            ["CW_1.01_PID"] = " W3_06_42 ",
+            ["CW_1.01_PID"] = " W3-06-42 ",
             ["CW_1.05_LOT"] = " R7 ",
             ["CW_1.05_RELEASE"] = "OLD-IGNORED",
             ["CW_1.07_WALL_TYPE"] = " WT-03 ",
@@ -31,28 +31,28 @@ internal static class Program
 
         PanelCladdingKeySet keySet = RequireData(keys.Parse(panelText, 100d, 100d, 0.001d), "Parse grid");
         PanelCladdingSpawnPlan plan = RequireData(planner.CreatePlan(panelText, keySet), "Create spawn plan");
-        Require(plan.PanelId == "W3_06_42", "PID was not normalized for CID authority.");
+        Require(plan.PanelId == "W3-06-42", "PID was not normalized for CID authority.");
         Require(plan.Regions.Count == 3, "Blank cladding cells must not create surfaces.");
         Require(plan.Regions.Select(region => region.Cid).SequenceEqual(new[]
-            { "W3_06_42-0A", "W3_06_42-0B", "W3_06_42-1A" }),
+            { "W3-06-42_0A", "W3-06-42_0B", "W3-06-42_1A" }),
             "CID ordering/naming is not column-first and bottom-to-top.");
         Require(PanelCladdingSpawnPlanningService.BuildSurfaceCid(
-                "PID_ABC_W3_05_25", "0A") == "CID_ABC_W3_05_25-0A",
-            "A semantic PID_ prefix must become CID_ for a spawned surface.");
+                "PID-ABC-W3-05-25", "0A") == "CID-ABC-W3-05-25_0A",
+            "A semantic PID- prefix must become CID- for a spawned surface.");
         Require(PanelCladdingSpawnPlanningService.BuildSurfaceCid(
-                "W3_06_42", "0A") == "W3_06_42-0A",
+                "W3-06-42", "0A") == "W3-06-42_0A",
             "A plain panel identifier must preserve the legacy CID naming behavior.");
 
         PanelCladdingSpawnRegionPlan glass = plan.Regions[0];
-        Require(glass.LayerPath == "04_STEP Surfaces::Surfaces-Glass::GL01",
+        Require(glass.LayerPath == "Reference::Surfaces - STEP::Surfaces - GL::GL01",
             "GL01 did not route to the required glass material layer.");
         Require(plan.Regions[1].LayerPath == glass.LayerPath,
             "Cells using the same material must reuse one layer path.");
-        Require(glass.UserTextWrites["CW_1.02_CID"] == "W3_06_42-0A",
+        Require(glass.UserTextWrites["CW_1.02_CID"] == "W3-06-42_0A",
             "Canonical CID user text is missing.");
         Require(!glass.UserTextWrites.ContainsKey("CID"),
             "The noncanonical CID alias must not be written.");
-        Require(glass.UserTextWrites["CW_1.01_PID"] == "W3_06_42", "PID source key/value was not inherited.");
+        Require(glass.UserTextWrites["CW_1.01_PID"] == "W3-06-42", "PID source key/value was not inherited.");
         Require(glass.UserTextWrites["CW_1.05_LOT"] == "R7", "Canonical lot key/value was not inherited.");
         Require(!glass.UserTextWrites.ContainsKey("CW_1.05_RELEASE"), "Former release key was propagated.");
         Require(glass.UserTextWrites["CW_1.07_WALL_TYPE"] == "WT-03", "Canonical wall type key/value was not inherited.");
@@ -61,16 +61,16 @@ internal static class Program
                 !glass.UserTextWrites.ContainsKey("WallType"),
             "Noncanonical metadata aliases must be ignored.");
         Require(glass.UserTextWrites["Cladding"] == "GL01", "Normalized cladding information is missing.");
-        Require(plan.Regions[2].LayerPath == "04_STEP Surfaces::Surfaces-Stone::STN02",
-            "STN02 did not route to the stone material family.");
+        Require(plan.Regions[2].LayerPath == "Reference::Surfaces - STEP::Surfaces - STN::STN02",
+            "STN02 did not route to its code-prefix material layer.");
         Console.WriteLine("[OK] PID-derived CIDs, metadata inheritance, blank-cell handling, and material layers");
 
-        Require(PanelCladdingSpawnPlanningService.ResolveMaterialFamilyLayer("TER01") == "Surfaces-Terracotta",
+        Require(PanelCladdingSpawnPlanningService.ResolveMaterialFamilyLayer("TER01") == "Surfaces - TER",
             "Terracotta routing failed.");
-        Require(PanelCladdingSpawnPlanningService.ResolveMaterialFamilyLayer("ACP01") == "Surfaces-Metal",
+        Require(PanelCladdingSpawnPlanningService.ResolveMaterialFamilyLayer("ACP01") == "Surfaces - ACP",
             "Metal routing failed.");
-        Require(PanelCladdingSpawnPlanningService.ResolveMaterialFamilyLayer("custom01") == "Surfaces-Other",
-            "Unknown materials must use the explicit fallback family.");
+        Require(PanelCladdingSpawnPlanningService.ResolveMaterialFamilyLayer("01") == "Surfaces - Other",
+            "Codes without a letter prefix must use the explicit fallback family.");
 
         PanelColorRgb glass01 = PanelCladdingSpawnPlanningService.ResolveMaterialLayerColor("GL01");
         PanelColorRgb glass02 = PanelCladdingSpawnPlanningService.ResolveMaterialLayerColor("GL02");

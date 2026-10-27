@@ -27,7 +27,7 @@ $installArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $installer
     '-BundleRoot', $BundleRoot, '-ProductRoot', $productRoot, '-RhinoPluginRoot', $pluginBase,
     '-LegacyRhinoPackageRoot', $legacyRoot, '-RhinoPluginRegistryRoot', $registryRoot)
 $commands = @('PCClear','PCCreate','PCCrvTemplate','PCEditor','PCMatchCrv','PCMatchSrf',
-    'PCpid','PCSpawnCrv','PCSpawnSrf','PCSyncCrv','PCSyncSrf','PCUpdate')
+    'PCpid','PCSpawnCrv','PCSpawnSrf','PCSyncCrv','PCSyncSrf','PCtemplatePNL','PCUpdate')
 
 Add-Type @'
 using System;
@@ -74,7 +74,7 @@ function Read-Registration {
     Require ((Get-ItemProperty -LiteralPath "$pluginKey\PlugIn").FileName -eq $rhp) 'exact PlugIn FileName after child process exits'
     $commandKey = Get-Item -LiteralPath "$pluginKey\CommandList"
     try {
-        Require (@(Compare-Object $commands @($commandKey.GetValueNames())).Count -eq 0) 'exact twelve command names'
+        Require (@(Compare-Object $commands @($commandKey.GetValueNames())).Count -eq 0) 'exact thirteen command names'
         foreach ($command in $commands) {
             if ($commandKey.GetValue($command) -cne "2;$command") { throw "Incorrect command value: $command" }
         }

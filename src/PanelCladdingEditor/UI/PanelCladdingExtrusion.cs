@@ -46,10 +46,10 @@ public static class PanelExtrusionTopology
     {
         var frames = new List<PanelExtrusionSegment>
         {
-            Frame("FRM_0", PanelExtrusionAxis.Horizontal, 0d, panelWidth),
-            Frame("FRM_1", PanelExtrusionAxis.Horizontal, panelHeight, panelWidth),
-            Frame("FRM_2", PanelExtrusionAxis.Vertical, 0d, panelHeight),
-            Frame("FRM_3", PanelExtrusionAxis.Vertical, panelWidth, panelHeight)
+            Frame("FRM-0", PanelExtrusionAxis.Horizontal, 0d, panelWidth),
+            Frame("FRM-1", PanelExtrusionAxis.Horizontal, panelHeight, panelWidth),
+            Frame("FRM-2", PanelExtrusionAxis.Vertical, 0d, panelHeight),
+            Frame("FRM-3", PanelExtrusionAxis.Vertical, panelWidth, panelHeight)
         };
         double[] xCuts = [0d, .. verticalOffsets, panelWidth];
         double[] yCuts = [0d, .. horizontalOffsets, panelHeight];
@@ -61,7 +61,7 @@ public static class PanelExtrusionTopology
                 string id = AtomicId(PanelExtrusionAxis.Horizontal, horizontalOffsets[line], bay);
                 atomic.Add(new PanelExtrusionSegment(
                     id,
-                    $"INT_{Alpha(line)}{bay}",
+                    $"INT-{Alpha(line)}{bay}",
                     "segment",
                     PanelExtrusionAxis.Horizontal,
                     horizontalOffsets[line],
@@ -77,7 +77,7 @@ public static class PanelExtrusionTopology
                 string id = AtomicId(PanelExtrusionAxis.Vertical, verticalOffsets[line], bay);
                 atomic.Add(new PanelExtrusionSegment(
                     id,
-                    $"INT_{line}{Alpha(bay)}",
+                    $"INT-{line}{Alpha(bay)}",
                     "segment",
                     PanelExtrusionAxis.Vertical,
                     verticalOffsets[line],
@@ -118,7 +118,7 @@ public static class PanelExtrusionTopology
                 : $"{Alpha(BayOf(first.Id))}–{Alpha(BayOf(last.Id))}";
             merged.Add(new PanelExtrusionSegment(
                 group.Id,
-                wholeLine ? $"INT_{baseLabel}" : $"INT_{baseLabel}{range}",
+                wholeLine ? $"INT-{baseLabel}" : $"INT-{baseLabel}{range}",
                 "merged",
                 first.Axis,
                 first.Offset,

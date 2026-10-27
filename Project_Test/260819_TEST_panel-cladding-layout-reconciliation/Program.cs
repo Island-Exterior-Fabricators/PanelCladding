@@ -128,8 +128,8 @@ internal static class Program
             0.001d));
         IReadOnlyList<PanelCladdingExtrusionCurvePlan> curves = Required(
             new PanelCladdingExtrusionPlanningService().CreatePlan(
-                "PID_GENERAL",
-                "CID_GENERAL",
+                "PID-GENERAL",
+                "CID-GENERAL",
                 98.69485d,
                 91.10313d,
                 new PanelCladdingKeySet
@@ -139,14 +139,14 @@ internal static class Program
                     Cells = baseKeySet.Cells,
                     Topology = refined
                 },
-                "01_CW Panels::Surfaces-PNL::WT-01"));
+                "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - WT-01"));
         string[] mergedVerticalCodes = curves
             .Where(curve => curve.Axis == PanelCladdingTopologyAxis.Vertical &&
                 curve.Kind == PanelCladdingExtrusionCurveKind.Merged)
             .Select(curve => curve.Code)
             .OrderBy(code => code, StringComparer.Ordinal)
             .ToArray();
-        Require(mergedVerticalCodes.SequenceEqual(new[] { "INT_0", "INT_2", "INT_3" }),
+        Require(mergedVerticalCodes.SequenceEqual(new[] { "INT-0", "INT-2", "INT-3" }),
             $"Retained full-height merged curves did not reindex deterministically: " +
             string.Join(",", mergedVerticalCodes));
     }
@@ -359,7 +359,7 @@ internal static class Program
         foreach (string forbidden in new[]
         {
             "25.0729", "33.93768", "42.80245", "70.65855",
-            "state=1", "state=2", "INT_1", "INT_2", "Untitled 1.3dm"
+            "state=1", "state=2", "INT-1", "INT-2", "Untitled 1.3dm"
         })
         {
             Require(!production.Contains(forbidden, StringComparison.OrdinalIgnoreCase),

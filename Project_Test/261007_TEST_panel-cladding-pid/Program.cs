@@ -13,20 +13,20 @@ var baseline = Required(Plan(panels));
 Check(baseline.Panels.Count == 20 && baseline.Panels.Select(p => p.Pid).Distinct().Count() == 20, "20 unique tutorial PIDs");
 var expected = new Dictionary<string, string>
 {
-    ["1"] = "N1_01_01", ["2"] = "N1_02_01", ["3"] = "N2_01_01", ["4"] = "N2_02_01",
-    ["5"] = "E1_01_01", ["6"] = "E1_02_01", ["8"] = "E1_01_02", ["7"] = "E1_02_02",
-    ["9"] = "E1_01_03", ["10"] = "E1_02_03",
-    ["unlabelled-1"] = "W1_01_01", ["unlabelled-2"] = "W1_02_01",
-    ["unlabelled-9"] = "S1_01_01", ["unlabelled-10"] = "S1_02_01",
-    ["unlabelled-11"] = "W2_02_01", ["unlabelled-12"] = "W2_01_01",
-    ["unlabelled-15"] = "S1_01_02", ["unlabelled-16"] = "S1_02_02",
-    ["unlabelled-17"] = "W1_01_02", ["unlabelled-18"] = "W1_02_02"
+    ["1"] = "N1-01-01", ["2"] = "N1-02-01", ["3"] = "N2-01-01", ["4"] = "N2-02-01",
+    ["5"] = "E1-01-01", ["6"] = "E1-02-01", ["8"] = "E1-01-02", ["7"] = "E1-02-02",
+    ["9"] = "E1-01-03", ["10"] = "E1-02-03",
+    ["unlabelled-1"] = "W1-01-01", ["unlabelled-2"] = "W1-02-01",
+    ["unlabelled-9"] = "S1-01-01", ["unlabelled-10"] = "S1-02-01",
+    ["unlabelled-11"] = "W2-02-01", ["unlabelled-12"] = "W2-01-01",
+    ["unlabelled-15"] = "S1-01-02", ["unlabelled-16"] = "S1-02-02",
+    ["unlabelled-17"] = "W1-01-02", ["unlabelled-18"] = "W1-02-02"
 };
 foreach (var pair in expected)
 {
     var assigned = baseline.Panels.Single(p => p.ObjectId == Label(pair.Key));
-    Check(assigned.Pid == "PID_ABC_" + pair.Value, $"Tutorial panel {pair.Key}: {assigned.Pid}");
-    Check(assigned.Cid == "CID_ABC_" + pair.Value, "Tutorial CID");
+    Check(assigned.Pid == "PID-ABC-" + pair.Value, $"Tutorial panel {pair.Key}: {assigned.Pid}");
+    Check(assigned.Cid == "CID-ABC-" + pair.Value, "Tutorial CID");
     Check(assigned.UserTextWrites.Count == 4 && assigned.UserTextWrites[PanelCladdingPidPlanningService.ElevationKey] == assigned.Elevation &&
         assigned.UserTextWrites[PanelCladdingPidPlanningService.LevelKey] == assigned.Level, "Canonical writes");
 }
@@ -47,11 +47,15 @@ Same(Required(Plan(reseeded)), baseline);
 Check(panels.All(p => p.UserText.Count == 2 && p.UserText["unrelated"] == "keep"), "Planning never mutates source metadata");
 Console.WriteLine("[OK] selection-order independence, rotated project north, translated/scaled geometry and repeat planning");
 
-foreach (var role in new (string Type, string Suffix)[] { ("flat", ""), ("corner_parent", "-P"), (" CORNER_CHILD ", "-C"), ("", ""), ("unknown", "") })
+foreach (var role in new (string Type, string Role, string Suffix)[]
+         {
+             ("F", "Parent", ""), ("L", "Parent", "_P"), (" l ", " child ", "_C"), ("Z", "Child 2", "_C2"),
+             ("L", "", ""), ("", "", ""), ("unknown", "Parent", ""), ("corner_child", "Child", "")
+         })
 {
     var typed = panels.Select(p => p with { UserText = new Dictionary<string, string>
     {
-        ["cw_1.06_unit_type"] = role.Type, ["CW_1.02_CID"] = "CUSTOM_OLD_CID",
+        ["cw_1.06_unit_type"] = role.Type, ["cw_5.00_definition_a"] = role.Role, ["CW_1.02_CID"] = "CUSTOM_OLD_CID",
         ["CW_1.99_PARENT"] = "TRUE"
     }}).ToArray();
     var plan = Required(Plan(typed));
@@ -120,10 +124,10 @@ Check(!planner.ValidateDocumentIdentities(baseline, panels, [external]).Success,
 Check(!planner.ValidateDocumentIdentities(baseline, panels, [external with { Pid = "", Cid = first.Cid }]).Success, "Unselected CID collision");
 Check(!planner.ValidateDocumentIdentities(baseline, panels, [external with { IsManagedDependency = true }]).Success, "Do not adopt orphan dependency identity");
 var writtenSources = panels.Select(p => p with { UserText = new Dictionary<string, string>(baseline.Panels.Single(a => a.ObjectId == p.ObjectId).UserTextWrites) }).ToArray();
-var dep = external with { Pid = first.Pid, Cid = first.Cid + "-0A", IsManagedDependency = true };
+var dep = external with { Pid = first.Pid, Cid = first.Cid + "_0A", IsManagedDependency = true };
 Check(planner.ValidateDocumentIdentities(baseline, writtenSources, [dep]).Success, "Idempotent run allowed with dependencies");
 var renumbered = new PanelCladdingPidPlan(baseline.Panels.Select(p => p.ObjectId == first.ObjectId ?
-    p with { Pid = "PID_NEW_N1_01_01", Cid = "CID_NEW_N1_01_01" } : p).ToArray());
+    p with { Pid = "PID-NEW-N1-01-01", Cid = "CID-NEW-N1-01-01" } : p).ToArray());
 Check(!planner.ValidateDocumentIdentities(renumbered, writtenSources, [dep]).Success, "Do not orphan dependencies when project/address changes");
 Check(!planner.ValidateDocumentIdentities(renumbered, writtenSources, [dep with { Pid = "" }]).Success, "CID-only dependency protects its source");
 Check(planner.ValidateDocumentIdentities(baseline, writtenSources,

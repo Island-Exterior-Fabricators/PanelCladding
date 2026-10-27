@@ -9,7 +9,7 @@ internal static class Program
 {
     private static readonly Guid PanelId =
         Guid.Parse("68000000-0000-0000-0000-000000000001");
-    private const string Pid = "PID_CLADDING_LOGIC_01";
+    private const string Pid = "PID-CLADDING-LOGIC-01";
     private const string Material = "MPL-001";
 
     private static void Main()
@@ -75,7 +75,7 @@ internal static class Program
                 preservedPanel.CellValues[CellKey(0)] == "1A",
             "An unchanged region did not preserve its saved non-default owner.");
         Require(preservedPlan.Surfaces.Single(surface =>
-                surface.CoveredCellLabels.Count == 2).DesiredCid.EndsWith("-1A", StringComparison.Ordinal),
+                surface.CoveredCellLabels.Count == 2).DesiredCid.EndsWith("_1A", StringComparison.Ordinal),
             "The preserved owner was not used for the surface CID.");
 
         PanelCladdingLayout merged = BuildLayout(keys, 3, new Dictionary<string, string>
@@ -325,7 +325,7 @@ internal static class Program
             DocumentRuntimeSerialNumber = 1,
             DocumentPath = "C:\\tests\\panel-cladding-logic.3dm",
             ObjectName = Pid,
-            LayerFullPath = "01_CW Panels::Surfaces-PNL::WT-01",
+            LayerFullPath = "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - WT-01",
             SystemCode = "WT01",
             GeometryFingerprint = "cladding-logic-fingerprint",
             GeometryClass = PanelGeometryClass.Planar,
@@ -356,7 +356,7 @@ internal static class Program
                 {
                     ObjectId = PanelId,
                     PanelId = Pid,
-                    PanelCid = "CID_CLADDING_LOGIC_01",
+                    PanelCid = "CID-CLADDING-LOGIC-01",
                     Layout = layout
                 }
             },
@@ -372,7 +372,7 @@ internal static class Program
             ObjectId = Guid.Parse(objectId),
             PanelObjectId = PanelId,
             PanelId = Pid,
-            Cid = $"CID_CLADDING_LOGIC_01-{coverage[0]}",
+            Cid = $"CID-CLADDING-LOGIC-01_{coverage[0]}",
             LayerPath = $"{PanelCladdingSpawnPlanningService.MaterialSurfaceRootLayer}::" +
                 $"{PanelCladdingSpawnPlanningService.ResolveMaterialFamilyLayer(material)}::{material}",
             CladdingValue = material,

@@ -29,8 +29,8 @@ internal static class NativeSmoke
         using var doc = RhinoDoc.CreateHeadless(null);
         doc.ModelAbsoluteTolerance = 0.00001;
         doc.UndoRecordingEnabled = true;
-        int parentIndex = doc.Layers.Add(new Layer { Name = "01_CW Panels" });
-        int sourceIndex = doc.Layers.Add(new Layer { Name = "Surfaces-PNL", ParentLayerId = doc.Layers[parentIndex].Id });
+        int parentIndex = doc.Layers.Add(new Layer { Name = "ABC-IEF-Wireframe" });
+        int sourceIndex = doc.Layers.Add(new Layer { Name = "Surfaces - PNL", ParentLayerId = doc.Layers[parentIndex].Id });
         int nestedIndex = doc.Layers.Add(new Layer { Name = "WT-01", ParentLayerId = doc.Layers[sourceIndex].Id });
         var ids = new List<Guid>();
         for (int row = 0; row < 2; row++)
@@ -44,7 +44,8 @@ internal static class NativeSmoke
             attributes.SetUserString("CW_2.01_UNIT_WIDTH", "stale");
             // Exercise duplicate casing cleanup, even though values are initially blank.
             attributes.SetUserString("cw_1.01_pid", "old");
-            attributes.SetUserString("CW_1.06_UNIT_TYPE", row == 0 ? "flat" : "corner_parent");
+            attributes.SetUserString("CW_1.06_UNIT_TYPE", row == 0 ? "F" : "L");
+            attributes.SetUserString("CW_5.00_DEFINITION_A", row == 0 ? " " : "Parent");
             ids.Add(doc.Objects.AddBrep(surface, attributes));
         }
         var root = new DirectoryInfo(AppContext.BaseDirectory);
@@ -59,8 +60,8 @@ internal static class NativeSmoke
         var service = new LivePanelCladdingPidService();
         var assigned = service.Assign(doc.RuntimeSerialNumber, request);
         Check(assigned.Success && assigned.Data?.UpdatedPanelCount == 2, assigned.Message);
-        Check(doc.Objects.FindId(ids[0]).Attributes.GetUserString("CW_1.01_PID") == "PID_ABC_N1_01_01", "Native lower PID");
-        Check(doc.Objects.FindId(ids[1]).Attributes.GetUserString("CW_1.02_CID") == "CID_ABC_N1_02_01-P", "Native upper role CID");
+        Check(doc.Objects.FindId(ids[0]).Attributes.GetUserString("CW_1.01_PID") == "PID-ABC-N1-01-01", "Native lower PID");
+        Check(doc.Objects.FindId(ids[1]).Attributes.GetUserString("CW_1.02_CID") == "CID-ABC-N1-02-01_P", "Native upper role CID");
         Check(doc.Objects.FindId(ids[0]).Attributes.GetUserString("cw_1.01_pid") is null, "Canonical casing");
         Check(ids.All(id => doc.Objects.FindId(id).Attributes.GetUserString("unrelated") == "keep"), "Unrelated metadata");
         foreach (Guid id in ids)
@@ -91,7 +92,7 @@ internal static class NativeSmoke
         // The lower panel is context and both references, but only the upper panel is written.
         var partial = service.Assign(doc.RuntimeSerialNumber, request with { PanelObjectIds = [ids[1]] });
         Check(partial.Success && partial.Data?.UpdatedPanelCount == 1 && partial.Data.Plan.ContextPanelCount == 2, partial.Message);
-        Check(doc.Objects.FindId(ids[1]).Attributes.GetUserString("CW_1.01_PID") == "PID_ABC_N1_02_01", "Partial native numbering uses unselected row");
+        Check(doc.Objects.FindId(ids[1]).Attributes.GetUserString("CW_1.01_PID") == "PID-ABC-N1-02-01", "Partial native numbering uses unselected row");
         Check(doc.Objects.FindId(ids[0]).Attributes.Name == "preserved-before-undo" &&
             doc.Objects.FindId(ids[0]).Attributes.GetUserString("cw_1.01_pid") == "old" &&
             doc.Objects.FindId(ids[0]).Attributes.GetUserString("CW_1.02_CID") is null, "Unselected panel attributes unchanged");

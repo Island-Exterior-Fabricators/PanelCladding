@@ -182,7 +182,7 @@ internal static class Program
         PanelCladdingSpawnPlan plan = Required(new PanelCladdingSpawnPlanningService(keys).CreatePlan(
             new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
-                [PanelCladdingSpawnPlanningService.PanelIdUserTextKey] = "PID_TEST_01",
+                [PanelCladdingSpawnPlanningService.PanelIdUserTextKey] = "PID-TEST-01",
                 [PanelCladdingSpawnPlanningService.ReleaseUserTextKey] = "REL-01",
                 [PanelCladdingSpawnPlanningService.WallTypeUserTextKey] = "WT-01"
             },
@@ -305,8 +305,8 @@ internal static class Program
             ObjectId = Guid.NewGuid(),
             DocumentRuntimeSerialNumber = 1,
             DocumentPath = "C:/test/full-track-collapse.3dm",
-            ObjectName = "N1_PF_07",
-            LayerFullPath = "01_CW Panels::Surfaces-PNL::WT-01",
+            ObjectName = "N1-PF-07",
+            LayerFullPath = "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - WT-01",
             SystemCode = "WT01",
             GeometryFingerprint = "full-track-collapse-fingerprint",
             GeometryClass = PanelGeometryClass.Planar,

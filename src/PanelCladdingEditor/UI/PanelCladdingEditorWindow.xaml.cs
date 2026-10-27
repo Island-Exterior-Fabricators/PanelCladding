@@ -352,7 +352,7 @@ public partial class PanelCladdingEditorWindow : Window
             {
                 continue;
             }
-            if (key.StartsWith("FRM_", StringComparison.OrdinalIgnoreCase))
+            if (key.StartsWith("FRM-", StringComparison.OrdinalIgnoreCase))
             {
                 frames[key.ToUpperInvariant()] = codes;
             }
@@ -478,7 +478,7 @@ public partial class PanelCladdingEditorWindow : Window
         var remappedModifiers = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase);
         foreach ((string key, HashSet<string> codes) in _frameAssignmentCodes)
         {
-            if (key.StartsWith("FRM_", StringComparison.OrdinalIgnoreCase))
+            if (key.StartsWith("FRM-", StringComparison.OrdinalIgnoreCase))
             {
                 remapped[key] = codes.ToHashSet(StringComparer.OrdinalIgnoreCase);
                 if (_frameCurveModifiers.TryGetValue(key, out double frameModifier))

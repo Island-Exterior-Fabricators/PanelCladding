@@ -274,8 +274,8 @@ public sealed class PanelCladdingSaveService
         return OperationResponse<PanelCladdingSaveResult>.Ok(new PanelCladdingSaveResult
         {
             ObjectId = request.ObjectId,
-            FrameConfig = writes.GetValueOrDefault(PanelCladdingKeyService.FrameConfigKey) ??
-                GetUserText(layout.SourceUserText, PanelCladdingKeyService.FrameConfigKey),
+            FrameConfig = writes.GetValueOrDefault(PanelCladdingKeyService.FrameConfigBackupKey) ??
+                GetUserText(layout.SourceUserText, PanelCladdingKeyService.FrameConfigBackupKey),
             StoredSignature = string.Empty,
             WorkbookPath = request.WorkbookPath,
             SheetName = string.Empty,

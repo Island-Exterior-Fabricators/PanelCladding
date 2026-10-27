@@ -11,7 +11,7 @@ var spawnPlanner = new PanelCladdingSpawnPlanningService(keys);
 
 foreach (string release in new[] { " 007 ", "R-03A" })
 {
-    var text = PanelText("PID_RELEASE_01", release);
+    var text = PanelText("PID-RELEASE-01", release);
     var grid = Required(keys.CreateKeySet([], [30d, 70d], text, 100, 80, 0.001));
     foreach (var spawn in new[]
     {
@@ -36,7 +36,7 @@ foreach ((string? source, string existing, bool changed) in new[]
     ("  ", "007", true), ((string?)null, "007", true), ((string?)null, "", false)
 })
 {
-    var snapshot = Fixture("PID_RELEASE_01", source, existing);
+    var snapshot = Fixture("PID-RELEASE-01", source, existing);
     var plan = Required(planner.CreatePlan(snapshot));
     Check(plan.Issues.Count == 0, string.Join(";", plan.Issues.Select(issue => issue.Message)));
     Check(plan.Surfaces.Count == 2, "Both material surfaces must be matched");
@@ -57,8 +57,8 @@ foreach ((string? source, string existing, bool changed) in new[]
 }
 Console.WriteLine("[OK] sync commits missing/stale/removed release; current values and panel types remain stable");
 
-var first = Fixture("PID_RELEASE_01", "007", "006");
-var second = Fixture("PID_RELEASE_02", "012", "012");
+var first = Fixture("PID-RELEASE-01", "007", "006");
+var second = Fixture("PID-RELEASE-02", "012", "012");
 var batch = new PanelCladdingSurfaceSyncSnapshot
 {
     SelectedPanelIds = [.. first.SelectedPanelIds, .. second.SelectedPanelIds],
@@ -67,7 +67,7 @@ var batch = new PanelCladdingSurfaceSyncSnapshot
 };
 var batchPlan = Required(planner.CreatePlan(batch));
 Check(batchPlan.Issues.Count == 0 && batchPlan.Surfaces.Count == 4, "Both panels must be planned");
-Check(batchPlan.Surfaces.Where(surface => surface.PanelId == "PID_RELEASE_02")
+Check(batchPlan.Surfaces.Where(surface => surface.PanelId == "PID-RELEASE-02")
     .All(surface => surface.DesiredReleaseNumber == "012" && !surface.MetadataChanged),
     "Each panel retains authority over its own surfaces");
 var batchCommit = Commit(batch);
@@ -82,8 +82,8 @@ var curveScope = new PanelCladdingSurfaceSyncSnapshot
     Curves = [new PanelCladdingSurfaceSyncCurveSnapshot
     {
         ObjectId = Guid.NewGuid(), PanelObjectId = first.Panels[0].ObjectId,
-        PanelId = "PID_RELEASE_01", Cid = "CID_RELEASE_01-P-FRM_0",
-        CurveCode = "FRM_0", DesiredCode = "FRM_0", ReleaseNumber = "007", UsesObjectColor = true
+        PanelId = "PID-RELEASE-01", Cid = "CID-RELEASE-01_P_FRM-0",
+        CurveCode = "FRM-0", DesiredCode = "FRM-0", ReleaseNumber = "007", UsesObjectColor = true
     }]
 };
 var scopedCommit = Commit(curveScope);
@@ -96,7 +96,7 @@ Dictionary<string, string> PanelText(string pid, string? release)
     var text = new Dictionary<string, string>(StringComparer.Ordinal)
     {
         [PanelCladdingSpawnPlanningService.PanelIdUserTextKey] = pid,
-        [PanelCladdingSpawnPlanningService.CidUserTextKey] = pid.Replace("PID_", "CID_") + "-P",
+        [PanelCladdingSpawnPlanningService.CidUserTextKey] = pid.Replace("PID-", "CID-") + "_P",
         [PanelCladdingSpawnPlanningService.WallTypeUserTextKey] = "WT01",
         ["CW_1.05_RELEASE"] = "OLD-IGNORED",
         ["parent"] = "1",

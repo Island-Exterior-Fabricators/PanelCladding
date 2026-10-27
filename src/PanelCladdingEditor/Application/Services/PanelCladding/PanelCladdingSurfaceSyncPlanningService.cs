@@ -462,7 +462,7 @@ public sealed class PanelCladdingSurfaceSyncPlanningService
                 string curvePanelCid = resolvedPanelCid;
                 foreach (PanelCladdingSurfaceSyncCurveSnapshot curve in scopedCurves)
                 {
-                    string desiredCid = $"{curvePanelCid}-{curve.DesiredCode}";
+                    string desiredCid = PanelCladdingCidService.Component(curvePanelCid, curve.DesiredCode);
                     curvePlans.Add(new PanelCladdingSurfaceSyncCurvePlan
                     {
                         ObjectId = curve.ObjectId,
@@ -685,7 +685,7 @@ public sealed class PanelCladdingSurfaceSyncPlanningService
             string panelCid = resolvedPanelCid;
             foreach (PanelCladdingSurfaceSyncCurveSnapshot curve in panelCurves)
             {
-                string desiredCid = $"{panelCid}-{curve.DesiredCode}";
+                string desiredCid = PanelCladdingCidService.Component(panelCid, curve.DesiredCode);
                 curvePlans.Add(new PanelCladdingSurfaceSyncCurvePlan
                 {
                     ObjectId = curve.ObjectId,
@@ -830,28 +830,29 @@ public sealed class PanelCladdingSurfaceSyncPlanningService
 
     private static OperationResponse<string> ResolveLayerMaterial(string layerPath, string cid)
     {
-        string[] segments = (layerPath ?? string.Empty).Split(
-            new[] { "::" },
-            StringSplitOptions.None);
-        if (segments.Length != 3 ||
-            !PanelCladdingSpawnPlanningService.IsSupportedMaterialSurfaceRoot(segments[0]))
+        string path = (layerPath ?? string.Empty).Trim();
+        string rootPrefix = PanelCladdingSpawnPlanningService.MaterialSurfaceRootLayer + "::";
+        string[] segments = path.StartsWith(rootPrefix, StringComparison.OrdinalIgnoreCase)
+            ? path[rootPrefix.Length..].Split(new[] { "::" }, StringSplitOptions.None)
+            : Array.Empty<string>();
+        if (segments.Length != 2)
         {
             return OperationResponse<string>.Fail(
                 $"PANEL_CLADDING_SURFACE_SYNC_LAYER_INVALID: {cid}: expected " +
                 $"{PanelCladdingSpawnPlanningService.MaterialSurfaceRootLayer}::<family>::<material>, found '{layerPath}'.");
         }
 
-        string material = (segments[2] ?? string.Empty).Trim().ToUpperInvariant();
+        string material = (segments[1] ?? string.Empty).Trim().ToUpperInvariant();
         if (!IsValidMaterialSegment(material))
         {
             return OperationResponse<string>.Fail(
-                $"PANEL_CLADDING_SURFACE_SYNC_MATERIAL_INVALID: {cid}: '{segments[2]}'.");
+                $"PANEL_CLADDING_SURFACE_SYNC_MATERIAL_INVALID: {cid}: '{segments[1]}'.");
         }
         string expectedFamily = PanelCladdingSpawnPlanningService.ResolveMaterialFamilyLayer(material);
-        if (!string.Equals(segments[1].Trim(), expectedFamily, StringComparison.OrdinalIgnoreCase))
+        if (!string.Equals(segments[0].Trim(), expectedFamily, StringComparison.OrdinalIgnoreCase))
         {
             return OperationResponse<string>.Fail(
-                $"PANEL_CLADDING_SURFACE_SYNC_MATERIAL_FAMILY_MISMATCH: {cid}: material {material} belongs under {expectedFamily}, found '{segments[1]}'.");
+                $"PANEL_CLADDING_SURFACE_SYNC_MATERIAL_FAMILY_MISMATCH: {cid}: material {material} belongs under {expectedFamily}, found '{segments[0]}'.");
         }
         return OperationResponse<string>.Ok(material);
     }

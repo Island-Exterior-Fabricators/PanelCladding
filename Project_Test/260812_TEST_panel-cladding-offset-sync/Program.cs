@@ -9,7 +9,7 @@ namespace PanelCladdingOffsetSyncSmoke;
 internal static class Program
 {
     private static readonly Guid PanelId = Guid.Parse("A1000000-0000-0000-0000-000000000001");
-    private const string Pid = "PID_OFFSET_SYNC_01";
+    private const string Pid = "PID-OFFSET-SYNC-01";
 
     private static void Main()
     {
@@ -30,17 +30,15 @@ internal static class Program
 
     private static void VerifyStepLayerContract(PanelCladdingKeyService keys)
     {
-        const string expectedRoot = "04_STEP Surfaces";
+        const string expectedRoot = "Reference::Surfaces - STEP";
         Require(PanelCladdingSpawnPlanningService.MaterialSurfaceRootLayer == expectedRoot,
             "Spawn root must use the STEP layer name.");
-        Require(PanelCladdingSpawnPlanningService.IsSupportedMaterialSurfaceRoot(expectedRoot),
+        Require(PanelCladdingSpawnPlanningService.IsManagedSurfaceLayerPath(expectedRoot),
             "STEP root must be accepted.");
-        Require(PanelCladdingSpawnPlanningService.IsSupportedMaterialSurfaceRoot(
-                "03_Material Surfaces (STEP)"),
-            "The exact legacy STEP root must remain readable for migration.");
-        Require(!PanelCladdingSpawnPlanningService.IsSupportedMaterialSurfaceRoot("02_Material Surfaces") &&
-                !PanelCladdingSpawnPlanningService.IsSupportedMaterialSurfaceRoot("03_Material Surfaces (STP)"),
-            "Unrecognized material roots must not be accepted.");
+        Require(!PanelCladdingSpawnPlanningService.IsManagedSurfaceLayerPath("04_STEP Surfaces") &&
+                !PanelCladdingSpawnPlanningService.IsManagedSurfaceLayerPath("03_Material Surfaces (STEP)") &&
+                !PanelCladdingSpawnPlanningService.IsManagedSurfaceLayerPath("Reference::Surfaces - STP"),
+            "Retired or unrecognized material roots must not be accepted.");
 
         PanelCladdingKeySet keySet = RequireData(keys.CreateKeySet(
             Array.Empty<double>(),
@@ -67,7 +65,7 @@ internal static class Program
                 expectedRoot + "::",
                 StringComparison.Ordinal)),
             "Every spawned cladding region must be under the STEP root.");
-        Console.WriteLine("[OK] 04_STEP Surfaces is the spawn root and the exact legacy root remains readable");
+        Console.WriteLine("[OK] Reference::Surfaces - STEP is the spawn root and retired roots are not accepted");
     }
 
     private static void VerifyCanonicalGrid(PanelCladdingKeyService keys)

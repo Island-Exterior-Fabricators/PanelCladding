@@ -6,7 +6,7 @@ it with `Install-PanelCladdingEditor.ps1`.
 
 The Rhino command surface uses the `PC` prefix: `_PCEditor`, `_PCCreate`, `_PCClear`,
 `_PCCrvTemplate`, `_PCMatchSrf`, `_PCMatchCrv`, `_PCSpawnSrf`, `_PCSpawnCrv`, `_PCSyncSrf`,
-`_PCSyncCrv`, `_PCUpdate`, and `_PCpid`. `PCUpdate` treats the selected panels' saved attributes as
+`_PCSyncCrv`, `_PCUpdate`, `_PCpid`, and `_PCtemplatePNL`. `PCUpdate` treats the selected panels' saved attributes as
 authoritative and reconciles all CID-bearing managed surfaces and curves: matching objects are
 rebuilt, missing objects are created, and stale or duplicate objects are deleted. `PCCrvTemplate`
 assigns a full-run horizontal or vertical merge mask only to selected
@@ -15,6 +15,103 @@ skipped and reported while the remaining eligible panels are updated. Selecting 
 panels succeeds without changes. A one-row/one-column case with no applicable
 run remains mask-free. Surface commands operate only on cladding Breps; curve commands operate only
 on extrusion curves.
+
+Since 1.1.0, panel attributes follow the project naming convention workbook
+`<PROJECT> - Naming Convention.xlsx` (PNL sheet):
+
+| Attribute | Value |
+| --- | --- |
+| `CW_1.06_UNIT_TYPE` | `C` Curved, `F` Flat, `L` Two Face, `Z` Three Face |
+| `CW_1.08_FRAME_CONFIG` | code in the project's Frame-Config format (`AA`, `AB`, … by default; no `I`/`O`) |
+| `CW_5.00_DEFINITION_A` | role: `Parent`, `Child`, `Child 1`, `Child 2` |
+| `CW_9.01_CLADDING_LOGIC` | cell ownership JSON (formerly `CW_2.13_CLADDING_LOGIC`) |
+| `CW_9.02_FRAME_CONFIG` | readable configuration, e.g. `2H 1V \| delete A1 0B \| merge B0–1 \| hide 0A` |
+
+`CW_9.02` is authoritative and lets the plug-in read a coded panel even when the workbook
+is unavailable. `2H 1V` is the number of horizontal and vertical intermediates; horizontal
+segments are track letter + bay number and vertical segments track number + bay letter,
+as in the `INT-` curve codes. Codes are assigned per document when a configuration is first
+written and are never reused; configurations with the same intermediate counts share the
+first letter. The code table lives in the document string `PanelCladdingEditor.FrameConfigCodes`.
+Only `L` and `Z` panels take a CID role suffix (`_P`, `_C`, `_C1`, `_C2`) from Definition A;
+`C` and `F` panels are `Parent` without a suffix. PCpid reserves Definition A, moving
+existing definitions down (adding `E`, `F`, … as needed). The former JSON frame
+configuration and `flat`/`corner_parent`/`corner_child` values must be migrated.
+
+Every save of the project's main model, `<PROJECT> - Wireframe.3dm` (the whole file name, any
+case), updates three tables in the PNL sheet. Since 1.2.1 other models of the project, such as
+`XYZ - Wireframe_STN.3dm` or a copy like `ABC - Wireframe - v2.3dm`, never write the sheet: they
+read its format and reserved Frame-Config codes, and print once per session that only the main
+model updates it. Each table is found by its title in row 12
+(`Unit-Type`, `Wall-Type`, `Frame-Config`, matched ignoring case, spaces and hyphens): the code
+is in the title's column, the description in the next one, and the rows start at row 13.
+Missing titles are added in E, H and J. Wall-Type codes are single letters (`A`, `B`, …, no
+`I`/`O`) for the `CW_1.07_WALL_TYPE` values. Only these six columns are written; header rows
+and any other tables in the sheet are left as they are, and nothing is written when the
+tables are already current. Since 1.1.1 the PNL header order is Unit-Type | Wall-Type |
+Frame-Config | Frame-Type | Cladding | Definition | Seq (1.1.0 wrote E/F, I/J and W/X from row 12).
+Since 1.1.3 the save also writes the project code into the example-row cells under the row-7
+`Job Code` header, one letter per cell (or whole in a single cell); a code that does not fit is
+reported once and the cells are left as they are.
+Codes no panel uses are kept, struck through and greyed. The workbook is found next to the
+model, or at the document string `PanelCladdingEditor.NamingConventionPath`. If it is open or
+locked the model still saves, a warning is printed, and the next save retries. The plug-in
+does not generate `CW_1.00_PNL`.
+
+Since 1.2.0 each project records its PNL code format with `PCtemplatePNL`. The command asks for
+the Wall-Type, Frame-Config, Frame-Type and Cladding formats one at a time; each answer is
+required and is one of `AA` (two letters), `A` (one letter), `A1` (letter + digit), `01` (two
+digits) or `001` (three digits). Letters `I` and `O` are never used. Definition is always `01`
+and, like every two-digit segment, continues `01`..`99`, `A1`..`Z9`, `AA`..`ZZ`. A format that
+codes already written in the sheet do not fit is refused, because codes never move. The command
+then lays out the PNL sheet: the row-7 segments (Wall-Type as wide as its code, the others at
+least two columns; a segment that is too narrow gains columns at its end and everything to its
+right moves), the example row 8 (one character per cell, merged across the segment for a
+one-character code), the row-12 titles and 24 placeholder codes under each table (none for
+grouped `AA`/`A1` frame configurations). The format is stored in the workbook's custom property
+`PanelCladdingEditor.PNLFormat`, so every model of the project shares it; each model also keeps a
+copy in the document string of the same name. Close the workbook in Excel first.
+For XYZ the answers are `A`, `A`, `01`, `001`; ABC, which has no recorded format, keeps `A`,
+`AA`, `01`, `01`, `01`.
+
+Since 1.2.0 the save-time sync follows the recorded format and changes the sheet in place: a code
+keeps its row, a placeholder (code without value) is filled when a new value takes that code, a
+written value is never replaced (a different model value is reported), only the struck state of
+used/unused rows changes, and new codes go below the table. Placeholder rows, other rows, merges
+and number cells are kept. `CW_1.08` follows the format on every panel write; without a recorded
+format a code of another shape (such as XYZ's one-letter `A`) is left as it is.
+
+Since 1.0.99, identifiers use `-` between the tokens of one ID and `_` between a panel
+CID and its role or component: `PID-ABC-N2-05-05`, panel `CID-ABC-N2-05-05_C`, cladding
+surface `CID-ABC-N2-05-05_C_0A`, and extrusion curve `CID-ABC-N2-05-05_C_FRM-0`. Curve
+codes (`CRV`) also use `-`: `FRM-0`…`FRM-3`, `INT-A0`, `INT-0A`, merged `INT-A0–1`, and
+`CW_1.09_FRAME_TYPE` keys perimeter frames as `FRM-n`. Object names follow the CID
+(`N2-05-05_C`). The former `PID_ABC_N2_05_05` / `CID_ABC_N2_05_05-C` / `FRM_0` forms
+are no longer produced or matched; migrate existing documents before using 1.0.99.
+
+Since 1.1.3 the project code comes from the Rhino file name: the text before the first ` - `,
+up to its first non-alphanumeric character, so `ABC - Wireframe.3dm` is `ABC`. It names the only
+project root layer, `ABC-IEF-Wireframe`; panels and curves under another `*-IEF-Wireframe` root are
+outside the project. The same code is the naming-convention workbook's name and Job Code, and
+PCpid offers it as the default project code. Unsaved documents accept any `*-IEF-Wireframe` root.
+
+Since 1.0.98, the plug-in follows the project layer standard. `<PROJECT>` is the
+project code of the top-level `<PROJECT>-IEF-Wireframe` layer, for example `ABC`:
+
+| Objects | Layer |
+| --- | --- |
+| Source panels | `<PROJECT>-IEF-Wireframe::Surfaces - PNL::Surfaces - <type>` |
+| Extrusion curves | `<PROJECT>-IEF-Wireframe::Curves - PNL::Curves - <type>` |
+| Cladding surfaces | `Reference::Surfaces - STEP::Surfaces - <prefix>::<material>` |
+
+A panel on `Surfaces - WT_01` gets its curves on `Curves - WT_01` under the same
+project root. The cladding family layer is the material code's leading letters, so
+`GLS-001` goes to `Surfaces - GLS::GLS-001` and `MPL-002` to `Surfaces - MPL::MPL-002`.
+Missing layers are created on spawn/update. Only these two output trees are treated
+as managed dependencies; copies elsewhere (for example the wireframe
+`Surfaces - GLS` glass) are not discovered, updated or deleted by spawn, update or sync.
+The former `01_CW Panels`, `02_CW Extrusions`, `04_STEP Surfaces` and
+`03_Material Surfaces (STEP)` trees are no longer recognized; re-layer older documents first.
 
 Since 1.0.96, `PCMatchCrv` copies extrusion assignments together with the segment, merge and hide
 masks. Select target panel Breps, then the source; horizontal/vertical grid counts
@@ -43,12 +140,13 @@ surfaces are still rejected at the document tolerance.
 prompts for a three-letter project code, the panels to update,
 a north-facade panel, and a first-floor panel. It writes
 `CW_1.03_ELEVATION`, `CW_1.04_LEVEL`, `CW_1.01_PID` and `CW_1.02_CID`, for example
-`PID_ABC_W3_05_11` and `CID_ABC_W3_05_11`. CID keeps the existing unit-type role
+`PID-ABC-W3-05-11` and `CID-ABC-W3-05-11`. CID keeps the existing unit-type role
 suffix policy, and the panel name follows the existing shortened-CID convention.
 Bay is the last PID/CID segment; PCpid does not introduce another user-text key.
 
 Since 1.0.90, numbering considers every surface/Brep on
-`01_CW Panels::Surfaces-PNL` and every nested sublayer, including hidden, locked
+`<PROJECT>-IEF-Wireframe::Surfaces - PNL` (before 1.0.98, `01_CW Panels::Surfaces-PNL`)
+and every nested sublayer, including hidden, locked
 and reference panels as read-only context. Only selected editable panels in this
 subtree receive PID/CID/elevation/level/name changes. North and first-floor
 references may be unselected panels in the subtree. Unrelated layers and similarly
@@ -150,25 +248,25 @@ intermediate curves are DarkGreen (`RGB 0,100,0`). `PCSpawnCrv` applies the colo
 while `PCUpdate` and `PCSyncCrv` correct existing curves within the selected-panel scope.
 
 Panel cladding saves persist material-independent cell ownership under
-`CW_2.13_CLADDING_LOGIC`. This key stores ownership JSON, separate from the binary
-hidden-segment mask inside `CW_1.08_FRAME_CONFIG`. `PCSyncSrf` combines that saved owner graph with current Rhino surface
+`CW_9.01_CLADDING_LOGIC` (`CW_2.13_CLADDING_LOGIC` before 1.1.0). This key stores ownership
+JSON, separate from the hidden segments in `CW_9.02_FRAME_CONFIG`. `PCSyncSrf` combines that saved owner graph with current Rhino surface
 coverage and material layers, while edited splits and merges remain geometry-authoritative.
 
-Since version 1.0.85, panel roles come exclusively from `CW_1.06_UNIT_TYPE`:
-`flat` uses a PID-derived CID without a role suffix, `corner_parent` uses `-P`,
-and `corner_child` uses `-C`. Keys and values ignore case and surrounding value
+Since version 1.0.85, panel roles come from `CW_1.06_UNIT_TYPE` (since 1.1.0 together
+with `CW_5.00_DEFINITION_A`, see above; before 1.1.0 `flat` had no suffix, `corner_parent`
+used `_P` and `corner_child` `_C`, and `-P`/`-C` before 1.0.99). Keys and values ignore case and surrounding value
 whitespace. The old `parent` and `child` flags are ignored. Material surfaces and
 extrusion curves inherit the suffix before their cell/curve code, for example
-`CID_ABC_W1_03_01-P-0A` and `CID_ABC_W1_03_01-P-INT_B1`.
+`CID-ABC-W1-03-01_P_0A` and `CID-ABC-W1-03-01_P_INT-B1`.
 Existing PC save/create/match/spawn/sync/update paths apply the rule. Changing to
 `flat` clears a stale panel CID role suffix. A missing or unsupported unit type
 does not rewrite an existing custom panel CID or fall back to legacy flags.
 
 Since version 1.0.86, panel and managed dependency object names use a shortened
-CID: `CID_ABC_S1_06_14` becomes `S1_06_14`, and
-`CID_ABC_S1_06_14-P-INT_B1` becomes `S1_06_14-P-INT_B1`. The leading `CID_ABC_`
-is removed without changing the full CID user text; other `CID_` identifiers lose
-only `CID_`, and custom identifiers are preserved. Prefix matching ignores case.
+CID: `CID-ABC-S1-06-14` becomes `S1-06-14`, and
+`CID-ABC-S1-06-14_P_INT-B1` becomes `S1-06-14_P_INT-B1`. The leading `CID-ABC-`
+is removed without changing the full CID user text; other `CID-` identifiers lose
+only `CID-`, and custom identifiers are preserved. Prefix matching ignores case.
 Create, save, match, spawn, sync, and update normalize source-panel names from the
 current CID. Spawn/update/sync apply the same rule to surfaces and extrusion curves.
 Run PCUpdate on existing configured panels to refresh their dependency names.
@@ -212,8 +310,10 @@ PCClear also recognizes these retired keys. Material, owner-graph, and topology
 validation remain active. The former frame-typology identifier is also retired.
 The old identity/workbook utilities remain dormant for a future design decision.
 
-Since 1.0.96, frame configuration is stored as versioned JSON in `CW_1.08_FRAME_CONFIG`:
-`{"v":1,"delete":"<mask>","merge":"<mask>","hide":"<mask>"}`.
+From 1.0.96 to 1.0.99, frame configuration was stored as versioned JSON in
+`CW_1.08_FRAME_CONFIG`: `{"v":1,"delete":"<mask>","merge":"<mask>","hide":"<mask>"}`.
+Since 1.1.0 it is the readable `CW_9.02_FRAME_CONFIG` text plus the `CW_1.08` code; the JSON
+form is still read and is converted the next time the panel is written.
 Each field retains the existing mask encoding and grid dimensions, including the
 delete mask's original polarity. A saved default grid also gets a complete config.
 No dimensions, profile definitions or generated typology hash are included in this value.

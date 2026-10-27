@@ -130,7 +130,7 @@ internal static class Program
         Require(topologyKeys.SequenceEqual(
                 new[]
                 {
-                    PanelCladdingKeyService.FrameConfigKey
+                    PanelCladdingKeyService.FrameConfigBackupKey
                 }
                     .OrderBy(key => key, StringComparer.Ordinal)),
             $"Expected combined frame configuration, got {string.Join(",", topologyKeys)}.");
@@ -206,7 +206,7 @@ internal static class Program
             "Merged extrusion run did not survive Save/reload.");
         Require(!FieldValue<bool>(window, "_dirty") && !FieldValue<bool>(window, "_structuralDirty"),
             "Successful structural Save did not return the editor to Saved state.");
-        Require(repository.Current.SourceUserText.ContainsKey(PanelCladdingKeyService.FrameConfigKey) &&
+        Require(repository.Current.SourceUserText.ContainsKey(PanelCladdingKeyService.FrameConfigBackupKey) &&
                 !repository.Current.SourceUserText.Keys.Any(PanelCladdingKeyService.IsRetiredFrameKey),
             "Editor Save did not persist combined configuration and remove legacy masks.");
     }
@@ -233,7 +233,7 @@ internal static class Program
             var assignedSegment = new PanelCladdingSegmentCoordinate(PanelCladdingTopologyAxis.Horizontal, 0, 1);
             var assignments = new PanelFrameAssignmentState
             {
-                FrameAssignments = new Dictionary<string, IReadOnlyList<string>> { ["FRM_0"] = new[] { "1D-ALU-001" } },
+                FrameAssignments = new Dictionary<string, IReadOnlyList<string>> { ["FRM-0"] = new[] { "1D-ALU-001" } },
                 SegmentAssignments = [new(assignedSegment, new[] { "1D-ALU-001" })],
                 CurveModifiers = new Dictionary<string, double> { [PanelFrameAssignmentService.SegmentKey(assignedSegment)] = 2d }
             };

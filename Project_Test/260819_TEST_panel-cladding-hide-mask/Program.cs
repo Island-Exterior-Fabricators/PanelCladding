@@ -107,12 +107,12 @@ internal static class Program
 
         IReadOnlyList<PanelCladdingExtrusionCurvePlan> curves = Required(
             new PanelCladdingExtrusionPlanningService().CreatePlan(
-                "PID_ABC_N1_01_07",
-                "CID_ABC_N1_01_07",
+                "PID-ABC-N1-01-07",
+                "CID-ABC-N1-01-07",
                 90d,
                 160d,
                 keySet,
-                "01_CW Panels::Surfaces-PNL::WT-01"));
+                "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - WT-01"));
         HashSet<PanelCladdingSegmentCoordinate> plannedAtoms = curves
             .SelectMany(curve => curve.AtomicSegments)
             .ToHashSet();
@@ -169,7 +169,7 @@ internal static class Program
             Snapshot(Guid.Parse("11111111-1111-1111-1111-111111111111"), 90d, 160d, [40d, 80d, 120d], [45d], sourceMasks),
             [Snapshot(Guid.Parse("22222222-2222-2222-2222-222222222222"), 120d, 240d, [60d, 120d, 180d], [70d], targetMasks)])).Targets.Single();
         Require(plan.UserTextWrites.Count == 1 &&
-                plan.UserTextWrites.ContainsKey(PanelCladdingKeyService.FrameConfigKey) &&
+                plan.UserTextWrites.ContainsKey(PanelCladdingKeyService.FrameConfigBackupKey) &&
                 Required(keys.EncodeTopology(Required(keys.DecodeTopology(plan.UserTextWrites, 3, 1)), 3, 1)).HideMask == sourceMasks.HideMask,
             "PCMatchCrv did not copy the hide mask in combined configuration.");
     }
@@ -212,8 +212,8 @@ internal static class Program
             ObjectId = Guid.NewGuid(),
             DocumentRuntimeSerialNumber = 1,
             DocumentPath = "C:/test/panel-hide-mask.3dm",
-            ObjectName = "PID_ABC_N1_01_07",
-            LayerFullPath = "01_CW Panels::Surfaces-PNL::WT-01",
+            ObjectName = "PID-ABC-N1-01-07",
+            LayerFullPath = "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - WT-01",
             SystemCode = "WT01",
             GeometryFingerprint = "hide-mask-fixture",
             GeometryClass = PanelGeometryClass.Planar,

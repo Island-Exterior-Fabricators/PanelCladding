@@ -39,20 +39,20 @@ internal static class Program
 
         IReadOnlyList<PanelCladdingExtrusionCurvePlan> curves = Required(
             new PanelCladdingExtrusionPlanningService().CreatePlan(
-                "PID_ABC_N2_06_04", "CID_ABC_N2_06_04", 100d, 80d, keySet,
-                "01_CW Panels::Surfaces-PNL::WT-04"),
+                "PID-ABC-N2-06-04", "CID-ABC-N2-06-04", 100d, 80d, keySet,
+                "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - WT-04"),
             "Plan extrusion curves");
         Require(curves.Count == 8, $"Expected 8 curve objects, got {curves.Count}.");
         Require(curves.Select(curve => curve.Code).OrderBy(code => code).SequenceEqual(new[]
         {
-            "FRM_0", "FRM_1", "FRM_2", "FRM_3", "INT_0A–B", "INT_0C", "INT_A0", "INT_B"
+            "FRM-0", "FRM-1", "FRM-2", "FRM-3", "INT-0A–B", "INT-0C", "INT-A0", "INT-B"
         }.OrderBy(code => code)), "Curve codes did not reflect deleted/merged topology.");
         Require(curves.All(curve => curve.LayerPath ==
-                "02_CW Extrusions::Curves-PNL::WT-04"),
+                "ABC-IEF-Wireframe::Curves - PNL::Curves - WT-04"),
             "A curve was planned on the wrong layer.");
-        Require(curves.All(curve => curve.Cid == $"CID_ABC_N2_06_04-{curve.Code}" &&
+        Require(curves.All(curve => curve.Cid == $"CID-ABC-N2-06-04_{curve.Code}" &&
             curve.UserTextWrites["CRV"] == curve.Code &&
-            curve.UserTextWrites["CW_1.01_PID"] == "PID_ABC_N2_06_04"),
+            curve.UserTextWrites["CW_1.01_PID"] == "PID-ABC-N2-06-04"),
             "Curve PID/CRV/CID metadata was not canonical.");
         Require(curves.Where(curve => curve.Kind == PanelCladdingExtrusionCurveKind.Frame)
                 .All(curve => curve.ObjectColor == new PanelColorRgb(0, 0, 255)),
@@ -67,17 +67,17 @@ internal static class Program
             "Vertical intermediate curves were not planned in DarkGreen.");
         Console.WriteLine("[OK] topology expands into underscore-named frame/segment/merge curves with canonical metadata.");
 
-        Require(PanelCladdingSpawnPlanningService.MaterialSurfaceRootLayer == "04_STEP Surfaces" &&
-            PanelCladdingSpawnPlanningService.IsSupportedMaterialSurfaceRoot("04_STEP Surfaces") &&
-            PanelCladdingSpawnPlanningService.IsSupportedMaterialSurfaceRoot("03_Material Surfaces (STEP)"),
-            "New write root or legacy read compatibility is wrong.");
+        Require(PanelCladdingSpawnPlanningService.MaterialSurfaceRootLayer == "Reference::Surfaces - STEP" &&
+            PanelCladdingSpawnPlanningService.IsManagedSurfaceLayerPath("Reference::Surfaces - STEP") &&
+            !PanelCladdingSpawnPlanningService.IsManagedSurfaceLayerPath("03_Material Surfaces (STEP)"),
+            "New write root or retired-root rejection is wrong.");
         var syncSrfCommand = (PanelCladdingSyncSrfCommand)RuntimeHelpers.GetUninitializedObject(
             typeof(PanelCladdingSyncSrfCommand));
         var syncCrvCommand = (PanelCladdingSyncCrvCommand)RuntimeHelpers.GetUninitializedObject(
             typeof(PanelCladdingSyncCrvCommand));
         Require(syncSrfCommand.EnglishName == "PCSyncSrf" && syncCrvCommand.EnglishName == "PCSyncCrv",
             "The visible synchronization commands are not separated by object family.");
-        Console.WriteLine("[OK] new surfaces target 04_STEP Surfaces, legacy root remains readable, and synchronization is split by object family.");
+        Console.WriteLine("[OK] new surfaces target Reference::Surfaces - STEP, retired roots are rejected, and synchronization is split by object family.");
 
         PanelCladdingLayout layout = new()
         {
@@ -101,8 +101,8 @@ internal static class Program
                 new PanelCladdingSurfaceSyncPanelSnapshot
                 {
                     ObjectId = PanelId,
-                    PanelId = "PID_ABC_N2_06_04",
-                    PanelCid = "CID_ABC_N2_06_04",
+                    PanelId = "PID-ABC-N2-06-04",
+                    PanelCid = "CID-ABC-N2-06-04",
                     Layout = layout,
                     GridChanged = true
                 }
@@ -115,7 +115,7 @@ internal static class Program
                     PanelObjectId = PanelId,
                     PanelId = "WRONG_PID",
                     Cid = "WRONG_CID",
-                    LayerPath = "04_STEP Surfaces::Surfaces-Metal::MPL-001",
+                    LayerPath = "Reference::Surfaces - STEP::Surfaces - MPL::MPL-001",
                     CladdingValue = "WRONG",
                     CoveredCellLabels = keySet.Cells.Select(cell => cell.ShortLabel).ToArray()
                 }
@@ -129,7 +129,7 @@ internal static class Program
                     PanelId = "WRONG_PID",
                     Cid = "WRONG_CID",
                     CurveCode = "FRM-0",
-                    DesiredCode = "FRM_0",
+                    DesiredCode = "FRM-0",
                     AssignedExtrusions = "1D-ALU-OLD",
                     DesiredAssignedExtrusions = "1D-ALU-H0651;1D-GSK-001",
                     AssignedExtrusionValues = new Dictionary<string, string>
@@ -144,7 +144,7 @@ internal static class Program
                     UsesObjectColor = true,
                     ObjectColor = new PanelColorRgb(1, 2, 3),
                     DesiredObjectColor = new PanelColorRgb(0, 0, 255),
-                    LayerPath = "02_CW Extrusions::Curves-PNL::WT-04"
+                    LayerPath = "ABC-IEF-Wireframe::Curves - PNL::Curves - WT-04"
                 }
             ]
         };
@@ -163,8 +163,8 @@ internal static class Program
             "PCSyncSrf must repair surfaces and panel values without writing curves.");
         PanelCladdingSurfaceSyncSurfacePlan surfaceWrite = surfaceRequest.SurfaceWrites.Single();
         PanelCladdingSurfaceSyncPanelWrite panelWrite = surfaceRequest.PanelWrites.Single();
-        Require(surfaceWrite.PanelId == "PID_ABC_N2_06_04" && surfaceWrite.PidChanged &&
-            surfaceWrite.DesiredCid.EndsWith("-0A", StringComparison.Ordinal),
+        Require(surfaceWrite.PanelId == "PID-ABC-N2-06-04" && surfaceWrite.PidChanged &&
+            surfaceWrite.DesiredCid.EndsWith("_0A", StringComparison.Ordinal),
             "Geometry-associated surface metadata was not repaired independently of its old PID/CID.");
         Require(panelWrite.UnitWidth == "90.00000" && panelWrite.UnitHeight == "180.00000" &&
             panelWrite.UnitDimension == "90.00000x180.00000",
@@ -184,8 +184,8 @@ internal static class Program
                 curveRequest.PanelWrites.Count == 1,
             "PCSyncCrv must repair curves and panel topology without writing surfaces.");
         PanelCladdingSurfaceSyncCurvePlan curveWrite = curveRequest.CurveWrites.Single();
-        Require(curveWrite.DesiredCode == "FRM_0" &&
-            curveWrite.DesiredCid == "CID_ABC_N2_06_04-FRM_0" &&
+        Require(curveWrite.DesiredCode == "FRM-0" &&
+            curveWrite.DesiredCid == "CID-ABC-N2-06-04_FRM-0" &&
             curveWrite.DesiredAssignedExtrusions == "1D-ALU-H0651;1D-GSK-001" &&
             curveWrite.DesiredAssignedExtrusionValues["1D-ALU-H0651"] == "(LL+4)*2" &&
             curveWrite.DesiredAssignedExtrusionValues["1D-GSK-001"] == "LL+4" &&

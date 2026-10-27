@@ -28,14 +28,20 @@ public sealed class PanelCladdingPidCommand : RhinoCommand
             RhinoApp.WriteLine("Save the Rhino document before running PCpid.");
             return Result.Failure;
         }
+        // The file name names the project (ABC - Wireframe.3dm is ABC); it is offered as the default.
+        string fileProject = PanelCladdingProjectService.CodeFromDocumentPath(doc.Path);
+        bool hasDefault = PanelCladdingPidPlanningService.IsProjectCode(fileProject);
         string project;
         while (true)
         {
             using var input = new GetString();
             input.SetCommandPrompt("Enter the three-letter project code");
-            input.AcceptNothing(false);
-            if (input.Get() != GetResult.String) return input.CommandResult();
-            project = input.StringResult().Trim().ToUpperInvariant();
+            if (hasDefault) input.SetDefaultString(fileProject);
+            input.AcceptNothing(hasDefault);
+            GetResult entered = input.Get();
+            if (entered == GetResult.Nothing && hasDefault) project = fileProject;
+            else if (entered != GetResult.String) return input.CommandResult();
+            else project = input.StringResult().Trim().ToUpperInvariant();
             if (PanelCladdingPidPlanningService.IsProjectCode(project)) break;
             RhinoApp.WriteLine("The project code must contain exactly three letters, for example ABC.");
         }
@@ -48,7 +54,7 @@ public sealed class PanelCladdingPidCommand : RhinoCommand
         }
         var contextIds = context.Data.ToHashSet();
         using var panels = new GetObject();
-        panels.SetCommandPrompt("Select panel surfaces to update under 01_CW Panels::Surfaces-PNL");
+        panels.SetCommandPrompt($"Select panel surfaces to update under {PanelCladdingProjectService.PanelLayerScope(fileProject)}");
         panels.GeometryFilter = ObjectType.Surface | ObjectType.Brep;
         panels.SubObjectSelect = false;
         panels.GroupSelect = true;

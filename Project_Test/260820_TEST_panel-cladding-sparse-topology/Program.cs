@@ -128,7 +128,7 @@ internal static class Program
         string[] topologyWrites = commit.UserTextWrites.Keys
             .Where(PanelCladdingKeyService.IsTopologyKey)
             .ToArray();
-        Require(topologyWrites.SequenceEqual([PanelCladdingKeyService.FrameConfigKey]),
+        Require(topologyWrites.SequenceEqual([PanelCladdingKeyService.FrameConfigBackupKey]),
             $"Hide-only save wrote unexpected topology keys: {string.Join(", ", topologyWrites)}");
         Require(commit.UserTextDeletes.Contains(
                     PanelCladdingKeyService.SegmentMaskKey,
@@ -162,7 +162,7 @@ internal static class Program
             new PanelCladdingCurveMatchPlanningService(keys).CreatePlan(source, [target]);
         Require(matched.Success && matched.Data is not null, $"Default curve match failed: {matched.Message}");
         PanelCladdingMatchTargetPlan targetPlan = matched.Data!.Targets.Single();
-        Require(targetPlan.UserTextWrites.ContainsKey(PanelCladdingKeyService.FrameConfigKey) &&
+        Require(targetPlan.UserTextWrites.ContainsKey(PanelCladdingKeyService.FrameConfigBackupKey) &&
                 !targetPlan.UserTextWrites.Keys.Any(PanelCladdingKeyService.IsRetiredFrameKey),
             "Default curve match must write combined configuration without separate masks.");
         Require(new[]
@@ -175,8 +175,8 @@ internal static class Program
 
         var spawnText = new Dictionary<string, string>(layout.SourceUserText, StringComparer.OrdinalIgnoreCase)
         {
-            [PanelCladdingSpawnPlanningService.PanelIdUserTextKey] = "PID_SPARSE_01",
-            [PanelCladdingSpawnPlanningService.CidUserTextKey] = "CID_SPARSE_01",
+            [PanelCladdingSpawnPlanningService.PanelIdUserTextKey] = "PID-SPARSE-01",
+            [PanelCladdingSpawnPlanningService.CidUserTextKey] = "CID-SPARSE-01",
             [PanelCladdingSpawnPlanningService.ReleaseUserTextKey] = "01",
             [PanelCladdingSpawnPlanningService.WallTypeUserTextKey] = "WT01"
         };
@@ -314,8 +314,8 @@ internal static class Program
             ObjectId = Guid.Parse("A8200000-0000-0000-0000-000000000100"),
             DocumentRuntimeSerialNumber = 1,
             DocumentPath = "C:/test/panel-sparse-topology.3dm",
-            ObjectName = "PID_SPARSE_01",
-            LayerFullPath = "01_CW Panels::Surfaces-PNL::WT-01",
+            ObjectName = "PID-SPARSE-01",
+            LayerFullPath = "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - WT-01",
             SystemCode = "WT01",
             GeometryFingerprint = "sparse-topology-fixture",
             GeometryClass = PanelGeometryClass.Planar,

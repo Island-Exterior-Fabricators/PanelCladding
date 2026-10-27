@@ -206,7 +206,7 @@ internal static class Program
         PanelCladdingLayout layout,
         string coverageValue)
     {
-        const string pid = "PID_COVERAGE_01";
+        const string pid = "PID-COVERAGE-01";
         const string material = "GLS-005";
         return new PanelCladdingSurfaceSyncSnapshot
         {
@@ -242,7 +242,7 @@ internal static class Program
     private static Dictionary<string, string> BasePanelText() =>
         new(StringComparer.OrdinalIgnoreCase)
         {
-            [PanelCladdingSpawnPlanningService.PanelIdUserTextKey] = "PID_COVERAGE_01",
+            [PanelCladdingSpawnPlanningService.PanelIdUserTextKey] = "PID-COVERAGE-01",
             [PanelCladdingSpawnPlanningService.ReleaseUserTextKey] = "R1",
             [PanelCladdingSpawnPlanningService.WallTypeUserTextKey] = "WT01"
         };

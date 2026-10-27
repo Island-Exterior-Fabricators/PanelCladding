@@ -25,9 +25,10 @@ internal static class Program
     {
         var metadata = new Dictionary<string, string>
         {
-            ["CW_1.01_PID"] = "PID_N1_03_07",
-            ["cw_1.02_cid"] = " CID_N1_03_07-C ",
-            ["CW_1.06_UNIT_TYPE"] = "corner_child"
+            ["CW_1.01_PID"] = "PID-N1-03-07",
+            ["cw_1.02_cid"] = " CID-N1-03-07_C ",
+            ["CW_1.06_UNIT_TYPE"] = "L",
+            ["CW_5.00_DEFINITION_A"] = "Child"
         };
         var repository = new Repository(BuildLayout(metadata));
         var keys = new PanelCladdingKeyService();
@@ -42,8 +43,8 @@ internal static class Program
         var canvas = Named<PanelCladdingGridCanvas>(window, "PanelGridCanvas");
         Require(ReferenceEquals(floating.Parent, window.FindName("CanvasWorkspace")), "Assignment is not on the canvas.");
         Require(floating.Visibility == Visibility.Collapsed, "Assignment is visible in Cladding view.");
-        Require(Named<TextBlock>(window, "PanelIdText").Text == "N1_03_07-C", "Heading did not prefer the shortened stored CID.");
-        Require((string)Named<TextBlock>(window, "PanelIdText").ToolTip == "CID_N1_03_07-C", "Full CID tooltip missing.");
+        Require(Named<TextBlock>(window, "PanelIdText").Text == "N1-03-07_C", "Heading did not prefer the shortened stored CID.");
+        Require((string)Named<TextBlock>(window, "PanelIdText").ToolTip == "CID-N1-03-07_C", "Full CID tooltip missing.");
         CultureInfo priorCulture = CultureInfo.CurrentCulture;
         try
         {
@@ -60,9 +61,9 @@ internal static class Program
 
         Invoke(window, "SwitchView", PanelEditorView.Extrusion, false);
         Require(floating.Visibility == Visibility.Collapsed, "Empty extrusion selection shows assignment.");
-        Select(canvas, "FRM_0");
+        Select(canvas, "FRM-0");
         Require(floating.Visibility == Visibility.Visible, "Click selection did not reveal assignment.");
-        Require(Named<TextBlock>(window, "SelectedExtrusionNamesText").Text == "FRM_0", "Selected curve name missing.");
+        Require(Named<TextBlock>(window, "SelectedExtrusionNamesText").Text == "FRM-0", "Selected curve name missing.");
         Render(root, 1440, 900, "empty-selection-1440x900.png");
 
         ObservableCollection<PanelFrameExtrusion> profiles = Field<ObservableCollection<PanelFrameExtrusion>>(window, "_frameExtrusions");
@@ -89,7 +90,7 @@ internal static class Program
         TextBox modifier = Descendants<TextBox>(cards).Single();
         modifier.Text = "+4";
         Invoke(window, "ApplyCurveModifier", modifier, false);
-        Require(Field<Dictionary<string, double>>(window, "_frameCurveModifiers")["FRM_0"] == 4, "Modifier failed.");
+        Require(Field<Dictionary<string, double>>(window, "_frameCurveModifiers")["FRM-0"] == 4, "Modifier failed.");
         Layout(root, 1440, 900);
         Descendants<Button>(cards).Single().RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         Require(cards.Items.Count == 0 && catalogue.Items.Count == 7, "Remove card failed.");
@@ -121,10 +122,10 @@ internal static class Program
             Require(scroll.VerticalOffset > 0, "Cannot reach the end of assignments.");
             scroll.ScrollToHome();
         }
-        Select(canvas, "FRM_1");
+        Select(canvas, "FRM-1");
         Require(cards.Items.Count == 0 && catalogue.Items.Count == 7, "Changing curves retained stale assignments.");
-        Select(canvas, "FRM_0", "FRM_1");
-        Require(cards.Items.Count == 7 && Named<TextBlock>(window, "SelectedExtrusionNamesText").Text == "FRM_0, FRM_1",
+        Select(canvas, "FRM-0", "FRM-1");
+        Require(cards.Items.Count == 7 && Named<TextBlock>(window, "SelectedExtrusionNamesText").Text == "FRM-0, FRM-1",
             "Multi-selection summary or assignments failed.");
         Named<Button>(window, "ClearExtrusionAssignmentsButton").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         Require(cards.Items.Count == 0, "Multi-selection clear failed.");
@@ -138,7 +139,7 @@ internal static class Program
         drag = DragArgs(dropTarget, "1D-T000", DragDrop.PreviewDragOverEvent);
         dropTarget.RaiseEvent(drag);
         Require(drag.Effects == DragDropEffects.None, "Drag without a selection was accepted.");
-        Select(canvas, "FRM_0");
+        Select(canvas, "FRM-0");
         Invoke(window, "SwitchView", PanelEditorView.Cladding, false);
         Require(floating.Visibility == Visibility.Collapsed, "View switch did not hide assignment.");
         Invoke(window, "SwitchView", PanelEditorView.Extrusion, false);
@@ -153,16 +154,20 @@ internal static class Program
 
         foreach ((string? cid, string? pid, string? role, string expected) in new[]
         {
-            ("CID_ABC_N1_03_07-P", "PID_WRONG", "flat", "N1_03_07-P"),
-            ((string?)null, "PID_N1_03_07", "corner_parent", "N1_03_07-P"),
-            (null, "PID_N1_03_07", "flat", "N1_03_07"),
+            ("CID-ABC-N1-03-07_P", "PID-WRONG", "F:Parent", "N1-03-07_P"),
+            ((string?)null, "PID-N1-03-07", "L:Parent", "N1-03-07_P"),
+            (null, "PID-N1-03-07", "F:Parent", "N1-03-07"),
             (null, null, null, "—")
         })
         {
             metadata.Clear();
             if (cid is not null) metadata["CW_1.02_CID"] = cid;
             if (pid is not null) metadata["CW_1.01_PID"] = pid;
-            if (role is not null) metadata["CW_1.06_UNIT_TYPE"] = role;
+            if (role is not null)
+            {
+                metadata["CW_1.06_UNIT_TYPE"] = role.Split(':')[0];
+                metadata["CW_5.00_DEFINITION_A"] = role.Split(':')[1];
+            }
             Invoke(window, "PopulatePanelMetadata");
             Require(Named<TextBlock>(window, "PanelIdText").Text == expected, $"CID fallback failed: {expected}.");
         }
@@ -188,7 +193,7 @@ internal static class Program
     {
         ObjectId = Guid.Parse("A0427000-0000-0000-0000-000000000107"),
         DocumentPath = "C:/fixtures/canvas-assignment.3dm", DocumentRuntimeSerialNumber = 107,
-        ObjectName = "N1_03_07", SystemCode = "WT04", GeometryFingerprint = "canvas-assignment",
+        ObjectName = "N1-03-07", SystemCode = "WT04", GeometryFingerprint = "canvas-assignment",
         GeometryClass = PanelGeometryClass.Planar, Width = 90.123456, Height = 180.000001,
         ModelTolerance = 0.001, ModelUnitScaleToMillimeters = 25.4,
         HorizontalOffsets = [102.85714], VerticalOffsets = [45], SourceUserText = metadata,

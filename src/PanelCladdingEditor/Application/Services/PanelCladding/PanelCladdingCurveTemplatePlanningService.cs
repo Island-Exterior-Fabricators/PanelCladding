@@ -108,7 +108,7 @@ public sealed class PanelCladdingCurveTemplatePlanningService
             {
                 ObjectId = panel.ObjectId,
                 MergeMask = runs.Count > 0 ? masks.Data!.MergeMask : string.Empty,
-                FrameConfig = encoded.Data[PanelCladdingKeyService.FrameConfigKey],
+                FrameConfig = encoded.Data[PanelCladdingKeyService.FrameConfigBackupKey],
                 UserTextDeletes = runs.Count > 0
                     ? new[]
                     {

@@ -227,7 +227,8 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
             {
                 Brep when PanelCladdingSpawnPlanningService.IsManagedSurfaceLayerPath(layerPath) =>
                     PanelCladdingDependencyKind.Surface,
-                Curve when PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath(layerPath) =>
+                Curve when PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath(layerPath,
+                        PanelCladdingProjectService.CodeFromDocumentPath(document.Path)) =>
                     PanelCladdingDependencyKind.Curve,
                 _ => null
             };

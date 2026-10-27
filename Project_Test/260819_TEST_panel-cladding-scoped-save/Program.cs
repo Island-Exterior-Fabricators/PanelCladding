@@ -32,8 +32,8 @@ internal static class Program
         PanelCladdingLayout source = BuildLayout(keys);
         var panelText = new Dictionary<string, string>(source.SourceUserText, StringComparer.OrdinalIgnoreCase)
         {
-            [PanelCladdingSpawnPlanningService.PanelIdUserTextKey] = "PID_TEST_01",
-            [PanelCladdingSpawnPlanningService.CidUserTextKey] = "CID_TEST_01",
+            [PanelCladdingSpawnPlanningService.PanelIdUserTextKey] = "PID-TEST-01",
+            [PanelCladdingSpawnPlanningService.CidUserTextKey] = "CID-TEST-01",
             [PanelCladdingSpawnPlanningService.ReleaseUserTextKey] = "01",
             [PanelCladdingSpawnPlanningService.WallTypeUserTextKey] = "WT01"
         };
@@ -75,7 +75,7 @@ internal static class Program
             "Cladding-only save omitted logical cells/logic or did not retire Signature.");
 
         PanelAttributeCommitRequest extrusions = Save(source, PanelCladdingSaveScope.Extrusions);
-        Require(extrusions.UserTextWrites.ContainsKey(PanelCladdingKeyService.FrameConfigKey) &&
+        Require(extrusions.UserTextWrites.ContainsKey(PanelCladdingKeyService.FrameConfigBackupKey) &&
                 !extrusions.UserTextWrites.Keys.Any(PanelCladdingKeyService.IsRetiredFrameKey),
             "Extrusion-only save must persist combined configuration without retired keys.");
         Require(extrusions.UserTextWrites.Keys.Any(keys.IsOffsetKey),
@@ -90,7 +90,7 @@ internal static class Program
             "Extrusion-only save changed cladding assignments/type or retained Signature.");
 
         PanelAttributeCommitRequest both = Save(source, PanelCladdingSaveScope.Both);
-        Require(both.UserTextWrites.ContainsKey(PanelCladdingKeyService.FrameConfigKey) &&
+        Require(both.UserTextWrites.ContainsKey(PanelCladdingKeyService.FrameConfigBackupKey) &&
                 both.UserTextWrites.Keys.Any(keys.IsCladdingCellKey) &&
                 both.UserTextWrites.Keys.Any(keys.IsOffsetKey),
             "Save Both did not include both scopes with combined configuration.");
@@ -144,7 +144,7 @@ internal static class Program
             "The editor still exposes an Exit button.");
 
         Invoke(window, "OnSaveExtrusionsClick", window, new RoutedEventArgs());
-        Require(repository.Current.SourceUserText.ContainsKey(PanelCladdingKeyService.FrameConfigKey) &&
+        Require(repository.Current.SourceUserText.ContainsKey(PanelCladdingKeyService.FrameConfigBackupKey) &&
                 !repository.Current.SourceUserText.Keys.Any(PanelCladdingKeyService.IsRetiredFrameKey),
             "Save Extrusions must store combined configuration without retired attributes.");
         Require(!FieldValue<bool>(window, "_structuralDirty"),
@@ -152,7 +152,7 @@ internal static class Program
         Invoke(window, "OnSaveCladdingClick", window, new RoutedEventArgs());
         Require(repository.CommitCount == 2 && repository.LastCommit is not null &&
                 !repository.LastCommit.UserTextWrites.Keys.Any(PanelCladdingKeyService.IsTopologyKey) &&
-                repository.Current.SourceUserText.ContainsKey(PanelCladdingKeyService.FrameConfigKey),
+                repository.Current.SourceUserText.ContainsKey(PanelCladdingKeyService.FrameConfigBackupKey),
             "A partial extrusion save did not refresh the source fingerprint for a following cladding save.");
         window.Close();
     }
@@ -215,8 +215,8 @@ internal static class Program
             ObjectId = Guid.NewGuid(),
             DocumentRuntimeSerialNumber = 1,
             DocumentPath = "C:/test/panel-scoped-save.3dm",
-            ObjectName = "PID_SCOPED_SAVE",
-            LayerFullPath = "01_CW Panels::Surfaces-PNL::WT-01",
+            ObjectName = "PID-SCOPED-SAVE",
+            LayerFullPath = "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - WT-01",
             SystemCode = "WT01",
             GeometryFingerprint = "scoped-save-fingerprint",
             GeometryClass = PanelGeometryClass.Planar,

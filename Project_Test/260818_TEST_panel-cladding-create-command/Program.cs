@@ -74,7 +74,7 @@ internal static class Program
 
         var expectedWrites = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            [PanelCladdingKeyService.FrameConfigKey] = RequireData(new PanelCladdingKeyService().EncodeFrameConfiguration(new(), 1, 1), "default frame config"),
+            [PanelCladdingKeyService.FrameConfigBackupKey] = RequireData(new PanelCladdingKeyService().EncodeFrameConfiguration(new(), 1, 1), "default frame config"),
             ["CW_2.00_UNIT_DIMENSION"] = "100.00000x80.00000",
             ["CW_2.01_UNIT_WIDTH"] = "100.00000",
             ["CW_2.02_UNIT_HEIGHT"] = "80.00000",

@@ -614,7 +614,7 @@ public sealed partial class PanelFrameAssignmentService
         first = false;
     }
 
-    [GeneratedRegex(@"^FRM_[0-3]$", RegexOptions.CultureInvariant)]
+    [GeneratedRegex(@"^FRM-[0-3]$", RegexOptions.CultureInvariant)]
     private static partial Regex FrameKeyRegex();
 
     [GeneratedRegex(@"^(?:0D|1D)-[A-Z0-9][A-Z0-9-]{0,76}$", RegexOptions.CultureInvariant)]

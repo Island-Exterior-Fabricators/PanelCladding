@@ -1,6 +1,8 @@
 extern alias rhinocommon;
 
 using System.Runtime.InteropServices;
+using PanelCladdingEditor.Infrastructure.Rhino.Live.PanelCladding;
+using LoadReturnCode = rhinocommon::Rhino.PlugIns.LoadReturnCode;
 using PlugIn = rhinocommon::Rhino.PlugIns.PlugIn;
 using PlugInLoadTime = rhinocommon::Rhino.PlugIns.PlugInLoadTime;
 
@@ -17,4 +19,10 @@ public sealed class PanelCladdingEditorPlugin : PlugIn
     }
 
     public override PlugInLoadTime LoadTime => PlugInLoadTime.AtStartup;
+
+    protected override LoadReturnCode OnLoad(ref string errorMessage)
+    {
+        LivePanelNamingConventionSync.Register();
+        return LoadReturnCode.Success;
+    }
 }

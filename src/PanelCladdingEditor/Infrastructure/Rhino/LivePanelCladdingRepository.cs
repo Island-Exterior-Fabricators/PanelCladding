@@ -101,7 +101,7 @@ public sealed partial class LivePanelCladdingRepository : ILivePanelCladdingRepo
                 }
             }
 
-            changed |= LivePanelCladdingCidService.Normalize(proposedAttributes);
+            changed |= LivePanelCladdingCidService.Normalize(document, proposedAttributes);
             string? oldWorkbookPath = document.Strings.GetValue(PanelCladdingKeyService.WorkbookPathDocumentKey);
             bool workbookPathChanged = !string.IsNullOrWhiteSpace(request.WorkbookPath) &&
                 !string.Equals(oldWorkbookPath, request.WorkbookPath, StringComparison.OrdinalIgnoreCase);
@@ -552,6 +552,7 @@ public sealed partial class LivePanelCladdingRepository : ILivePanelCladdingRepo
         {
             if (key.StartsWith("CW_2.", StringComparison.OrdinalIgnoreCase) ||
                 key.StartsWith("CW_4.", StringComparison.OrdinalIgnoreCase) ||
+                key.StartsWith("CW_9.", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(key, PanelCladdingKeyService.FrameConfigKey, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(key, PanelCladdingKeyService.FrameTypeKey, StringComparison.OrdinalIgnoreCase))
             {

@@ -59,12 +59,12 @@ internal static class Program
             "create curve-color grid");
         IReadOnlyList<PanelCladdingExtrusionCurvePlan> curves = Required(
             new PanelCladdingExtrusionPlanningService().CreatePlan(
-                "PID_COLOR",
-                "CID_COLOR",
+                "PID-COLOR",
+                "CID-COLOR",
                 100d,
                 80d,
                 keySet,
-                "01_CW Panels::Surfaces-PNL::WT-COLOR"),
+                "ABC-IEF-Wireframe::Surfaces - PNL::Surfaces - WT-COLOR"),
             "plan colored curves");
 
         Require(curves.Count(curve => curve.Kind == PanelCladdingExtrusionCurveKind.Frame) == 4 &&

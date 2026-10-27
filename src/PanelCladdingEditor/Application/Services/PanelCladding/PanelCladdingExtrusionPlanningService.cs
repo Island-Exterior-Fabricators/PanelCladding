@@ -6,8 +6,15 @@ namespace PanelCladdingEditor.Application.Services.PanelCladding;
 
 public sealed class PanelCladdingExtrusionPlanningService
 {
-    public const string PanelSurfaceLayerRootPath = "01_CW Panels::Surfaces-PNL";
-    public const string CurveLayerRootPath = "02_CW Extrusions::Curves-PNL";
+    // Layer standard: panels live on <PROJECT>-IEF-Wireframe::Surfaces - PNL::Surfaces - <type>
+    // and their curves on <PROJECT>-IEF-Wireframe::Curves - PNL::Curves - <type>. The project
+    // root is taken from the panel's own layer, so any project code is supported.
+    public const string ProjectRootLayerSuffix = "-IEF-Wireframe";
+    public const string PanelSurfaceLayerName = "Surfaces - PNL";
+    public const string CurveLayerName = "Curves - PNL";
+    public const string PanelTypeLayerPrefix = "Surfaces - ";
+    public const string CurveTypeLayerPrefix = "Curves - ";
+    public const string PanelSurfaceLayerPattern = "<PROJECT>" + ProjectRootLayerSuffix + "::" + PanelSurfaceLayerName;
     public const string CurveUserTextKey = "CRV";
     public const string AssignedExtrusionsUserTextKey = "Extrusions";
     public static readonly PanelColorRgb MainFrameObjectColor = new(0, 0, 255);
@@ -22,7 +29,8 @@ public sealed class PanelCladdingExtrusionPlanningService
         double panelHeight,
         PanelCladdingKeySet keySet,
         string sourcePanelLayerPath,
-        string? releaseNumber = null)
+        string? releaseNumber = null,
+        string? projectCode = null)
     {
         if (string.IsNullOrWhiteSpace(panelId) || string.IsNullOrWhiteSpace(panelCid))
         {
@@ -35,7 +43,7 @@ public sealed class PanelCladdingExtrusionPlanningService
                 "PANEL_CLADDING_EXTRUSION_PANEL_EXTENT_INVALID");
         }
 
-        OperationResponse<string> curveLayer = ResolveCurveLayerPath(sourcePanelLayerPath);
+        OperationResponse<string> curveLayer = ResolveCurveLayerPath(sourcePanelLayerPath, projectCode);
         if (!curveLayer.Success || curveLayer.Data is null)
         {
             return OperationResponse<IReadOnlyList<PanelCladdingExtrusionCurvePlan>>.Fail(
@@ -44,10 +52,10 @@ public sealed class PanelCladdingExtrusionPlanningService
 
         var curves = new List<PanelCladdingExtrusionCurvePlan>
         {
-            Frame("FRM_0", PanelCladdingTopologyAxis.Horizontal, 0d, panelWidth),
-            Frame("FRM_1", PanelCladdingTopologyAxis.Horizontal, panelHeight, panelWidth),
-            Frame("FRM_2", PanelCladdingTopologyAxis.Vertical, 0d, panelHeight),
-            Frame("FRM_3", PanelCladdingTopologyAxis.Vertical, panelWidth, panelHeight)
+            Frame("FRM-0", PanelCladdingTopologyAxis.Horizontal, 0d, panelWidth),
+            Frame("FRM-1", PanelCladdingTopologyAxis.Horizontal, panelHeight, panelWidth),
+            Frame("FRM-2", PanelCladdingTopologyAxis.Vertical, 0d, panelHeight),
+            Frame("FRM-3", PanelCladdingTopologyAxis.Vertical, panelWidth, panelHeight)
         };
         double[] xCuts = [0d, .. keySet.VerticalOffsets, panelWidth];
         double[] yCuts = [0d, .. keySet.HorizontalOffsets, panelHeight];
@@ -108,7 +116,7 @@ public sealed class PanelCladdingExtrusionPlanningService
         var attributed = new List<PanelCladdingExtrusionCurvePlan>();
         foreach (PanelCladdingExtrusionCurvePlan curve in curves)
         {
-            string curveCid = $"{cid}-{curve.Code}";
+            string curveCid = PanelCladdingCidService.Component(cid, curve.Code);
             IReadOnlyList<string> assignedCodes = PanelFrameAssignmentService.CodesForCurve(
                 keySet.FrameAssignments,
                 curve.Code,
@@ -196,27 +204,66 @@ public sealed class PanelCladdingExtrusionPlanningService
                 ? HorizontalObjectColor
                 : VerticalObjectColor;
 
-    public static OperationResponse<string> ResolveCurveLayerPath(string sourcePanelLayerPath)
+    // With a project code (from the Rhino file name) only <code>-IEF-Wireframe is the root;
+    // without one, as for an unsaved document, any *-IEF-Wireframe layer is.
+    public static bool IsProjectRootLayer(string layerName) => IsProjectRootLayer(layerName, null);
+
+    public static bool IsProjectRootLayer(string layerName, string? projectCode)
     {
-        string source = (sourcePanelLayerPath ?? string.Empty).Trim();
-        string requiredPrefix = PanelSurfaceLayerRootPath + "::";
-        if (!source.StartsWith(requiredPrefix, StringComparison.OrdinalIgnoreCase))
+        string name = (layerName ?? string.Empty).Trim();
+        if (!string.IsNullOrWhiteSpace(projectCode))
+        {
+            return string.Equals(name, PanelCladdingProjectService.RootLayerName(projectCode), StringComparison.OrdinalIgnoreCase);
+        }
+        return name.EndsWith(ProjectRootLayerSuffix, StringComparison.OrdinalIgnoreCase) &&
+            !string.IsNullOrWhiteSpace(name[..^ProjectRootLayerSuffix.Length]);
+    }
+
+    // The branch root itself and every nested sublayer belong to the branch.
+    public static bool IsPanelLayerPath(string layerPath) => IsPanelLayerPath(layerPath, null);
+
+    public static bool IsPanelLayerPath(string layerPath, string? projectCode) =>
+        IsProjectBranch(SplitLayerPath(layerPath), PanelSurfaceLayerName, projectCode);
+
+    public static bool IsCurveLayerPath(string layerPath) => IsCurveLayerPath(layerPath, null);
+
+    public static bool IsCurveLayerPath(string layerPath, string? projectCode) =>
+        IsProjectBranch(SplitLayerPath(layerPath), CurveLayerName, projectCode);
+
+    public static OperationResponse<string> ResolveCurveLayerPath(string sourcePanelLayerPath, string? projectCode = null)
+    {
+        string[] segments = SplitLayerPath(sourcePanelLayerPath);
+        if (!IsProjectBranch(segments, PanelSurfaceLayerName, projectCode))
         {
             return OperationResponse<string>.Fail(
-                $"PANEL_CLADDING_PANEL_LAYER_NOT_SUPPORTED: {sourcePanelLayerPath}");
+                $"PANEL_CLADDING_PANEL_LAYER_NOT_SUPPORTED: {sourcePanelLayerPath}; expected " +
+                $"{PanelCladdingProjectService.PanelLayerScope(projectCode)}::{PanelTypeLayerPrefix}<type>.");
         }
 
-        string suffix = source[requiredPrefix.Length..];
-        if (suffix.Length == 0 || suffix.Split(
-                new[] { "::" },
-                StringSplitOptions.None).Any(string.IsNullOrWhiteSpace))
+        string[] typeSegments = segments[2..];
+        if (typeSegments.Length == 0 || typeSegments.Any(string.IsNullOrWhiteSpace))
         {
             return OperationResponse<string>.Fail(
                 $"PANEL_CLADDING_PANEL_TYPE_LAYER_REQUIRED: {sourcePanelLayerPath}");
         }
 
-        return OperationResponse<string>.Ok($"{CurveLayerRootPath}::{suffix}");
+        // Surfaces - WT_01 hosts its curves on Curves - WT_01 under the same project root.
+        IEnumerable<string> curveTypeSegments = typeSegments.Select(segment =>
+            segment.StartsWith(PanelTypeLayerPrefix, StringComparison.OrdinalIgnoreCase)
+                ? CurveTypeLayerPrefix + segment[PanelTypeLayerPrefix.Length..]
+                : segment);
+        return OperationResponse<string>.Ok(string.Join(
+            "::",
+            new[] { segments[0], CurveLayerName }.Concat(curveTypeSegments)));
     }
+
+    private static bool IsProjectBranch(string[] segments, string branchLayerName, string? projectCode) =>
+        segments.Length >= 2 &&
+        IsProjectRootLayer(segments[0], projectCode) &&
+        string.Equals(segments[1], branchLayerName, StringComparison.OrdinalIgnoreCase);
+
+    private static string[] SplitLayerPath(string layerPath) =>
+        (layerPath ?? string.Empty).Trim().Split(new[] { "::" }, StringSplitOptions.None);
 
     private static void AddAtomicCurves(
         ICollection<PanelCladdingExtrusionCurvePlan> curves,
@@ -236,8 +283,8 @@ public sealed class PanelCladdingExtrusionPlanningService
                     continue;
                 }
                 string code = axis == PanelCladdingTopologyAxis.Horizontal
-                    ? $"INT_{Alpha(track)}{bay.ToString(CultureInfo.InvariantCulture)}"
-                    : $"INT_{track.ToString(CultureInfo.InvariantCulture)}{Alpha(bay)}";
+                    ? $"INT-{Alpha(track)}{bay.ToString(CultureInfo.InvariantCulture)}"
+                    : $"INT-{track.ToString(CultureInfo.InvariantCulture)}{Alpha(bay)}";
                 curves.Add(Curve(
                     code,
                     PanelCladdingExtrusionCurveKind.Segment,
@@ -257,7 +304,7 @@ public sealed class PanelCladdingExtrusionPlanningService
             : run.Track.ToString(CultureInfo.InvariantCulture);
         if (run.StartBay == 0 && run.EndBay == bayCount - 1)
         {
-            return $"INT_{track}";
+            return $"INT-{track}";
         }
         string start = run.Axis == PanelCladdingTopologyAxis.Horizontal
             ? run.StartBay.ToString(CultureInfo.InvariantCulture)
@@ -265,7 +312,7 @@ public sealed class PanelCladdingExtrusionPlanningService
         string end = run.Axis == PanelCladdingTopologyAxis.Horizontal
             ? run.EndBay.ToString(CultureInfo.InvariantCulture)
             : Alpha(run.EndBay);
-        return $"INT_{track}{start}–{end}";
+        return $"INT-{track}{start}–{end}";
     }
 
     private static PanelCladdingExtrusionCurvePlan Frame(
