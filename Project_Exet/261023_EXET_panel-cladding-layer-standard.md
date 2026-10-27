@@ -162,3 +162,8 @@ Post-start: after Rhino next started, root and `CommandList` advanced to 19:57:2
 while `PlugIn` stayed at the install time (19:17:17.43Z) and `FileName` still names the
 1.0.98 RHP. The loaded module itself was not inspected. Native command acceptance was
 superseded by the 1.0.99 ID change.
+
+## GitHub publication follow-up (2026-10-27)
+
+Source commit: `971f652e7565c083af77ce55dac70001e3f2b5cf`.
+Pull request: [#2 — project layer standard, ID separators and PNL naming convention](https://github.com/novan-xu/PanelCladding/pull/2).

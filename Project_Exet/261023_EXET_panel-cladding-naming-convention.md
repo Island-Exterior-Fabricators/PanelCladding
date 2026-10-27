@@ -248,3 +248,8 @@ this writer-only change.
 
 Install 1.1.4; the next ABC save removes the leftover backup file. The 1.1.0 leftover `ABC - Naming Convention.xlsx.panel-naming-backup` is still beside the
 sheet for the user to remove. No commit was requested.
+
+## GitHub publication follow-up (2026-10-27)
+
+Source commit: `971f652e7565c083af77ce55dac70001e3f2b5cf`.
+Pull request: [#2 — project layer standard, ID separators and PNL naming convention](https://github.com/novan-xu/PanelCladding/pull/2).

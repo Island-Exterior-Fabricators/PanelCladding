@@ -120,3 +120,8 @@ the 1.0.98 rollback copy hash matches; `-Mode Validate` passed; no Rhino process
 
 The plug-in now produces and matches `-`-separated IDs joined by `_`, and ABC has been
 converted in memory and verified; saving and installing 1.0.99 are pending.
+
+## GitHub publication follow-up (2026-10-27)
+
+Source commit: `971f652e7565c083af77ce55dac70001e3f2b5cf`.
+Pull request: [#2 — project layer standard, ID separators and PNL naming convention](https://github.com/novan-xu/PanelCladding/pull/2).

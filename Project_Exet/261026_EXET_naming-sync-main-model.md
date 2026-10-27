@@ -100,3 +100,8 @@ sheet or model was touched, and 1.2.0 stays installed.
 The save-time naming-convention sync now writes the sheet only from `<PROJECT> - Wireframe.3dm`.
 1.2.1 builds, passes the managed suite apart from the known pre-existing failures, passes the
 package test and is staged; it is not installed.
+
+## GitHub publication follow-up (2026-10-27)
+
+Source commit: `971f652e7565c083af77ce55dac70001e3f2b5cf`.
+Pull request: [#2 — project layer standard, ID separators and PNL naming convention](https://github.com/novan-xu/PanelCladding/pull/2).

@@ -157,3 +157,8 @@ registration export; reinstalling the 1.1.4 package restores it. Sheet: the 16:4
 
 1.2.0 is installed and attested on the host, PCtemplatePNL works in Rhino, and the XYZ sheet is
 configured for `A`, `A`, `01`, `001`, `01`; saving the STN model leaves it unchanged.
+
+## GitHub publication follow-up (2026-10-27)
+
+Source commit: `971f652e7565c083af77ce55dac70001e3f2b5cf`.
+Pull request: [#2 — project layer standard, ID separators and PNL naming convention](https://github.com/novan-xu/PanelCladding/pull/2).
