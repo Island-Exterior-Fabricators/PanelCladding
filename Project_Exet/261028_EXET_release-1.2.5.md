@@ -4,7 +4,9 @@
 
 [PLAN](../Project_Plan/261028_PLAN_release-1.2.5.md),
 [TEST evidence](../Project_Test/261028_TEST_release-1.2.5/README.md).
-Executed 2026-10-28 on branch `codex/release-1.2.5` from `master` (`09365d8`), host NOVAN-HOME.
+Executed 2026-10-28 on branch `codex/release-1.2.5` from `master` (`09365d8`), host NOVAN-HOME;
+commits `9f48c11` (tagged) and `e01514a`, [PR 7](https://github.com/novan-xu/PanelCladding/pull/7),
+merged into `master` at the user's request.
 Release: [PanelCladdingEditor v1.2.5](https://github.com/novan-xu/PanelCladding/releases/tag/v1.2.5).
 
 ## Changes
