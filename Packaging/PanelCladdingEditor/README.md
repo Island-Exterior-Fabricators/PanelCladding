@@ -472,7 +472,7 @@ the new version loads after a Rhino restart. Rhino installs packages under
 ## Downloadable release installation
 
 Download the `PanelCladdingEditor-<version>-win-x64.zip` asset from
-[GitHub Releases](https://github.com/novan-xu/PanelCladding/releases/latest), extract
+[GitHub Releases](https://github.com/nuofan-island/PanelCladding/releases/latest), extract
 all files, close Rhino, and run `Install.cmd` normally. The launcher installs for
 the current Windows user and runs `-Mode Validate` before reporting success.
 Restart Rhino and run `PCEditor`. Use `Uninstall.cmd` with Rhino closed to remove it.

@@ -1,14 +1,14 @@
 # PanelCladding
 
 Standalone Rhino 8 panel cladding editor, migrated from
-[MCP_Rhino](https://github.com/novan-xu/MCP_Rhino) on 2026-10-13.
+[MCP_Rhino](https://github.com/nuofan-island/MCP_Rhino) on 2026-10-13.
 The plug-in/assembly name remains **PanelCladdingEditor** and its primary command
 is **PCEditor**. No MCP server or Router is needed.
 
 ## Install (no administrator access)
 
 Download **PanelCladdingEditor-1.2.5-win-x64.zip** from the
-[latest release](https://github.com/novan-xu/PanelCladding/releases/latest).
+[latest release](https://github.com/nuofan-island/PanelCladding/releases/latest).
 Extract all files, close Rhino, and double-click **Install.cmd** as your normal
 Windows user. After installation and validation pass, start Rhino and run **PCEditor**.
 To upgrade an earlier zip installation, do the same with the new package; it replaces the
