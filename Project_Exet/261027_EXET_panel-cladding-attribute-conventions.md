@@ -9,7 +9,8 @@ Executed 2026-10-27 under
 
 [TEST](../Project_Test/261027_TEST_panel-cladding-attribute-conventions/README.md) with the managed
 smoke `PanelCladdingAttributeConventionsSmoke.csproj`. Branch
-`codex/panel-cladding-attribute-conventions` from `master` (`340515f`); no commit or PR was created.
+`codex/panel-cladding-attribute-conventions` from `master` (`340515f`), commit `4ce1a30`,
+[PR 5](https://github.com/novan-xu/PanelCladding/pull/5), merged into `master` at the user's request.
 The reference models (`XYZ - Wireframe.3dm`, `ABC - Wireframe.3dm`) were only read, through the
 live Rhino connection; neither was modified.
 
