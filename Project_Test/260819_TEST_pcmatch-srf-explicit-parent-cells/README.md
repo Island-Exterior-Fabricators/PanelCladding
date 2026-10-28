@@ -1,5 +1,7 @@
 # PCMatchSrf Explicit Parent Cells TEST
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/pcmatch-srf-explicit-parent-cells`](../../tests/Smoke/pcmatch-srf-explicit-parent-cells/) (run `.\tests\Run-Regression.ps1 -Name pcmatch-srf-explicit-parent-cells`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 Regression coverage for copying the reported 2-column by 4-row parent graph and for preserving an explicitly stored parent-cell key even when extrusion topology would otherwise collapse that physical cell.
 
 Run with:

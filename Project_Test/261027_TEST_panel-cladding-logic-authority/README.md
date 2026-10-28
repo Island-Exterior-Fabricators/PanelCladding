@@ -1,5 +1,7 @@
 # Panel cladding logic authority TEST
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-logic-authority`](../../tests/Smoke/panel-cladding-logic-authority/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-logic-authority`); `CladdingLogicFixture.cs` moved to [`tests/Shared`](../../tests/Shared/). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 Regression for [the PLAN](../../Project_Plan/261027_PLAN_panel-cladding-logic-authority.md):
 in 1.2.4 `UD_CLADDING_LOGIC` becomes the only cladding the plug-in reads, `CW_4.xx` is output only,
 and `PCCreate` no longer generates or overwrites cladding.

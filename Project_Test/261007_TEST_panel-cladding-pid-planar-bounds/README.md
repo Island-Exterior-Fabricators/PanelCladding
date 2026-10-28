@@ -1,5 +1,7 @@
 # PCpid planar bounds regression
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-pid-planar-bounds`](../../tests/Smoke/panel-cladding-pid-planar-bounds/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-pid-planar-bounds`); `Verify-Regression.ps1` is replaced by `.\tests\Run-Regression.ps1 -Name panel-cladding-pid,panel-cladding-pid-layer-scope,panel-cladding-pid-setup-keys,panel-cladding-point-order,panel-cladding-pid-planar-bounds`. Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 `reported-panel.json` contains the numeric boundary and normal from read-only live
 inspection, with document path, project metadata and object identity removed.
 Rhino reported a planar degree-1 2x2 surface; document tolerance is 0.00001.

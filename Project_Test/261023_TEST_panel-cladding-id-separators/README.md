@@ -1,5 +1,7 @@
 # Panel cladding PID/CID separator TEST
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-id-separators`](../../tests/Smoke/panel-cladding-id-separators/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-id-separators`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 Plan: [261023_PLAN_panel-cladding-id-separators](../../Project_Plan/261023_PLAN_panel-cladding-id-separators.md)
 
 | ID | Before 1.0.99 | Since 1.0.99 |

@@ -1,5 +1,7 @@
 # Panel Cladding Layout Reconciliation TEST
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-layout-reconciliation`](../../tests/Smoke/panel-cladding-layout-reconciliation/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-layout-reconciliation`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 Focused regression coverage for the general layout reconciliation contract:
 
 - coordinate/order-based topology remapping across inserted and moved H/V tracks;

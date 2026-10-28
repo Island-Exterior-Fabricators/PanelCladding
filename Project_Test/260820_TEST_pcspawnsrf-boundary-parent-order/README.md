@@ -1,5 +1,7 @@
 # PCSpawnSrf Boundary And Parent Order Smoke
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/pcspawnsrf-boundary-parent-order`](../../tests/Smoke/pcspawnsrf-boundary-parent-order/) (run `.\tests\Run-Regression.ps1 -Name pcspawnsrf-boundary-parent-order`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 This focused smoke validates the 2026-08-20 boundary-first region construction contract and the
 parent-reference dropdown order.
 

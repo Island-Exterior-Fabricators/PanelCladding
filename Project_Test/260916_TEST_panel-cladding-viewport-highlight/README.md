@@ -1,5 +1,7 @@
 # Panel viewport highlight validation
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: `Test-ViewportHighlightDrawing.ps1` moved to [`tests/Checks`](../../tests/Checks/). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 ## Build verification (2026-09-16)
 
 Run from the repository root:

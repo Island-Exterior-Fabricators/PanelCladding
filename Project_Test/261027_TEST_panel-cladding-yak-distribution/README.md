@@ -1,5 +1,7 @@
 # Panel cladding Yak distribution TEST
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: `Verify-YakPackage.ps1` moved to [`tests/Package`](../../tests/Package/). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 Regression for [the PLAN](../../Project_Plan/261027_PLAN_panel-cladding-yak-distribution.md):
 the plug-in is built as a Rhino Yak package and published to a company-internal source.
 

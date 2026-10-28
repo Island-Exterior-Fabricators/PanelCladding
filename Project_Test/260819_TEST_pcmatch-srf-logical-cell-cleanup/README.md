@@ -1,5 +1,7 @@
 # PCMatchSrf Logical Cell Cleanup TEST
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/pcmatch-srf-logical-cell-cleanup`](../../tests/Smoke/pcmatch-srf-logical-cell-cleanup/) (run `.\tests\Run-Regression.ps1 -Name pcmatch-srf-logical-cell-cleanup`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 Runs a standalone regression for source merge topology that hides physical cells `0B` and `1C`.
 
 ```powershell

@@ -1,5 +1,7 @@
 # Panel Cladding Clear Test
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-clear`](../../tests/Smoke/panel-cladding-clear/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-clear`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 ## Automated smoke
 
 Run from the repository root:

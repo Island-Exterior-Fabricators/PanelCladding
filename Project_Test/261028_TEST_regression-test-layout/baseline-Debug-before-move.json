@@ -1,0 +1,486 @@
+﻿[
+    {
+        "project":  "Project_Test\\260804_TEST_standalone-panel-cladding-editor\\PanelCladdingEditorSmoke.csproj",
+        "exit":  0,
+        "seconds":  3,
+        "last":  "[OK] temporary artifacts verified and cleaned"
+    },
+    {
+        "project":  "Project_Test\\260805_TEST_panel-cladding-match\\PanelCladdingMatchSmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "[OK] standalone PCMatchSrf command/service contract and unique GUID"
+    },
+    {
+        "project":  "Project_Test\\260805_TEST_panel-cladding-spawn\\PanelCladdingSpawnSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] standalone PanelCladdingSpawn Rhino command contract and unique GUID"
+    },
+    {
+        "project":  "Project_Test\\260805_TEST_rhino-plugin-assembly-identity\\PluginAssemblyIdentityProbe\\PluginAssemblyIdentityProbe.csproj",
+        "exit":  2,
+        "seconds":  1,
+        "last":  {
+
+                 }
+    },
+    {
+        "project":  "Project_Test\\260807_TEST_panel-cladding-clear\\PanelCladdingClearSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] standalone PanelCladdingClear command/service contract and unique GUID"
+    },
+    {
+        "project":  "Project_Test\\260807_TEST_panel-cladding-surface-sync\\PanelCladdingSurfaceSyncSmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "[OK] standalone sync command/services, batch contract, and unique GUID"
+    },
+    {
+        "project":  "Project_Test\\260812_TEST_panel-cladding-offset-sync\\PanelCladdingOffsetSyncSmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "[SKIP] Rhino Brep offset inference requires a running Rhino native host"
+    },
+    {
+        "project":  "Project_Test\\260812_TEST_panel-cladding-regions\\PanelCladdingRegionsSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] surface-object coverage reconstructs merges and isolates invalid mappings"
+    },
+    {
+        "project":  "Project_Test\\260812_TEST_panel-cladding-wpf-ui\\PanelCladdingWpfUiSmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "[OK] 680 x 690 material setup render: C:\\01_Projects\\Panel Cladding Full\\PanelCladding\\Project_Test\\260812_TEST_panel-cladding-wpf-ui\\panel-cladding-material-setup-680x690.png"
+    },
+    {
+        "project":  "Project_Test\\260813_TEST_panel-cladding-canvas-alignment\\PanelCladdingCanvasAlignmentSmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "[OK] Notification remains canvas-centered and clear of extrusion actions at every zoom/pan state."
+    },
+    {
+        "project":  "Project_Test\\260813_TEST_panel-cladding-direct-interactions\\PanelCladdingDirectInteractionsSmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "[OK] Dimension locks, far-right danger/zoom toolbar, footer, 10-inch grid, and half-weight strokes passed."
+    },
+    {
+        "project":  "Project_Test\\260813_TEST_panel-cladding-extrusion-fidelity\\PanelCladdingExtrusionFidelitySmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "[OK] Extrusion selection uses a visible yellow halo around the normal dark curve core."
+    },
+    {
+        "project":  "Project_Test\\260813_TEST_panel-cladding-extrusion-visuals\\PanelCladdingExtrusionVisualsSmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "[OK] Structural actions are compact and arranged as two rounded groups."
+    },
+    {
+        "project":  "Project_Test\\260813_TEST_panel-cladding-latest-ui\\PanelCladdingLatestUiSmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "[OK] Desktop, compact, merged, and mullion-dialog renders were generated."
+    },
+    {
+        "project":  "Project_Test\\260813_TEST_panel-cladding-material-catalog\\PanelCladdingMaterialCatalogSmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "PASS: project material catalog round trip, Rhino-only cladding save, and UI source checks."
+    },
+    {
+        "project":  "Project_Test\\260813_TEST_panel-cladding-ui-refinement\\PanelCladdingUiRefinementSmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "[OK] Active modes, typography, rounded fields, and redundant-UI removal passed."
+    },
+    {
+        "project":  "Project_Test\\260813_TEST_panel-cladding-visual-polish\\PanelCladdingVisualPolishSmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "[OK] Material Setup matches the main editor\u0027s typography, sizing, spacing, and rounded controls."
+    },
+    {
+        "project":  "Project_Test\\260818_TEST_material-catalogue-editing\\MaterialCatalogueEditingSmoke.csproj",
+        "exit":  0,
+        "seconds":  3,
+        "last":  "[OK] Responsive catalogue wrap, expanded description, palette bounds, and equal footer passed."
+    },
+    {
+        "project":  "Project_Test\\260818_TEST_material-setup-color-picker\\MaterialSetupColorPickerSmoke.csproj",
+        "exit":  0,
+        "seconds":  3,
+        "last":  "[OK] Compact hover, press, and keyboard-focus visual states are present."
+    },
+    {
+        "project":  "Project_Test\\260818_TEST_panel-cladding-cell-topology\\PanelCladdingCellTopologySmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "[OK] Add V creates/renumbers columns without phantom neighboring cells."
+    },
+    {
+        "project":  "Project_Test\\260818_TEST_panel-cladding-create-command\\PanelCladdingCreateSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] PCCreate exposes the required panel-first, curve-second Rhino command flow."
+    },
+    {
+        "project":  "Project_Test\\260818_TEST_panel-cladding-extrusion-sync\\PanelCladdingExtrusionSyncSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] scoped sync plans repair only its own object family and retains five-decimal unit dimensions."
+    },
+    {
+        "project":  "Project_Test\\260818_TEST_panel-cladding-hide-smoke-command\\PanelCladdingHideSmokeCommandSmoke.csproj",
+        "exit":  1,
+        "seconds":  1,
+        "last":  {
+
+                 }
+    },
+    {
+        "project":  "Project_Test\\260818_TEST_panel-cladding-match-parent-cells\\PanelCladdingMatchParentCellsSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] invalid source parent-reference cycles fail before target mutation."
+    },
+    {
+        "project":  "Project_Test\\260818_TEST_panel-cladding-match-topology-masks\\PanelCladdingMatchTopologyMasksSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] mask transfer remains fail-closed for different grid dimensions."
+    },
+    {
+        "project":  "Project_Test\\260818_TEST_panel-cladding-pc-commands\\PanelCladdingPcCommandsSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] Command GUIDs remain explicit and unique, and package metadata names PCEditor only."
+    },
+    {
+        "project":  "Project_Test\\260818_TEST_panel-cladding-topology-persistence\\PanelCladdingTopologyPersistenceSmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "[OK] H/V and row/column edits preserve all masks, cladding, profiles, undo, and scoped save/reload."
+    },
+    {
+        "project":  "Project_Test\\260818_TEST_panel-cladding-wheel-zoom-aspect\\PanelCladdingWheelZoomAspectSmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "[OK] Cladding hit geometry and extrusion view share the corrected panel bounds."
+    },
+    {
+        "project":  "Project_Test\\260819_TEST_panel-cladding-blank-cell-persistence\\PanelCladdingBlankCellPersistenceSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] hidden physical members of merged cells remain obsolete and are not recreated."
+    },
+    {
+        "project":  "Project_Test\\260819_TEST_panel-cladding-curve-topology\\PanelCladdingCurveTopologySmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] PCMatchCrv transfers sparse masks and full extrusion assignments across equal H/V counts."
+    },
+    {
+        "project":  "Project_Test\\260819_TEST_panel-cladding-full-track-collapse\\PanelCladdingFullTrackCollapseSmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "[OK] previously saved complete-track masks normalize when the editor loads."
+    },
+    {
+        "project":  "Project_Test\\260819_TEST_panel-cladding-hide-mask\\PanelCladdingHideMaskSmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "[OK] PCMatchCrv and PCEditor include the hide state."
+    },
+    {
+        "project":  "Project_Test\\260819_TEST_panel-cladding-layout-reconciliation\\PanelCladdingLayoutReconciliationSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] production reconciliation contains no fixture coordinates, states, or literal index transition"
+    },
+    {
+        "project":  "Project_Test\\260819_TEST_panel-cladding-logical-cell-cleanup\\PanelCladdingLogicalCellCleanupSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] Parent references to hidden physical cells resolve to logical representatives."
+    },
+    {
+        "project":  "Project_Test\\260819_TEST_panel-cladding-logic-persistence\\PanelCladdingLogicPersistenceSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] Save, PCCreate, PCMatchSrf, PCSyncSrf, and PCClear maintain the logic attribute."
+    },
+    {
+        "project":  "Project_Test\\260819_TEST_panel-cladding-scoped-save\\PanelCladdingScopedSaveSmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "[OK] editor footer exposes Save Extrusions, Save Cladding, and Save Both with no Exit action."
+    },
+    {
+        "project":  "Project_Test\\260819_TEST_panel-cladding-split-spawn-sync\\PanelCladdingSplitSpawnSyncSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] surface/curve scope is explicit in the shared application contract."
+    },
+    {
+        "project":  "Project_Test\\260819_TEST_panel-cladding-surface-sync-structural-grid\\PanelCladdingSurfaceSyncStructuralGridSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[SKIP] Rhino Brep inference requires a Rhino native host"
+    },
+    {
+        "project":  "Project_Test\\260819_TEST_pcmatch-parent-fidelity\\PanelCladdingMatchParentFidelitySmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] the live adapter\u0027s shared attribute transformation retains the exact values."
+    },
+    {
+        "project":  "Project_Test\\260819_TEST_pcmatch-srf-explicit-parent-cells\\PCMatchSrfExplicitParentCellsSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] explicit parent survives collapse and target-visible cells inherit the region"
+    },
+    {
+        "project":  "Project_Test\\260819_TEST_pcmatch-srf-logical-cell-cleanup\\PCMatchSrfLogicalCellCleanupSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] target offsets, masks, metadata, and unrelated attributes remain unchanged."
+    },
+    {
+        "project":  "Project_Test\\260819_TEST_pcmatch-srf-logical-cells\\PCMatchSrfLogicalCellsSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] PCMatchSrf is the registered public command name."
+    },
+    {
+        "project":  "Project_Test\\260819_TEST_pcmatch-srf-repair-existing-targets\\PCMatchSrfRepairExistingTargetsSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] postcondition validation rejects missing writes and retained deletes"
+    },
+    {
+        "project":  "Project_Test\\260819_TEST_pcsync-srf-parent-persistence\\PCSyncSrfParentPersistenceSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] postcondition validation rejects missing or replaced parent values"
+    },
+    {
+        "project":  "Project_Test\\260819_TEST_pcsync-srf-preserve-structural-grid\\PCSyncSrfPreserveStructuralGridSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] live PCSyncSrf grid construction uses the scope-aware effective offsets"
+    },
+    {
+        "project":  "Project_Test\\260820_TEST_panel-cladding-curve-template-ui\\PanelCladdingCurveTemplateUiSmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "[OK] Save Extrusions, Save Cladding, and Save Both fit at constrained width."
+    },
+    {
+        "project":  "Project_Test\\260820_TEST_panel-cladding-sparse-topology\\PanelCladdingSparseTopologySmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] surface sync uses combined configuration while signatures retain canonical mask contents."
+    },
+    {
+        "project":  "Project_Test\\260820_TEST_panel-cladding-type-code-format\\PanelCladdingTypeCodeFormatSmoke.csproj",
+        "exit":  -532462766,
+        "seconds":  4,
+        "last":  {
+
+                 }
+    },
+    {
+        "project":  "Project_Test\\260820_TEST_panel-extrusion-assignment\\NativeRuntimeProbe\\PanelExtrusionNativeRuntimeProbe.csproj",
+        "exit":  -532462766,
+        "seconds":  3,
+        "last":  {
+
+                 }
+    },
+    {
+        "project":  "Project_Test\\260820_TEST_panel-extrusion-assignment\\PanelExtrusionAssignmentSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] exact Rhino keys and baked-curve take-off key are present in production sources."
+    },
+    {
+        "project":  "Project_Test\\260820_TEST_pcspawnsrf-boundary-parent-order\\PCSpawnSrfBoundaryParentOrderSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[SKIP] Rhino-native single-face probe requires a running Rhino native host"
+    },
+    {
+        "project":  "Project_Test\\260825_TEST_cladding-merge-mark-key\\CladdingMergeMarkKeySmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] live sync resolves and deletes the legacy key before writing Merge_Mark"
+    },
+    {
+        "project":  "Project_Test\\260825_TEST_cladding-surface-coverage-metadata\\CladdingSurfaceCoverageMetadataSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] live sync reads, validates, rewrites, and persists coverage metadata"
+    },
+    {
+        "project":  "Project_Test\\260825_TEST_pcsync-srf-offset-refresh\\PCSyncSrfOffsetRefreshSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] live PCSyncSrf uses role-aware offset refresh planning"
+    },
+    {
+        "project":  "Project_Test\\260825_TEST_pcsync-srf-unmarked-offset-clearing\\PCSyncSrfUnmarkedOffsetClearingSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] coverage-blind planning never preserves stored tracks"
+    },
+    {
+        "project":  "Project_Test\\260826_TEST_extrusion-assignment-dropzone\\ExtrusionAssignmentDropZoneSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] available profiles are filtered against the selected curves\u0027 assignments."
+    },
+    {
+        "project":  "Project_Test\\260903_TEST_panel-cladding-managed-cid-scope\\PanelCladdingManagedCidScopeSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] sync discovery is restricted to Reference::Surfaces - STEP and \u003cPROJECT\u003e-IEF-Wireframe::Curves - PNL"
+    },
+    {
+        "project":  "Project_Test\\260903_TEST_panel-cladding-update-command\\PanelCladdingUpdateCommandSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] supported package registers PCUpdate"
+    },
+    {
+        "project":  "Project_Test\\260903_TEST_pc-curve-display-colors\\PCCurveDisplayColorsSmoke.csproj",
+        "exit":  -532462766,
+        "seconds":  4,
+        "last":  "[OK] spawn, update, and sync write/repair curve object colors"
+    },
+    {
+        "project":  "Project_Test\\260903_TEST_pcspawncrv-curve-simplification\\PCSpawnCrvCurveSimplificationSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[SKIP] native curve reduction requires an initialized Rhino runtime; pass --rhino-geometry in a supported Rhino test host"
+    },
+    {
+        "project":  "Project_Test\\260903_TEST_pcupdate-command-undo\\PCUpdateCommandUndoSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[SKIP] native ambient Undo verification requires an initialized Rhino runtime; pass --rhino-undo in a supported Rhino test host"
+    },
+    {
+        "project":  "Project_Test\\260903_TEST_pcupdate-locked-managed-objects\\PCUpdateLockedManagedObjectsSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] package supports protected-object PCUpdate"
+    },
+    {
+        "project":  "Project_Test\\260923_TEST_panel-cladding-curve-release\\PanelCladdingCurveReleaseSmoke.csproj",
+        "exit":  -532462766,
+        "seconds":  3,
+        "last":  {
+
+                 }
+    },
+    {
+        "project":  "Project_Test\\260923_TEST_panel-cladding-role-cid\\PanelCladdingRoleCidSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] unit types, ignored legacy flags, casing, role transitions, missing/unknown types, custom IDs, and sibling update isolation"
+    },
+    {
+        "project":  "Project_Test\\260923_TEST_panel-cladding-surface-release\\PanelCladdingSurfaceReleaseSmoke.csproj",
+        "exit":  -532462766,
+        "seconds":  4,
+        "last":  "[OK] spawn/update plans inherit panel release on merged and single-cell surfaces"
+    },
+    {
+        "project":  "Project_Test\\261006_TEST_panel-cladding-object-names\\PanelCladdingObjectNamesSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "[OK] live create/save/match/spawn/update/sync naming routes and name-only create commit guard"
+    },
+    {
+        "project":  "Project_Test\\261007_TEST_panel-cladding-pid\\PanelCladdingPidSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "PASS: PCpid planning and document preflight regression"
+    },
+    {
+        "project":  "Project_Test\\261007_TEST_panel-cladding-pid-layer-scope\\PanelCladdingPidLayerScopeSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "PASS: PCpid layer scope and selected-write regression"
+    },
+    {
+        "project":  "Project_Test\\261007_TEST_panel-cladding-pid-planar-bounds\\PanelCladdingPidPlanarBoundsSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "PASS: reported live boundary plans, dimensions 90x180, all 30 keys, point order and nonplanarity guard"
+    },
+    {
+        "project":  "Project_Test\\261007_TEST_panel-cladding-pid-setup-keys\\PanelCladdingPidSetupKeysSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "PASS: PCpid setup metadata and dimensions"
+    },
+    {
+        "project":  "Project_Test\\261007_TEST_panel-cladding-point-order\\PanelCladdingPointOrderSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "PASS: 480 point-order cases (permutations, rotations, slopes, opposite fronts), plus invalid/ambiguous cases"
+    },
+    {
+        "project":  "Project_Test\\261007_TEST_pc-editor-canvas-assignment\\PanelCladdingCanvasAssignmentSmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "PASS: precise dimensions, stored/legacy/missing CID, selection/view/reload visibility, routed drag/drop, modifier/remove/clear/Undo, multi-selection, scrolling at 1440x900 and 980x680; no document commits."
+    },
+    {
+        "project":  "Project_Test\\261023_TEST_panel-cladding-id-separators\\PanelCladdingIdSeparatorsSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "PASS: panel cladding PID/CID separator regression"
+    },
+    {
+        "project":  "Project_Test\\261023_TEST_panel-cladding-layer-standard\\PanelCladdingLayerStandardSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "PASS: panel cladding layer standard regression"
+    },
+    {
+        "project":  "Project_Test\\261023_TEST_panel-cladding-naming-convention\\PanelCladdingNamingConventionSmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "PASS: panel cladding naming convention regression"
+    },
+    {
+        "project":  "Project_Test\\261027_TEST_panel-auto-attributes\\PanelAutoAttributesSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "PASS: panel auto attribute regression"
+    },
+    {
+        "project":  "Project_Test\\261027_TEST_panel-cladding-attribute-conventions\\PanelCladdingAttributeConventionsSmoke.csproj",
+        "exit":  0,
+        "seconds":  2,
+        "last":  "PASS: panel cladding attribute conventions regression"
+    },
+    {
+        "project":  "Project_Test\\261027_TEST_panel-cladding-logic-authority\\PanelCladdingLogicAuthoritySmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "PASS: panel cladding logic authority regression"
+    },
+    {
+        "project":  "Project_Test\\261027_TEST_panel-cladding-ud-keys\\PanelCladdingUdKeysSmoke.csproj",
+        "exit":  0,
+        "seconds":  1,
+        "last":  "PASS: panel cladding UD_ key regression"
+    }
+]

@@ -1,5 +1,7 @@
 # Panel cladding naming-convention TEST
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-naming-convention`](../../tests/Smoke/panel-cladding-naming-convention/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-naming-convention`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 Plan: [261023_PLAN_panel-cladding-naming-convention](../../Project_Plan/261023_PLAN_panel-cladding-naming-convention.md)
 
 | Attribute | Before 1.1.0 | Since 1.1.0 |

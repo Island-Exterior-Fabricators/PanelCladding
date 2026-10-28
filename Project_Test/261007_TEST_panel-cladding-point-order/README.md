@@ -1,5 +1,7 @@
 # Panel command point-order tests — 2026-10-07
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-point-order`](../../tests/Smoke/panel-cladding-point-order/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-point-order`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 ## Requirements reference
 
 Matches the current repository StandardFourPointSurfaceRebuildSkill: local

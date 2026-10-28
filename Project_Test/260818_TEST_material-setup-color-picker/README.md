@@ -1,5 +1,7 @@
 # Material Setup Color Picker Smoke
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/material-setup-color-picker`](../../tests/Smoke/material-setup-color-picker/) (run `.\tests\Run-Regression.ps1 -Name material-setup-color-picker`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 This focused WPF smoke verifies the custom-color swatch button without opening Rhino's modal picker
 or using Windows UI automation. Injected picker fakes cover both confirmed and cancelled results.
 

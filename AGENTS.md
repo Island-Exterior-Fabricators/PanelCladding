@@ -10,7 +10,14 @@ This is the standalone Rhino 8 PanelCladdingEditor repository. Read
 - Treat an explicit implementation request as authorization for its required
   PLAN -> EXET -> TEST records. Do not invent new capabilities during runtime use.
 - Use a `codex/` branch for construction changes. Keep unrelated user edits intact.
-- Verify Debug and Release builds and relevant managed regression tests. Directly
+- Keep rerunnable test code in `tests/`; `Project_Test/` folders hold evidence only.
+  Update older smokes that a behaviour change affects; the suite has no accepted failures.
+- Archive completed work consistently: once a PLAN/EXET/TEST set has completed
+  successfully and more than three days have passed since its recorded execution date,
+  move the three together, keeping their names, under `Project_Archive/`. Do not
+  archive incomplete, failed, blocked, unmatched or still-active work. The plan log has
+  the details.
+- Verify Debug and Release builds and managed regressions (`tests/Run-Regression.ps1`). Directly
   verify compiled RHP assembly-level GUID metadata before packaging or installation;
   it must be non-empty and match the manifest and plug-in class GUID.
 - Production installation requires independent host-persistent registry attestation.

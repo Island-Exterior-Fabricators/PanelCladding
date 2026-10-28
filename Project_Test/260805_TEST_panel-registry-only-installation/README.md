@@ -1,5 +1,7 @@
 # PanelCladdingEditor registry-only installation smoke
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: `PanelRegistryOnlyInstallationSmoke.ps1` moved to [`tests/Package`](../../tests/Package/). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 Build the 1.0.6 bundle, then run:
 
 ```powershell

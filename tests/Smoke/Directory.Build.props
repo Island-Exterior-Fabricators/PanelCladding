@@ -1,0 +1,11 @@
+<Project>
+  <!-- All smokes build into one folder so shared dependencies are copied once.
+       Build them serially (Run-Regression.ps1 uses -m:1). -->
+  <PropertyGroup>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)..\..\artifacts\tests\bin\</BaseOutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)..\Shared\RegressionPaths.cs" Link="RegressionPaths.cs" />
+  </ItemGroup>
+</Project>
