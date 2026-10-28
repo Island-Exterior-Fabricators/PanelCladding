@@ -5,7 +5,8 @@
 [PLAN](../Project_Plan/261028_PLAN_repository-owner-transfer.md),
 [TEST evidence](../Project_Test/261028_TEST_repository-owner-transfer/README.md).
 Executed 2026-10-28 on branch `codex/repository-owner-transfer` from `master` (`ad23285`), host
-NYCZBF16G9NXU.
+NYCZBF16G9NXU; commit `b48611c`,
+[PR 8](https://github.com/nuofan-island/PanelCladding/pull/8).
 
 ## Changes
 
