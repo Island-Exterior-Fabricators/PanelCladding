@@ -413,7 +413,7 @@ activate it.
 The installed RHP and its private dependencies live at
 `%LOCALAPPDATA%\PanelCladdingEditor\plugin\<version>`. The installer writes the complete Rhino 8
 current-user registration directly: root product/startup metadata, `PlugIn\FileName`, and the exact
-twelve-command `CommandList`. It does not rely on Rhino consuming a shorthand root `FileName` during
+thirteen-command `CommandList`. It does not rely on Rhino consuming a shorthand root `FileName` during
 first startup. Installer validation rejects shorthand-only, partial, stale-command, or mixed
 registrations. It removes the legacy `PanelCladdingEditor` and `LegacyPanelCladdingEditor` roots
 from Rhino Package Manager discovery. Do not place the RHP under

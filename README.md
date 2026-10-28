@@ -7,10 +7,13 @@ is **PCEditor**. No MCP server or Router is needed.
 
 ## Install (no administrator access)
 
-Download **PanelCladdingEditor-1.0.97-win-x64.zip** from the
+Download **PanelCladdingEditor-1.2.5-win-x64.zip** from the
 [latest release](https://github.com/novan-xu/PanelCladding/releases/latest).
 Extract all files, close Rhino, and double-click **Install.cmd** as your normal
 Windows user. After installation and validation pass, start Rhino and run **PCEditor**.
+To upgrade an earlier zip installation, do the same with the new package; it replaces the
+previous version. The [release notes](Packaging/PanelCladdingEditor/RELEASE-NOTES-1.2.5.md)
+list the attribute and naming changes since 1.0.97.
 
 Requires Windows x64 and Rhino 8 running .NET 8. You do not need the .NET SDK or
 an MCP server to install. Files live in your LocalAppData folder and registration
