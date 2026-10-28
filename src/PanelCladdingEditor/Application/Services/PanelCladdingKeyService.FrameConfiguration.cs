@@ -114,7 +114,7 @@ public sealed partial class PanelCladdingKeyService
         foreach ((string current, string[] legacy) in new[]
                  {
                      (FrameConfigBackupKey, new[] { FrameConfigKey, SegmentMaskKey, MergeMaskKey, HideMaskKey }),
-                     (FrameTypeKey, new[] { LegacyFrameAssignmentsKey })
+                     (FrameAssignmentsKey, new[] { LegacyFrameAssignmentsKey })
                  })
         {
             OperationResponse<string> value = ReadFrameAttribute(userText, current);

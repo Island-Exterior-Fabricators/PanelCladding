@@ -29,7 +29,7 @@ internal static class Program
                 [PanelCladdingKeyService.LegacyTypeCodeKey] = "LEGACY",
                 [PanelCladdingKeyService.LegacySignatureKey] = "legacy-signature",
                 [PanelCladdingKeyService.FrameConfigKey] = "config",
-                [PanelCladdingKeyService.FrameTypeKey] = "assignments",
+                [PanelCladdingKeyService.FrameAssignmentsKey] = "assignments",
                 [PanelCladdingKeyService.LegacyFrameAssignmentsKey] = "old-assignments",
                 [PanelCladdingKeyService.LegacyFrameTypologyKey] = "old-typology",
                 ["CW_2.03_OFFSET_H0"] = "40",
@@ -69,7 +69,7 @@ internal static class Program
             PanelCladdingKeyService.LegacyTypeCodeKey,
             PanelCladdingKeyService.LegacySignatureKey,
             PanelCladdingKeyService.FrameConfigKey,
-            PanelCladdingKeyService.FrameTypeKey,
+            PanelCladdingKeyService.FrameAssignmentsKey,
             PanelCladdingKeyService.LegacyFrameAssignmentsKey,
             PanelCladdingKeyService.LegacyFrameTypologyKey
         })

@@ -263,7 +263,7 @@ internal static partial class Program
             [Definition('A')] = "Glass", [Definition('B')] = "Anchor", [Definition('C')] = " ", [Definition('D')] = "Note"
         };
         PanelCladdingPidSetupService.ReserveRoleDefinition(flat, new Dictionary<string, string>());
-        Require(flat[Definition('A')] == "Parent" && flat[Definition('B')] == "Glass" && flat[Definition('C')] == "Anchor" &&
+        Require(flat[Definition('A')] == "parent" && flat[Definition('B')] == "Glass" && flat[Definition('C')] == "Anchor" &&
                 flat[Definition('D')] == " " && flat[Definition('E')] == "Note",
             "A taken Definition A moves the definitions down and adds E: " + Dump(flat));
         var again = new Dictionary<string, string>(flat, StringComparer.Ordinal);
@@ -275,8 +275,8 @@ internal static partial class Program
         {
             [PanelCladdingCidService.UnitTypeUserTextKey] = "L", [Definition('A')] = "Child", [Definition('B')] = "Kept"
         });
-        Require(child[Definition('A')] == "Child" && child[Definition('B')] == "Kept" && !child.ContainsKey(Definition('E')),
-            "An existing role stays in Definition A.");
+        Require(child[Definition('A')] == "child" && !child.ContainsKey(Definition('B')) && !child.ContainsKey(Definition('E')),
+            "An existing role stays in Definition A, lowercase; an unchanged existing definition is not rewritten.");
 
         var unknown = new Dictionary<string, string>(StringComparer.Ordinal);
         PanelCladdingPidSetupService.ReserveRoleDefinition(unknown, new Dictionary<string, string>
@@ -288,7 +288,7 @@ internal static partial class Program
 
         var formerChild = new Dictionary<string, string>(StringComparer.Ordinal) { [PanelCladdingCidService.UnitTypeUserTextKey] = "C" };
         PanelCladdingPidSetupService.ReserveRoleDefinition(formerChild, new Dictionary<string, string> { [Definition('A')] = "Child" });
-        Require(formerChild[Definition('A')] == "Parent", "Flat and curved panels are always Parent.");
+        Require(formerChild[Definition('A')] == "parent", "Flat and curved panels are always parent.");
         Console.WriteLine("[OK] CW_5.00_DEFINITION_A is reserved for Parent/Child; flat panels are Parent");
     }
 

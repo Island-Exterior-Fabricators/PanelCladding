@@ -30,7 +30,9 @@ internal static partial class LivePanelCladdingGeometryPartitionService
         IReadOnlyDictionary<string, string> userText,
         double tolerance)
     {
-        OperationResponse<LocalPanelFrame> frameResponse = BuildLocalFrame(source, tolerance);
+        string? storedPlane = userText.FirstOrDefault(item =>
+            string.Equals(item.Key, PanelCladdingKeyService.PlaneKey, StringComparison.OrdinalIgnoreCase)).Value;
+        OperationResponse<LocalPanelFrame> frameResponse = BuildLocalFrame(source, tolerance, storedPlane);
         if (!frameResponse.Success || frameResponse.Data is null)
         {
             return OperationResponse<PanelCladdingCreatePanelSnapshot>.Fail(frameResponse.Message);
@@ -73,16 +75,18 @@ internal static partial class LivePanelCladdingGeometryPartitionService
     public static OperationResponse<PanelCladdingInferredOffsets> InferOffsets(
         Brep source,
         IReadOnlyList<Brep> claddingSurfaces,
-        double tolerance)
+        double tolerance,
+        string? storedPlane = null)
     {
-        return InferOffsets(source, claddingSurfaces, Array.Empty<Curve>(), tolerance);
+        return InferOffsets(source, claddingSurfaces, Array.Empty<Curve>(), tolerance, storedPlane);
     }
 
     public static OperationResponse<PanelCladdingInferredOffsets> InferOffsets(
         Brep source,
         IReadOnlyList<Brep> claddingSurfaces,
         IReadOnlyList<Curve> extrusionCurves,
-        double tolerance)
+        double tolerance,
+        string? storedPlane = null)
     {
         if ((claddingSurfaces is null || claddingSurfaces.Count == 0) &&
             (extrusionCurves is null || extrusionCurves.Count == 0))
@@ -91,7 +95,7 @@ internal static partial class LivePanelCladdingGeometryPartitionService
                 "PANEL_CLADDING_SYNC_GEOMETRY_MISSING");
         }
 
-        OperationResponse<LocalPanelFrame> frameResponse = BuildLocalFrame(source, tolerance);
+        OperationResponse<LocalPanelFrame> frameResponse = BuildLocalFrame(source, tolerance, storedPlane);
         if (!frameResponse.Success || frameResponse.Data is null)
         {
             return OperationResponse<PanelCladdingInferredOffsets>.Fail(frameResponse.Message);
@@ -174,9 +178,10 @@ internal static partial class LivePanelCladdingGeometryPartitionService
     public static OperationResponse<LivePanelCladdingGeometryGrid> CreateGrid(
         Brep source,
         PanelCladdingKeySet keySet,
-        double tolerance)
+        double tolerance,
+        string? storedPlane = null)
     {
-        OperationResponse<LocalPanelFrame> frameResponse = BuildLocalFrame(source, tolerance);
+        OperationResponse<LocalPanelFrame> frameResponse = BuildLocalFrame(source, tolerance, storedPlane);
         if (!frameResponse.Success || frameResponse.Data is null)
         {
             return OperationResponse<LivePanelCladdingGeometryGrid>.Fail(frameResponse.Message);
@@ -376,14 +381,15 @@ internal static partial class LivePanelCladdingGeometryPartitionService
         IReadOnlyList<Curve> curves,
         IReadOnlyList<double> horizontalOffsets,
         IReadOnlyList<double> verticalOffsets,
-        double tolerance)
+        double tolerance,
+        string? storedPlane = null)
     {
         if (curves is null || curves.Count == 0)
         {
             return OperationResponse<PanelCladdingInferredExtrusionLayout>.Fail(
                 "PANEL_CLADDING_SYNC_CURVES_MISSING");
         }
-        OperationResponse<LocalPanelFrame> frameResponse = BuildLocalFrame(source, tolerance);
+        OperationResponse<LocalPanelFrame> frameResponse = BuildLocalFrame(source, tolerance, storedPlane);
         if (!frameResponse.Success || frameResponse.Data is null)
         {
             return OperationResponse<PanelCladdingInferredExtrusionLayout>.Fail(frameResponse.Message);
@@ -1186,7 +1192,7 @@ internal static partial class LivePanelCladdingGeometryPartitionService
         pieces.AddRange(trimmed);
     }
 
-    private static OperationResponse<LocalPanelFrame> BuildLocalFrame(Brep brep, double tolerance)
+    private static OperationResponse<LocalPanelFrame> BuildLocalFrame(Brep brep, double tolerance, string? storedPlane)
     {
         Mesh[] pieces = Mesh.CreateFromBrep(brep, MeshingParameters.FastRenderMesh);
         if (pieces.Length == 0)
@@ -1211,23 +1217,14 @@ internal static partial class LivePanelCladdingGeometryPartitionService
         }
 
         Plane frame;
-        if (TryParseStoredPlane(brep.GetUserString("Plane"), out Plane stored))
+        try
         {
-            frame = OrientFrame(stored);
+            frame = LivePanelPlane.Resolve(
+                brep, combined.Vertices.Select(vertex => new Point3d(vertex)).ToArray(), tolerance, storedPlane).Frame;
         }
-        else if (brep.Faces.Count > 0 && brep.Faces[0].TryGetPlane(out Plane planar, tolerance))
+        catch (InvalidOperationException exception)
         {
-            frame = OrientFrame(planar);
-        }
-        else
-        {
-            Point3d[] samples = combined.Vertices.Select(vertex => new Point3d(vertex)).ToArray();
-            PlaneFitResult fit = Plane.FitPlaneToPoints(samples, out Plane fitted);
-            if (fit == PlaneFitResult.Failure || !fitted.IsValid)
-            {
-                return OperationResponse<LocalPanelFrame>.Fail("PANEL_CLADDING_REFERENCE_PLANE_FAILED");
-            }
-            frame = OrientFrame(fitted);
+            return OperationResponse<LocalPanelFrame>.Fail(exception.Message);
         }
 
         var localPoints = new List<(double X, double Y, double Z)>(combined.Vertices.Count);
@@ -1264,56 +1261,6 @@ internal static partial class LivePanelCladdingGeometryPartitionService
             .ToArray();
     }
 
-    private static Plane OrientFrame(Plane source)
-    {
-        Vector3d normal = source.ZAxis;
-        normal.Unitize();
-        Vector3d up = Vector3d.ZAxis - (Vector3d.ZAxis * normal) * normal;
-        if (!up.Unitize())
-        {
-            up = source.YAxis;
-            up.Unitize();
-        }
-        if (up * Vector3d.ZAxis < 0d)
-        {
-            up.Reverse();
-        }
-        Vector3d right = Vector3d.CrossProduct(up, normal);
-        right.Unitize();
-        Vector3d referenceRight = source.XAxis - (source.XAxis * normal) * normal -
-            (source.XAxis * up) * up;
-        if (referenceRight.Unitize() && right * referenceRight < 0d)
-        {
-            right.Reverse();
-        }
-        return new Plane(source.Origin, right, up);
-    }
-
-    private static bool TryParseStoredPlane(string? raw, out Plane plane)
-    {
-        plane = Plane.Unset;
-        if (string.IsNullOrWhiteSpace(raw))
-        {
-            return false;
-        }
-        double[] values = NumberRegex().Matches(raw)
-            .Select(match => double.Parse(match.Value, CultureInfo.InvariantCulture))
-            .ToArray();
-        if (values.Length < 9)
-        {
-            return false;
-        }
-        var origin = new Point3d(values[0], values[1], values[2]);
-        var right = new Vector3d(values[3], values[4], values[5]);
-        var up = new Vector3d(values[6], values[7], values[8]);
-        if (!right.Unitize() || !up.Unitize())
-        {
-            return false;
-        }
-        plane = new Plane(origin, right, up);
-        return plane.IsValid;
-    }
-
     private static void DisposeCells(IEnumerable<LivePanelCladdingGeometryCell> cells)
     {
         foreach (LivePanelCladdingGeometryCell cell in cells)
@@ -1321,9 +1268,6 @@ internal static partial class LivePanelCladdingGeometryPartitionService
             cell.Geometry.Dispose();
         }
     }
-
-    [GeneratedRegex(@"[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?", RegexOptions.CultureInvariant)]
-    private static partial Regex NumberRegex();
 
     private sealed class LocalPanelFrame
     {

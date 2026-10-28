@@ -113,7 +113,7 @@ public sealed class LivePanelCladdingCurveTemplateService : ILivePanelCladdingCu
             }
             foreach (string key in ReadUserText(original).Keys.Where(key =>
                          PanelCladdingKeyService.IsRetiredFrameKey(key) ||
-                         string.Equals(key, PanelCladdingKeyService.FrameTypeKey, StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(key, PanelCladdingKeyService.FrameAssignmentsKey, StringComparison.OrdinalIgnoreCase) ||
                          PanelCladdingKeyService.IsTopologyKey(key)))
             {
                 DeleteUserTextCaseInsensitive(proposed, key);
@@ -123,7 +123,7 @@ public sealed class LivePanelCladdingCurveTemplateService : ILivePanelCladdingCu
             LivePanelFrameConfigCodes.Normalize(document, proposed);
             if (!string.IsNullOrWhiteSpace(frameType.Data))
             {
-                proposed.SetUserString(PanelCladdingKeyService.FrameTypeKey, frameType.Data);
+                proposed.SetUserString(PanelCladdingKeyService.FrameAssignmentsKey, frameType.Data);
             }
             if (UserTextEquals(original, proposed))
             {

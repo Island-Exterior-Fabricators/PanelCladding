@@ -275,14 +275,14 @@ internal static class Program
         var sourceText = new Dictionary<string, string>(Grid(
             "30", "70", "50", Required(keys.EncodeTopology(topology, 2, 1))))
         {
-            [PanelCladdingKeyService.FrameTypeKey] = encoded,
+            [PanelCladdingKeyService.FrameAssignmentsKey] = encoded,
             [PanelCladdingKeyService.LegacyFrameTypologyKey] = "SOURCE-STALE",
             [PanelCladdingKeyService.GetCellKey(0, "A")] = "MPL-001"
         };
         var targetText = new Dictionary<string, string>(Grid(
             "20", "160", "65", Required(keys.EncodeTopology(new(), 2, 1))))
         {
-            [PanelCladdingKeyService.FrameTypeKey.ToLowerInvariant()] =
+            [PanelCladdingKeyService.FrameAssignmentsKey.ToLowerInvariant()] =
                 "{\"v\":1,\"f\":{\"FRM-2\":[\"1D-OLD\"]},\"s\":[{\"a\":\"H\",\"t\":1,\"b\":1,\"c\":[\"1D-OLD\"]}]}",
             [PanelCladdingKeyService.LegacyFrameTypologyKey.ToLowerInvariant()] = "TARGET-STALE",
             [PanelCladdingKeyService.SignatureKey] = "STALE-SIGNATURE",
@@ -300,11 +300,11 @@ internal static class Program
         ];
         PanelCladdingMatchPlan plan = Required(planner.CreatePlan(source, targets));
         var legacyFrameText = new Dictionary<string, string>(sourceText);
-        legacyFrameText.Remove(PanelCladdingKeyService.FrameTypeKey);
+        legacyFrameText.Remove(PanelCladdingKeyService.FrameAssignmentsKey);
         legacyFrameText[PanelCladdingKeyService.LegacyFrameAssignmentsKey] = encoded;
         PanelCladdingMatchTargetPlan migrated = Required(planner.CreatePlan(
             MatchSnapshot(SourceId, legacyFrameText, 100d, 100d), [targets[0]])).Targets.Single();
-        Require(migrated.UserTextWrites[PanelCladdingKeyService.FrameTypeKey] == encoded &&
+        Require(migrated.UserTextWrites[PanelCladdingKeyService.FrameAssignmentsKey] == encoded &&
                 migrated.UserTextWrites.ContainsKey(PanelCladdingKeyService.FrameConfigBackupKey) &&
                 !migrated.UserTextWrites.Keys.Any(PanelCladdingKeyService.IsRetiredFrameKey),
             "PCMatchCrv must migrate an older source to the new frame keys.");
@@ -323,7 +323,7 @@ internal static class Program
                 "Old assignments must be replaced atomically with source topology, including hidden assignments.");
             foreach ((string key, string value) in targetText.Where(item =>
                          !PanelCladdingKeyService.IsTopologyKey(item.Key) &&
-                         !item.Key.Equals(PanelCladdingKeyService.FrameTypeKey, StringComparison.OrdinalIgnoreCase) &&
+                         !item.Key.Equals(PanelCladdingKeyService.FrameAssignmentsKey, StringComparison.OrdinalIgnoreCase) &&
                          !item.Key.Equals(PanelCladdingKeyService.LegacyFrameTypologyKey, StringComparison.OrdinalIgnoreCase) &&
                          !item.Key.Equals(PanelCladdingKeyService.SignatureKey, StringComparison.OrdinalIgnoreCase) &&
                          !item.Key.Equals(PanelCladdingKeyService.LegacySignatureKey, StringComparison.OrdinalIgnoreCase)))
@@ -361,18 +361,18 @@ internal static class Program
             "PCMatchCrv mutated its source.");
 
         var emptySourceText = new Dictionary<string, string>(sourceText);
-        emptySourceText.Remove(PanelCladdingKeyService.FrameTypeKey);
+        emptySourceText.Remove(PanelCladdingKeyService.FrameAssignmentsKey);
         PanelCladdingMatchTargetPlan clear = Required(planner.CreatePlan(
             MatchSnapshot(SourceId, emptySourceText, 100d, 100d), [targets[0]])).Targets.Single();
         IReadOnlyDictionary<string, string> cleared = PanelCladdingMatchPlanningService.ApplyUserTextPlan(targetText, clear);
-        Require(!cleared.ContainsKey(PanelCladdingKeyService.FrameTypeKey) &&
+        Require(!cleared.ContainsKey(PanelCladdingKeyService.FrameAssignmentsKey) &&
                 !cleared.ContainsKey(PanelCladdingKeyService.LegacyFrameTypologyKey) &&
                 Required(keys.Parse(cleared, 180d, 240d, 0.001d)).FrameAssignments.IsEmpty,
             "An unassigned source must remove case-variant target assignment and typology keys.");
 
         var legacySourceText = new Dictionary<string, string>(emptySourceText)
         {
-            [PanelCladdingKeyService.FrameTypeKey] = "{\"v\":1,\"f\":{\"FRM-0\":[\"1D-LEGACY\"]},\"s\":[]}"
+            [PanelCladdingKeyService.FrameAssignmentsKey] = "{\"v\":1,\"f\":{\"FRM-0\":[\"1D-LEGACY\"]},\"s\":[]}"
         };
         PanelCladdingMatchTargetPlan legacyPlan = Required(planner.CreatePlan(
             MatchSnapshot(SourceId, legacySourceText, 100d, 100d), [targets[0]])).Targets.Single();
@@ -387,13 +387,13 @@ internal static class Program
         {
             var badSource = new Dictionary<string, string>(sourceText)
             {
-                [PanelCladdingKeyService.FrameTypeKey] = badPayload
+                [PanelCladdingKeyService.FrameAssignmentsKey] = badPayload
             };
             RequireFailure(planner.CreatePlan(MatchSnapshot(SourceId, badSource, 100d, 100d), targets), "SOURCE_INVALID");
         }
         var badTarget = new Dictionary<string, string>(targetText)
         {
-            [PanelCladdingKeyService.FrameTypeKey.ToLowerInvariant()] = "not-json"
+            [PanelCladdingKeyService.FrameAssignmentsKey.ToLowerInvariant()] = "not-json"
         };
         OperationResponse<PanelCladdingMatchPlan> rejected = planner.CreatePlan(source,
             [targets[0], MatchSnapshot(targets[1].ObjectId, badTarget, 220d, 300d)]);

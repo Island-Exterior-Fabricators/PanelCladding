@@ -38,30 +38,35 @@ assignment = Plan(panel);
 var writes = Required(setup.CreateWrites(assignment, panel));
 string[] generated = ["CW_1.01_PID", "CW_1.02_CID", "CW_1.03_ELEVATION", "CW_1.04_LEVEL",
     "CW_2.00_UNIT_DIMENSION", "CW_2.01_UNIT_WIDTH", "CW_2.02_UNIT_HEIGHT"];
-Check(expectedKeys.Except(generated).All(k => writes[k] == text[k.ToLowerInvariant()]), "Existing non-generated values preserved byte-for-byte");
+// Since 1.2.5 existing setup keys (any case, blank or not) are never rewritten; only the generated
+// values and a Definition A role that changes ("Child" -> "child") are written.
+Check(writes.Keys.ToHashSet().SetEquals(generated.Append("CW_5.00_DEFINITION_A")) && writes["CW_5.00_DEFINITION_A"] == "child",
+    "Existing non-generated keys are not rewritten: " + string.Join(", ", writes.Keys));
 Check(writes["CW_1.02_CID"] == "CID-ABC-N1-01-01_C", "CID agrees with retained unit role");
 Check(!writes.ContainsKey("unrelated") && before == JsonSerializer.Serialize(panel), "Unrelated text is outside writes and source is immutable");
 var applied = Apply(text, writes);
-Check(expectedKeys.All(applied.ContainsKey) && applied.Count == 31 && applied["unrelated"] == "keep", "Canonical merge retains all keys plus unrelated text");
+Check(applied.Count == 32 && applied["unrelated"] == "keep" && applied["cw_1.11_phase"] == "preserve:CW_1.11_PHASE" &&
+    applied["cw_1.05_lot"] == " Lot 12 " && applied["CW_1.05_LOT"] == "", "Existing keys keep their name, case and value");
 var repeat = panel with { UserText = applied };
 var repeatWrites = Required(setup.CreateWrites(Plan(repeat), repeat));
 Check(Same(applied, Apply(applied, repeatWrites)), "Repeat is idempotent");
-var conflict = panel with { UserText = new Dictionary<string, string>(text) { ["CW_1.05_LOT"] = "different" } };
-Check(!setup.CreateWrites(Plan(conflict), conflict).Success, "Conflicting case variants rejected");
+var variants = panel with { UserText = new Dictionary<string, string>(text) { ["CW_1.05_LOT"] = "different" } };
+var variantWrites = Required(setup.CreateWrites(Plan(variants), variants));
+Check(!variantWrites.Keys.Any(key => key.Equals("CW_1.05_LOT", StringComparison.OrdinalIgnoreCase)), "Case variants of an existing key are left as they are");
 var ambiguousRole = panel with { UserText = new Dictionary<string, string>
     { ["CW_1.06_UNIT_TYPE"] = "", ["cw_1.06_unit_type"] = "L", ["CW_5.00_DEFINITION_A"] = "Parent" } };
 Check(!setup.CreateWrites(Plan(ambiguousRole), ambiguousRole).Success, "Canonicalized role cannot silently disagree with CID");
 var flat = panel with { UserText = new Dictionary<string, string>(text) { ["cw_1.06_unit_type"] = "F", ["cw_5.00_definition_a"] = "Glass note" } };
 var flatWrites = Required(setup.CreateWrites(Plan(flat), flat));
-Check(flatWrites["CW_5.00_DEFINITION_A"] == "Parent" && flatWrites["CW_5.00_DEFINITION_B"] == "Glass note" &&
+Check(flatWrites["CW_5.00_DEFINITION_A"] == "parent" && flatWrites["CW_5.00_DEFINITION_B"] == "Glass note" &&
     flatWrites["CW_5.00_DEFINITION_C"] == text["cw_5.00_definition_b"] &&
     flatWrites["CW_5.00_DEFINITION_E"] == text["cw_5.00_definition_d"] && flatWrites["CW_1.02_CID"] == "CID-ABC-N1-01-01",
-    "A flat panel is Parent; a taken Definition A moves the definitions down to E");
+    "A flat panel is parent; a taken Definition A moves the definitions down to E");
 var formerChild = panel with { UserText = new Dictionary<string, string>(text) { ["cw_1.06_unit_type"] = "F" } };
 var formerChildWrites = Required(setup.CreateWrites(Plan(formerChild), formerChild));
-Check(formerChildWrites["CW_5.00_DEFINITION_A"] == "Parent" && !formerChildWrites.ContainsKey("CW_5.00_DEFINITION_E"),
-    "A panel changed to flat becomes Parent");
-Console.WriteLine("[OK] existing values, role CID, Definition A reservation, canonical casing, repeat stability and conflict preflight");
+Check(formerChildWrites["CW_5.00_DEFINITION_A"] == "parent" && !formerChildWrites.ContainsKey("CW_5.00_DEFINITION_E"),
+    "A panel changed to flat becomes parent");
+Console.WriteLine("[OK] existing keys untouched, role CID, Definition A reservation, lowercase roles and repeat stability");
 
 CultureInfo previous = CultureInfo.CurrentCulture;
 try

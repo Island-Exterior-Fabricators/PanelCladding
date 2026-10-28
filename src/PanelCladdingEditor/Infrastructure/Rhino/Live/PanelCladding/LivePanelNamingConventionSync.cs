@@ -125,10 +125,15 @@ internal static class LivePanelNamingConventionSync
             RhinoApp.WriteLine($"PanelCladdingEditor: no free {format.WallType} Wall-Type code for {string.Join(", ", tables.UncodedWallTypes)}; " +
                 "run PCtemplatePNL with a wider Wall-Type format.");
         }
+        if (tables.UncodedFrameTypes.Count > 0)
+        {
+            RhinoApp.WriteLine($"PanelCladdingEditor: no free {format.FrameType} Frame-Type code for {string.Join(", ", tables.UncodedFrameTypes)}; " +
+                "run PCtemplatePNL with a wider Frame-Type format.");
+        }
         var written = Workbook.Write(path!, tables);
         if (written.Success && written.Message == OpenXmlPanelNamingConventionWorkbook.UnchangedMessage) return;
         RhinoApp.WriteLine(written.Success
-            ? $"PanelCladdingEditor: {Path.GetFileName(path)} PNL updated ({tables.FrameConfigs.Count} frame configs, {tables.WallTypes.Count} wall types)."
+            ? $"PanelCladdingEditor: {Path.GetFileName(path)} PNL updated ({tables.FrameConfigs.Count} frame configs, {tables.WallTypes.Count} wall types, {tables.FrameTypes.Count} frame types)."
             : $"PanelCladdingEditor: {written.Message}");
     }
 
@@ -137,6 +142,8 @@ internal static class LivePanelNamingConventionSync
         var unitTypes = new HashSet<string>(StringComparer.Ordinal);
         var frameCodes = new HashSet<string>(StringComparer.Ordinal);
         var wallTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var frameTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        bool blankFrameType = false;
         int panels = 0;
         int mismatched = 0;
         foreach (var rhinoObject in document.Objects.GetObjectList(new ObjectEnumeratorSettings
@@ -170,11 +177,19 @@ internal static class LivePanelNamingConventionSync
             }
             string wallType = Value(PanelCladdingSpawnPlanningService.WallTypeUserTextKey);
             if (wallType.Length > 0) wallTypes.Add(wallType);
+            // CW_1.09 is hand-filled; a leftover assignment payload of 1.2.4 or older is not a type.
+            string frameType = Value(PanelCladdingKeyService.FrameTypeKey);
+            if (frameType.Length == 0) blankFrameType = true;
+            else if (!frameType.StartsWith('{')) frameTypes.Add(frameType);
         }
         if (panels == 0) return null;
         return new Snapshot(
             projectCode,
-            new PanelNamingConventionUsage { UnitTypes = unitTypes, FrameConfigCodes = frameCodes, WallTypes = wallTypes },
+            new PanelNamingConventionUsage
+            {
+                UnitTypes = unitTypes, FrameConfigCodes = frameCodes, WallTypes = wallTypes,
+                FrameTypes = frameTypes, HasBlankFrameType = blankFrameType
+            },
             mismatched);
     }
 

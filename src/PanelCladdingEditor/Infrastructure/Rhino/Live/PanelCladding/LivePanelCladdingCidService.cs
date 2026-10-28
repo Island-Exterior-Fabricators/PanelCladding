@@ -18,10 +18,12 @@ internal static class LivePanelCladdingCidService
             .ToDictionary(key => key!, key => text![key!] ?? string.Empty, StringComparer.Ordinal);
     }
 
-    // Normalizes UD_ key names, panel identity (CID, name) and the frame configuration code on a write.
+    // Normalizes UD_ key names, the role case, panel identity (CID, name) and the frame
+    // configuration code on a write.
     internal static bool Normalize(RhinoDoc document, ObjectAttributes attributes)
     {
         bool changed = MigrateUserDefinedKeys(attributes);
+        changed |= NormalizeRole(attributes);
         changed |= LivePanelFrameConfigCodes.Normalize(document, attributes);
         IReadOnlyDictionary<string, string> text = Read(attributes);
         string? cid = PanelCladdingCidService.PanelCidWrite(text);
@@ -43,6 +45,21 @@ internal static class LivePanelCladdingCidService
             !string.Equals(attributes.Name, name, StringComparison.Ordinal))
         {
             attributes.Name = name;
+            changed = true;
+        }
+        return changed;
+    }
+
+    // A role in CW_5.00_DEFINITION_A is stored lowercase (Parent -> parent); other values stay.
+    internal static bool NormalizeRole(ObjectAttributes attributes)
+    {
+        bool changed = false;
+        foreach ((string key, string value) in Read(attributes).Where(item =>
+                     string.Equals(item.Key, PanelCladdingCidService.RoleDefinitionKey, StringComparison.OrdinalIgnoreCase)).ToArray())
+        {
+            string role = PanelCladdingCidService.NormalizeRole(value);
+            if (role == value) continue;
+            attributes.SetUserString(key, role);
             changed = true;
         }
         return changed;

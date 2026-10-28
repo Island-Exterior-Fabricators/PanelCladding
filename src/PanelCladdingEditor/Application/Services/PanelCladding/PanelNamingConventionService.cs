@@ -9,6 +9,8 @@ namespace PanelCladdingEditor.Application.Services.PanelCladding;
 // uses are kept but marked unused.
 public static partial class PanelNamingConventionService
 {
+    public const string BlankFrameTypeValue = "NA";
+
     public static readonly IReadOnlyList<(string Code, string Description)> UnitTypeCodes =
     [
         (PanelCladdingCidService.CurvedUnitType, "Curved"),
@@ -36,28 +38,14 @@ public static partial class PanelNamingConventionService
             frameConfigs.TryAdd(code, config);
         }
 
-        // A new wall value takes the first code of the wall format without a value in the sheet,
-        // which is the first placeholder row when the sheet has them.
-        var wallTypes = new List<(string Code, string Value)>();
-        var knownWallValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        foreach ((string code, string value) in sheet.WallTypes)
-        {
-            wallTypes.Add((code, value));
-            knownWallValues.Add(value);
-        }
-        var usedCodes = wallTypes.Select(item => item.Code).ToHashSet(StringComparer.Ordinal);
-        var uncoded = new List<string>();
-        foreach (string value in usage.WallTypes.Where(value => !knownWallValues.Contains(value)).OrderBy(NaturalKey, StringComparer.Ordinal))
-        {
-            string? code = PanelNamingFormat.Sequence(format.WallType).FirstOrDefault(candidate => !usedCodes.Contains(candidate));
-            if (code is null)
-            {
-                uncoded.Add(value);
-                continue;
-            }
-            usedCodes.Add(code);
-            wallTypes.Add((code, value));
-        }
+        (PanelNamingCodeRow[] wallTypes, string[] uncodedWallTypes) = CodeValues(
+            sheet.WallTypes, usage.WallTypes, format.WallType,
+            value => usage.WallTypes.Contains(value, StringComparer.OrdinalIgnoreCase));
+        // A sheet row whose value is NA stands for a blank CW_1.09_FRAME_TYPE (XYZ's Frame-Type 01).
+        (PanelNamingCodeRow[] frameTypes, string[] uncodedFrameTypes) = CodeValues(
+            sheet.FrameTypes, usage.FrameTypes, format.FrameType,
+            value => usage.FrameTypes.Contains(value, StringComparer.OrdinalIgnoreCase) ||
+                (usage.HasBlankFrameType && string.Equals(value, BlankFrameTypeValue, StringComparison.OrdinalIgnoreCase)));
 
         return new PanelNamingConventionTables
         {
@@ -67,14 +55,44 @@ public static partial class PanelNamingConventionService
             FrameConfigs = frameConfigs
                 .Select(item => new PanelNamingCodeRow(item.Key, item.Value, usage.FrameConfigCodes.Contains(item.Key)))
                 .ToArray(),
-            WallTypes = wallTypes
-                .OrderBy(item => PanelNamingFormat.SequenceIndex(format.WallType, item.Code))
-                .Select(item => new PanelNamingCodeRow(item.Code, item.Value,
-                    usage.WallTypes.Contains(item.Value, StringComparer.OrdinalIgnoreCase)))
-                .ToArray(),
+            WallTypes = wallTypes,
+            FrameTypes = frameTypes,
             JobCode = (jobCode ?? string.Empty).Trim().ToUpperInvariant(),
-            UncodedWallTypes = uncoded
+            UncodedWallTypes = uncodedWallTypes,
+            UncodedFrameTypes = uncodedFrameTypes
         };
+    }
+
+    // Sheet rows keep their codes. A new value takes the first code of the format without a value
+    // in the sheet, which is the first placeholder row when the sheet has them.
+    private static (PanelNamingCodeRow[] Rows, string[] Uncoded) CodeValues(
+        IReadOnlyDictionary<string, string> sheetRows, IReadOnlySet<string> values, string token, Func<string, bool> isUsed)
+    {
+        var rows = new List<(string Code, string Value)>();
+        var knownValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach ((string code, string value) in sheetRows)
+        {
+            rows.Add((code, value));
+            knownValues.Add(value);
+        }
+        var usedCodes = rows.Select(item => item.Code).ToHashSet(StringComparer.Ordinal);
+        var uncoded = new List<string>();
+        foreach (string value in values.Where(value => !knownValues.Contains(value)).OrderBy(NaturalKey, StringComparer.Ordinal))
+        {
+            string? code = PanelNamingFormat.Sequence(token).FirstOrDefault(candidate => !usedCodes.Contains(candidate));
+            if (code is null)
+            {
+                uncoded.Add(value);
+                continue;
+            }
+            usedCodes.Add(code);
+            rows.Add((code, value));
+        }
+        return (rows
+                .OrderBy(item => PanelNamingFormat.SequenceIndex(token, item.Code))
+                .Select(item => new PanelNamingCodeRow(item.Code, item.Value, isUsed(item.Value)))
+                .ToArray(),
+            uncoded.ToArray());
     }
 
     // The project code fills the Job Code cells one character each, or a single cell whole.

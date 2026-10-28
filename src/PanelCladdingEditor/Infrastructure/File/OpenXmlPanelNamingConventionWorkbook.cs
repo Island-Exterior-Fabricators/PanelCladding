@@ -8,9 +8,11 @@ using S = DocumentFormat.OpenXml.Spreadsheet;
 namespace PanelCladdingEditor.Infrastructure.PanelCladding;
 
 // Code tables of the PNL sheet in "<PROJECT> - Naming Convention.xlsx". Row 12 holds a title
-// cell per table ("Unit-Type", "Wall-Type", "Frame-Config") above its code column; the
-// description is the next column and the codes start in row 13. A missing title is added in
-// the default column (E, H, J). The tables are reconciled in place: a code keeps its row, a
+// cell per table ("Unit-Type", "Wall-Type", "Frame-Config", "Frame-Type") above its code column;
+// the description is the next column and the codes start in row 13. A missing title is added in
+// the default column (E, H, J; Frame-Type under its row-7 header, else L). A sheet without a
+// Frame-Type table gets one only when there is a frame type to record. The tables are
+// reconciled in place: a code keeps its row, a
 // placeholder (code without description) is filled, a written description is never changed,
 // only the struck state of used/unused rows changes, and new codes go below the table. Every
 // other cell, merge and cell type is left as it is.
@@ -24,7 +26,7 @@ public sealed class OpenXmlPanelNamingConventionWorkbook
     private const string JobCodeTitle = "Job Code";
     public const string UnchangedMessage = "PANEL_NAMING_CONVENTION_UNCHANGED";
 
-    private enum Table { UnitTypes, WallTypes, FrameConfigs }
+    private enum Table { UnitTypes, WallTypes, FrameConfigs, FrameTypes }
 
     private sealed record TableLayout(Table Table, string Title, string DescriptionTitle, string DefaultColumn);
 
@@ -32,7 +34,8 @@ public sealed class OpenXmlPanelNamingConventionWorkbook
     [
         new(Table.UnitTypes, "Unit-Type", "Description", "E"),
         new(Table.WallTypes, "Wall-Type", "Value", "H"),
-        new(Table.FrameConfigs, "Frame-Config", "Configuration", "J")
+        new(Table.FrameConfigs, "Frame-Config", "Configuration", "J"),
+        new(Table.FrameTypes, "Frame-Type", "Value", "L")
     ];
 
     private sealed record Placement(TableLayout Layout, string CodeColumn, string DescriptionColumn, S.Cell? Title, S.Cell? DescriptionTitle);
@@ -77,6 +80,10 @@ public sealed class OpenXmlPanelNamingConventionWorkbook
             {
                 FrameConfigs = Pairs(Table.FrameConfigs, code => PanelNamingFormat.Fits(format.Data.FrameConfig, code)),
                 WallTypes = Pairs(Table.WallTypes, code => code.Length > 0),
+                // An untitled Frame-Type table has no rows yet; its default columns are not read.
+                FrameTypes = placements.Data.Single(item => item.Layout.Table == Table.FrameTypes).Title is null
+                    ? new Dictionary<string, string>(StringComparer.Ordinal)
+                    : Pairs(Table.FrameTypes, code => code.Length > 0),
                 JobCodeWidth = LocateJobCode(document.WorkbookPart!, sheet.Data.Worksheet!, sheetData).Length,
                 RecordedFormat = recorded
             });
@@ -144,6 +151,16 @@ public sealed class OpenXmlPanelNamingConventionWorkbook
 
         foreach (Placement placement in placements.Data)
         {
+            IReadOnlyList<PanelNamingCodeRow> rows = Rows(tables, placement.Layout.Table);
+            if (placement.Layout.Table == Table.FrameTypes && placement.Title is null)
+            {
+                if (rows.Count == 0) continue;
+                if (Overlaps(placement, placements.Data))
+                {
+                    return OperationResponse<bool>.Fail(
+                        $"PANEL_NAMING_CONVENTION_LAYOUT_INVALID: the Frame-Type table would overlap another table in row {TitleRow}.");
+                }
+            }
             if (placement.Title is null)
             {
                 changed = true;
@@ -157,7 +174,7 @@ public sealed class OpenXmlPanelNamingConventionWorkbook
                     }
                 }
             }
-            changed |= ReconcileTable(workbookPart, sheetData, styles, placement, Rows(tables, placement.Layout.Table), apply);
+            changed |= ReconcileTable(workbookPart, sheetData, styles, placement, rows, apply);
         }
         if (apply && changed)
         {
@@ -290,24 +307,47 @@ public sealed class OpenXmlPanelNamingConventionWorkbook
                 return OperationResponse<Placement[]>.Fail(
                     $"PANEL_NAMING_CONVENTION_LAYOUT_INVALID: row {TitleRow} has more than one '{layout.Title}' title.");
             }
-            int codeIndex = titles.Length == 1 ? ColumnIndex(titles[0].CellReference?.Value) : ColumnIndex(layout.DefaultColumn);
+            int codeIndex = titles.Length == 1 ? ColumnIndex(titles[0].CellReference?.Value) : DefaultColumn(workbookPart, sheetData, layout);
             string codeColumn = ColumnName(codeIndex);
             string descriptionColumn = ColumnName(codeIndex + 1);
             S.Cell? descriptionTitle = titleRow is null ? null : FindCell(titleRow, descriptionColumn);
             placements.Add(new Placement(layout, codeColumn, descriptionColumn, titles.SingleOrDefault(),
                 descriptionTitle is not null && CellText(workbookPart, descriptionTitle).Trim().Length > 0 ? descriptionTitle : null));
         }
-        int[] columns = placements.SelectMany(item => new[] { ColumnIndex(item.CodeColumn), ColumnIndex(item.DescriptionColumn) }).ToArray();
+        // An untitled Frame-Type table is optional; Reconcile checks it once it has rows.
+        int[] columns = placements.Where(item => item.Title is not null || item.Layout.Table != Table.FrameTypes)
+            .SelectMany(item => new[] { ColumnIndex(item.CodeColumn), ColumnIndex(item.DescriptionColumn) }).ToArray();
         return columns.Distinct().Count() == columns.Length
             ? OperationResponse<Placement[]>.Ok(placements.ToArray())
             : OperationResponse<Placement[]>.Fail(
-                $"PANEL_NAMING_CONVENTION_LAYOUT_INVALID: the Unit-Type, Wall-Type and Frame-Config tables in row {TitleRow} overlap.");
+                $"PANEL_NAMING_CONVENTION_LAYOUT_INVALID: the code tables in row {TitleRow} overlap.");
+    }
+
+    // Frame-Type defaults to its row-7 segment header (where PCtemplatePNL puts its table).
+    private static int DefaultColumn(WorkbookPart workbookPart, S.SheetData sheetData, TableLayout layout)
+    {
+        if (layout.Table == Table.FrameTypes &&
+            FindRow(sheetData, HeaderRow)?.Elements<S.Cell>()
+                .FirstOrDefault(cell => Normalize(CellText(workbookPart, cell)) == Normalize(layout.Title)) is S.Cell header)
+        {
+            return ColumnIndex(header.CellReference?.Value);
+        }
+        return ColumnIndex(layout.DefaultColumn);
+    }
+
+    private static bool Overlaps(Placement placement, IEnumerable<Placement> placements)
+    {
+        int[] own = [ColumnIndex(placement.CodeColumn), ColumnIndex(placement.DescriptionColumn)];
+        return placements.Where(item => !ReferenceEquals(item, placement))
+            .SelectMany(item => new[] { ColumnIndex(item.CodeColumn), ColumnIndex(item.DescriptionColumn) })
+            .Any(own.Contains);
     }
 
     private static IReadOnlyList<PanelNamingCodeRow> Rows(PanelNamingConventionTables tables, Table table) => table switch
     {
         Table.UnitTypes => tables.UnitTypes,
         Table.WallTypes => tables.WallTypes,
+        Table.FrameTypes => tables.FrameTypes,
         _ => tables.FrameConfigs
     };
 }

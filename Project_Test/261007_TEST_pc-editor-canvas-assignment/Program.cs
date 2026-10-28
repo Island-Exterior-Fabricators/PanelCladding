@@ -25,8 +25,8 @@ internal static class Program
     {
         var metadata = new Dictionary<string, string>
         {
-            ["CW_1.01_PID"] = "PID-N1-03-07",
-            ["cw_1.02_cid"] = " CID-N1-03-07_C ",
+            ["CW_1.01_PID"] = "PID-ABC-N1-03-07",
+            ["cw_1.02_cid"] = " CID-ABC-N1-03-07_C ",
             ["CW_1.06_UNIT_TYPE"] = "L",
             ["CW_5.00_DEFINITION_A"] = "Child"
         };
@@ -44,7 +44,7 @@ internal static class Program
         Require(ReferenceEquals(floating.Parent, window.FindName("CanvasWorkspace")), "Assignment is not on the canvas.");
         Require(floating.Visibility == Visibility.Collapsed, "Assignment is visible in Cladding view.");
         Require(Named<TextBlock>(window, "PanelIdText").Text == "N1-03-07_C", "Heading did not prefer the shortened stored CID.");
-        Require((string)Named<TextBlock>(window, "PanelIdText").ToolTip == "CID-N1-03-07_C", "Full CID tooltip missing.");
+        Require((string)Named<TextBlock>(window, "PanelIdText").ToolTip == "CID-ABC-N1-03-07_C", "Full CID tooltip missing.");
         CultureInfo priorCulture = CultureInfo.CurrentCulture;
         try
         {
@@ -155,8 +155,8 @@ internal static class Program
         foreach ((string? cid, string? pid, string? role, string expected) in new[]
         {
             ("CID-ABC-N1-03-07_P", "PID-WRONG", "F:Parent", "N1-03-07_P"),
-            ((string?)null, "PID-N1-03-07", "L:Parent", "N1-03-07_P"),
-            (null, "PID-N1-03-07", "F:Parent", "N1-03-07"),
+            ((string?)null, "PID-ABC-N1-03-07", "L:Parent", "N1-03-07_P"),
+            (null, "PID-ABC-N1-03-07", "F:Parent", "N1-03-07"),
             (null, null, null, "—")
         })
         {

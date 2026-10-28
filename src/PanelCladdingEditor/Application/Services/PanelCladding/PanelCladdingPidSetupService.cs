@@ -71,25 +71,27 @@ public sealed class PanelCladdingPidSetupService
         };
         foreach (string key in RequiredKeys)
         {
-            if (writes.ContainsKey(key)) continue;
-            string[] values = panel.UserText.Where(p => string.Equals(p.Key, key, StringComparison.OrdinalIgnoreCase))
-                .Select(p => p.Value).Where(value => !string.IsNullOrWhiteSpace(value))
-                .Distinct(StringComparer.Ordinal).ToArray();
-            if (values.Length > 1)
-                return Fail(panel, $"Conflicting case variants of {key}; resolve their values before running PCpid.");
+            // A key that already exists (any case, blank or not) is never overwritten; many of
+            // these fields are hand-filled. Only a missing key gets the placeholder.
+            if (writes.ContainsKey(key) ||
+                panel.UserText.Keys.Any(existing => string.Equals(existing, key, StringComparison.OrdinalIgnoreCase))) continue;
             // Empty user strings are not retained reliably by Rhino. A space is the
             // same persisted blank convention used by the editor's unassigned cells.
-            writes[key] = values.Length == 1 ? values[0] : PanelCladdingKeyService.PersistedBlankCellValue;
+            writes[key] = PanelCladdingKeyService.PersistedBlankCellValue;
         }
         ReserveRoleDefinition(writes, panel.UserText);
-        if (assignment.Cid != PanelCladdingCidService.FromPanelId(assignment.Pid) + PanelCladdingCidService.RoleSuffix(writes))
+        // Existing keys are not copied into the writes, so the CID check reads both.
+        var effective = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach ((string key, string value) in panel.UserText) effective[key] = value;
+        foreach ((string key, string value) in writes) effective[key] = value;
+        if (assignment.Cid != PanelCladdingCidService.FromPanelId(assignment.Pid) + PanelCladdingCidService.RoleSuffix(effective))
             return Fail(panel, "Unit-type case variants disagree with the planned CID; consolidate CW_1.06_UNIT_TYPE before running PCpid.");
         return OperationResponse<IReadOnlyDictionary<string, string>>.Ok(writes);
     }
 
     // Definition A is reserved for the panel role. A non-role value moves the existing
     // definitions down one letter (adding E, F, ... as needed); flat and curved panels are
-    // always Parent, multi-face panels keep their role.
+    // always parent, multi-face panels keep their role. Roles are stored lowercase.
     public static void ReserveRoleDefinition(IDictionary<string, string> writes, IReadOnlyDictionary<string, string> userText)
     {
         string Value(string key) => writes.TryGetValue(key, out string? written) ? written
@@ -109,11 +111,20 @@ public sealed class PanelCladdingPidSetupService
         {
             values[0] = PanelCladdingCidService.ParentRole;
         }
+        else if (PanelCladdingCidService.IsRole(values[0]))
+        {
+            values[0] = PanelCladdingCidService.NormalizeRole(values[0]);
+        }
         for (int index = 0; index < values.Count; index++)
         {
-            writes[DefinitionKey(index)] = string.IsNullOrWhiteSpace(values[index])
+            string key = DefinitionKey(index);
+            string value = string.IsNullOrWhiteSpace(values[index])
                 ? PanelCladdingKeyService.PersistedBlankCellValue
                 : values[index];
+            // An existing key that already holds the value is left as it is.
+            if (!writes.ContainsKey(key) &&
+                userText.Any(item => string.Equals(item.Key, key, StringComparison.OrdinalIgnoreCase) && item.Value == value)) continue;
+            writes[key] = value;
         }
     }
 
