@@ -1,5 +1,7 @@
 # Panel cladding layer standard TEST
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-layer-standard`](../../tests/Smoke/panel-cladding-layer-standard/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-layer-standard`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 Plan: [261023_PLAN_panel-cladding-layer-standard](../../Project_Plan/261023_PLAN_panel-cladding-layer-standard.md)
 
 Managed regression for the project layer standard:

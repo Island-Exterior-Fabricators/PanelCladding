@@ -1,5 +1,7 @@
 # Standalone panel cladding editor smoke
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/standalone-panel-cladding-editor`](../../tests/Smoke/standalone-panel-cladding-editor/) (run `.\tests\Run-Regression.ps1 -Name standalone-panel-cladding-editor`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 Run independently of MCP_Rhino.Server:
 
 ```powershell

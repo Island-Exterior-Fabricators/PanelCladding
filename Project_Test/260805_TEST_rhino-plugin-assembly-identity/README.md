@@ -1,5 +1,7 @@
 # Plug-in assembly identity validation
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: `PluginAssemblyIdentityProbe`, `Verify-PluginAssemblyIdentity.ps1` moved to [`tests/Package`](../../tests/Package/). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 `PluginAssemblyIdentityProbe` reads the assembly-level GuidAttribute directly from
 compiled PE metadata, without loading Rhino. The verifier checks that this
 repository's product declares a non-empty ID matching its package manifest.

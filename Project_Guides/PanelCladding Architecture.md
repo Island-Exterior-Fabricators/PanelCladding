@@ -10,10 +10,13 @@ It does not host MCP and must not reference MCP_Rhino or ModelContextProtocol.
 - `UI/` contains WPF surfaces and Rhino command adapters.
 - `Packaging/PanelCladdingEditor/` owns packaging, install, repair and uninstall.
 - `Design/PanelCladdingEditor/` contains design references.
-- `Project_Test/` contains dedicated regression projects and historical evidence.
+- `tests/` contains all rerunnable test code: managed smokes, package checks and the
+  `Run-Regression.ps1` runner (see `tests/README.md`).
+- `Project_Test/` contains dated evidence only and is never built or run.
 
 Preserve existing boundaries and transaction/Undo semantics. Managed tests opt into
 `PanelCladdingTestHost=true` to produce a DLL; Rhino builds produce the RHP directly.
+Smokes share the `artifacts/tests/bin/<Configuration>/` output folder.
 Serialize builds that use different values of that property, then rebuild the
 production project before packaging. RhinoCommon is supplied by the local Rhino 8
 installation and must not be shipped in the package.

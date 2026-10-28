@@ -1,5 +1,7 @@
 # Panel Cladding WPF UI Test
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-wpf-ui`](../../tests/Smoke/panel-cladding-wpf-ui/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-wpf-ui`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 This folder contains focused structural and off-screen rendering verification for the non-Eto WPF
 Panel Cladding Editor introduced by
 `Project_Plan/260812_PLAN_panel-cladding-wpf-ui.md`.

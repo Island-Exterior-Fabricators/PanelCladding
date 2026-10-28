@@ -1,5 +1,7 @@
 # Frame config/type attributes TEST
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: `Verify-Regression.ps1` is replaced by `.\tests\Run-Regression.ps1 -Name panel-extrusion-assignment,panel-cladding-curve-topology,panel-cladding-hide-mask,panel-cladding-scoped-save,panel-cladding-topology-persistence,panel-cladding-create-command,panel-cladding-curve-template-ui,panel-cladding-sparse-topology,panel-cladding-layout-reconciliation,panel-cladding-surface-sync,panel-cladding-surface-sync-structural-grid,panel-cladding-clear,panel-cladding-match,panel-cladding-update-command`. Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 Run from the repository root:
 
 ```powershell

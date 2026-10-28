@@ -1,5 +1,7 @@
 # PCMatchSrf Repair Existing Targets TEST
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/pcmatch-srf-repair-existing-targets`](../../tests/Smoke/pcmatch-srf-repair-existing-targets/) (run `.\tests\Run-Regression.ps1 -Name pcmatch-srf-repair-existing-targets`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 Validates that PCMatchSrf can overwrite a partially configured compatible target, restore a missing parent value such as `1A=0A`, remove stale target-only cell keys, preserve all non-cell attributes, and detect incomplete Rhino attribute commits before reporting success.
 
 Run with:

@@ -1,0 +1,464 @@
+﻿[
+    {
+        "name":  "cladding-merge-mark-key",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  2.2
+    },
+    {
+        "name":  "cladding-surface-coverage-metadata",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "extrusion-assignment-dropzone",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1
+    },
+    {
+        "name":  "material-catalogue-editing",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  2.3
+    },
+    {
+        "name":  "material-setup-color-picker",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  2.1
+    },
+    {
+        "name":  "panel-auto-attributes",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "panel-cladding-attribute-conventions",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.8
+    },
+    {
+        "name":  "panel-cladding-blank-cell-persistence",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.4
+    },
+    {
+        "name":  "panel-cladding-canvas-alignment",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  2.5
+    },
+    {
+        "name":  "panel-cladding-cell-topology",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  2.5
+    },
+    {
+        "name":  "panel-cladding-clear",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "panel-cladding-create-command",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "panel-cladding-curve-release",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.5
+    },
+    {
+        "name":  "panel-cladding-curve-template-ui",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  2.5
+    },
+    {
+        "name":  "panel-cladding-curve-topology",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.5
+    },
+    {
+        "name":  "panel-cladding-direct-interactions",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  2.1
+    },
+    {
+        "name":  "panel-cladding-extrusion-fidelity",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  2.2
+    },
+    {
+        "name":  "panel-cladding-extrusion-sync",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.6
+    },
+    {
+        "name":  "panel-cladding-extrusion-visuals",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  2.3
+    },
+    {
+        "name":  "panel-cladding-full-track-collapse",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  2
+    },
+    {
+        "name":  "panel-cladding-hide-mask",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  2.1
+    },
+    {
+        "name":  "panel-cladding-hide-smoke-command",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "panel-cladding-id-separators",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.2
+    },
+    {
+        "name":  "panel-cladding-latest-ui",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  2.1
+    },
+    {
+        "name":  "panel-cladding-layer-standard",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.5
+    },
+    {
+        "name":  "panel-cladding-layout-reconciliation",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.5
+    },
+    {
+        "name":  "panel-cladding-logical-cell-cleanup",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.5
+    },
+    {
+        "name":  "panel-cladding-logic-authority",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "panel-cladding-logic-persistence",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "panel-cladding-managed-cid-scope",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.2
+    },
+    {
+        "name":  "panel-cladding-match",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "panel-cladding-match-parent-cells",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "panel-cladding-match-topology-masks",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "panel-cladding-material-catalog",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.5
+    },
+    {
+        "name":  "panel-cladding-naming-convention",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.8
+    },
+    {
+        "name":  "panel-cladding-object-names",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.2
+    },
+    {
+        "name":  "panel-cladding-offset-sync",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.2
+    },
+    {
+        "name":  "panel-cladding-pc-commands",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.2
+    },
+    {
+        "name":  "panel-cladding-pid",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "panel-cladding-pid-layer-scope",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "panel-cladding-pid-planar-bounds",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "panel-cladding-pid-setup-keys",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.2
+    },
+    {
+        "name":  "panel-cladding-point-order",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.2
+    },
+    {
+        "name":  "panel-cladding-regions",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.2
+    },
+    {
+        "name":  "panel-cladding-role-cid",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "panel-cladding-scoped-save",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.9
+    },
+    {
+        "name":  "panel-cladding-sparse-topology",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "panel-cladding-spawn",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "panel-cladding-split-spawn-sync",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.2
+    },
+    {
+        "name":  "panel-cladding-surface-release",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "panel-cladding-surface-sync",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.7
+    },
+    {
+        "name":  "panel-cladding-surface-sync-structural-grid",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.4
+    },
+    {
+        "name":  "panel-cladding-topology-persistence",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  2
+    },
+    {
+        "name":  "panel-cladding-type-code-format",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.2
+    },
+    {
+        "name":  "panel-cladding-ud-keys",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.2
+    },
+    {
+        "name":  "panel-cladding-ui-refinement",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  2.2
+    },
+    {
+        "name":  "panel-cladding-update-command",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.5
+    },
+    {
+        "name":  "panel-cladding-visual-polish",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  2.1
+    },
+    {
+        "name":  "panel-cladding-wheel-zoom-aspect",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.6
+    },
+    {
+        "name":  "panel-cladding-wpf-ui",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  2.1
+    },
+    {
+        "name":  "panel-extrusion-assignment",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.4
+    },
+    {
+        "name":  "pc-curve-display-colors",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.4
+    },
+    {
+        "name":  "pc-editor-canvas-assignment",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  2.5
+    },
+    {
+        "name":  "pcmatch-parent-fidelity",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "pcmatch-srf-explicit-parent-cells",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "pcmatch-srf-logical-cell-cleanup",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.4
+    },
+    {
+        "name":  "pcmatch-srf-logical-cells",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "pcmatch-srf-repair-existing-targets",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "pcspawncrv-curve-simplification",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.2
+    },
+    {
+        "name":  "pcspawnsrf-boundary-parent-order",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.5
+    },
+    {
+        "name":  "pcsync-srf-offset-refresh",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.4
+    },
+    {
+        "name":  "pcsync-srf-parent-persistence",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.3
+    },
+    {
+        "name":  "pcsync-srf-preserve-structural-grid",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.2
+    },
+    {
+        "name":  "pcsync-srf-unmarked-offset-clearing",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.2
+    },
+    {
+        "name":  "pcupdate-command-undo",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.2
+    },
+    {
+        "name":  "pcupdate-locked-managed-objects",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.2
+    },
+    {
+        "name":  "standalone-panel-cladding-editor",
+        "status":  "pass",
+        "exitCode":  0,
+        "seconds":  1.6
+    }
+]

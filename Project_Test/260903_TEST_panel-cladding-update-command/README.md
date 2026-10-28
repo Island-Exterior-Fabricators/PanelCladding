@@ -1,5 +1,7 @@
 # Panel Cladding Update Command Smoke
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-update-command`](../../tests/Smoke/panel-cladding-update-command/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-update-command`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 Validates deterministic create/update/delete reconciliation, duplicate expected-CID rejection,
 the `PCUpdate` batch command contract, managed-root/PID/CID mutation boundaries, one Undo record, and
 package registration.

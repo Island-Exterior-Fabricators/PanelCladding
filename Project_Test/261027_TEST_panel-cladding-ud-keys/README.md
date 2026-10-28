@@ -1,5 +1,7 @@
 # Panel cladding UD_ user-defined keys TEST
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-ud-keys`](../../tests/Smoke/panel-cladding-ud-keys/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-ud-keys`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 Regression for [the PLAN](../../Project_Plan/261027_PLAN_panel-cladding-ud-keys.md):
 the `CW_9.xx` series becomes `UD_XXX` in 1.2.2.
 

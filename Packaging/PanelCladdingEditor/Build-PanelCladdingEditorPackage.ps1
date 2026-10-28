@@ -37,7 +37,7 @@ dotnet build $project -c Release -t:Rebuild --nologo
 if ($LASTEXITCODE -ne 0) { throw "PanelCladdingEditor direct RHP build failed." }
 
 # Inspect compiled PE metadata before copying an RHP into a distributable bundle.
-& (Join-Path $repoRoot 'Project_Test\260805_TEST_rhino-plugin-assembly-identity\Verify-PluginAssemblyIdentity.ps1') -Configuration Release -SkipBuild | Out-Host
+& (Join-Path $repoRoot 'tests\Package\Verify-PluginAssemblyIdentity.ps1') -Configuration Release -SkipBuild | Out-Host
 
 Get-ChildItem -LiteralPath $publish -Recurse -File | ForEach-Object {
     $relativePath = $_.FullName.Substring($publish.Length).TrimStart('\')

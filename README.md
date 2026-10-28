@@ -34,8 +34,8 @@ For another Rhino installation path, update RhinoCommon HintPath in the project.
 ```powershell
 dotnet build .\PanelCladding.sln -c Debug -m:1
 dotnet build .\PanelCladding.sln -c Release -m:1
-.\Project_Test\261007_TEST_panel-cladding-pid-planar-bounds\Verify-Regression.ps1
-.\Project_Test\260805_TEST_rhino-plugin-assembly-identity\Verify-PluginAssemblyIdentity.ps1 -Configuration Release
+.\tests\Run-Regression.ps1
+.\tests\Package\Verify-PluginAssemblyIdentity.ps1 -Configuration Release
 .\Packaging\PanelCladdingEditor\Build-PanelCladdingEditorPackage.ps1
 .\Packaging\PanelCladdingEditor\Build-PanelCladdingEditorYak.ps1
 ```
@@ -57,12 +57,13 @@ host attestation requirements in [AGENTS.md](AGENTS.md) before activation.
 - `src/PanelCladdingEditor/`: application, Rhino adapters and WPF UI.
 - `Packaging/PanelCladdingEditor/`: release build and installer scripts.
 - `Design/PanelCladdingEditor/`: design reference.
-- `Project_Plan/`, `Project_Exet/`, `Project_Test/`: development records and tests.
+- `tests/`: regression smokes, package checks and the [test runner](tests/README.md).
+- `Project_Plan/`, `Project_Exet/`, `Project_Test/`: development records; `Project_Test/` holds
+  evidence only.
 
 The extraction retains 25 relevant commits from original source commit
 `f6dc9d095c28dfc72ebcfd8a4ba7c06b336dcd71`; filtered commit IDs necessarily differ.
-See the [migration inventory](Project_Test/261013_TEST_panel-cladding-repository-migration/migration-inventory.json)
-and [commit map](Project_Test/261013_TEST_panel-cladding-repository-migration/commit-map.txt).
+See the [migration inventory](Project_Archive/Project_Test/261013_TEST_panel-cladding-repository-migration/migration-inventory.json)
+and [commit map](Project_Archive/Project_Test/261013_TEST_panel-cladding-repository-migration/commit-map.txt).
 Historical reports retain their original paths and GitHub links as provenance.
-The original MCP-hosted type-editor smoke is historical; use the standalone smoke
-project and later regression projects for current validation.
+The original MCP-hosted type-editor smoke is historical; use `tests/` for current validation.

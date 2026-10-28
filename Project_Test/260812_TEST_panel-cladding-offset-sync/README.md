@@ -1,5 +1,7 @@
 # Panel Cladding Offset Sync Smoke
 
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-offset-sync`](../../tests/Smoke/panel-cladding-offset-sync/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-offset-sync`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+
 This folder owns focused regression coverage for geometry-derived H/V offset replacement and the
 `04_STEP Surfaces` spawn root plus exact legacy-root read compatibility.
 
