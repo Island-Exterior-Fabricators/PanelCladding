@@ -87,7 +87,13 @@ internal static partial class Program
         var registry = new PanelFrameConfigCodeRegistry(format.FrameConfig);
         foreach ((string code, string config) in sheet.FrameConfigs) Require(registry.Register(code, config).Success, "Register " + code);
         Require(Resolve(registry, "0H 0V", expectAssigned: false) == "A", "0H 0V keeps code A.");
-        PanelNamingConventionUsage usage = Usage(["F", "L"], ["A"], ["1A.1", "1A.2", "1C.1", "1C.2", "1C.4", "3A.2"]);
+        PanelNamingConventionUsage walls = Usage(["F", "L"], ["A"], ["1A.1", "1A.2", "1C.1", "1C.2", "1C.4", "3A.2"]);
+        // Since 1.2.5 the sync also records CW_1.09 frame types; XYZ's are all in use (NA = blank).
+        var usage = new PanelNamingConventionUsage
+        {
+            UnitTypes = walls.UnitTypes, FrameConfigCodes = walls.FrameConfigCodes, WallTypes = walls.WallTypes,
+            FrameTypes = new HashSet<string> { "oCornerL", "oCornerR", "iCornerL_oCornerR", "iCornerR" }, HasBlankFrameType = true
+        };
         PanelNamingConventionTables tables = PanelNamingConventionService.BuildTables(registry.Entries, sheet, usage, "XYZ", format);
         OperationResponse unchanged = workbook.Write(path, tables);
         Require(unchanged.Success && unchanged.Message == OpenXmlPanelNamingConventionWorkbook.UnchangedMessage &&
@@ -96,8 +102,12 @@ internal static partial class Program
 
         // A new configuration takes the first placeholder in place; nothing moves.
         Require(Resolve(registry, "1H 0V", expectAssigned: true) == "B", "The next configuration gets B.");
-        tables = PanelNamingConventionService.BuildTables(registry.Entries, Required(workbook.Read(path)),
-            Usage(["F", "L"], ["A", "B"], ["1A.1", "1A.2", "1C.1", "1C.2", "1C.4", "3A.2", "2C.1"]), "XYZ", format);
+        PanelNamingConventionUsage grown = Usage(["F", "L"], ["A", "B"], ["1A.1", "1A.2", "1C.1", "1C.2", "1C.4", "3A.2", "2C.1"]);
+        tables = PanelNamingConventionService.BuildTables(registry.Entries, Required(workbook.Read(path)), new PanelNamingConventionUsage
+        {
+            UnitTypes = grown.UnitTypes, FrameConfigCodes = grown.FrameConfigCodes, WallTypes = grown.WallTypes,
+            FrameTypes = usage.FrameTypes, HasBlankFrameType = true
+        }, "XYZ", format);
         Require(workbook.Write(path, tables).Success, "Write with a new frame config and wall type.");
         Dictionary<string, string> updated = Snapshot(path);
         string[] changedCells = updated.Where(item => !after.TryGetValue(item.Key, out string? value) || value != item.Value)

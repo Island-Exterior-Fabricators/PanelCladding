@@ -201,7 +201,7 @@ public sealed partial class PanelCladdingCreatePlanningService
                 PanelCladdingKeyService.IsRetiredCladdingTypeKey(key) ||
                 PanelCladdingKeyService.IsTopologyKey(key) ||
                 PanelCladdingKeyService.IsRetiredFrameKey(key) ||
-                string.Equals(key, PanelCladdingKeyService.FrameTypeKey, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(key, PanelCladdingKeyService.FrameAssignmentsKey, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(key, PanelCladdingKeyService.UnitDimensionKey, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(key, PanelCladdingKeyService.UnitWidthKey, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(key, PanelCladdingKeyService.UnitHeightKey, StringComparison.OrdinalIgnoreCase) ||

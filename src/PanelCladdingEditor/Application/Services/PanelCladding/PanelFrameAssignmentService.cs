@@ -20,7 +20,7 @@ public sealed partial class PanelFrameAssignmentService
         PanelCladdingTopologyState topology)
     {
         OperationResponse<string> payload = PanelCladdingKeyService.ReadFrameAttribute(
-            userText, PanelCladdingKeyService.FrameTypeKey);
+            userText, PanelCladdingKeyService.FrameAssignmentsKey);
         if (payload.Success && string.IsNullOrWhiteSpace(payload.Data))
         {
             payload = PanelCladdingKeyService.ReadFrameAttribute(userText, PanelCladdingKeyService.LegacyFrameAssignmentsKey);

@@ -12,7 +12,12 @@ public sealed partial class PanelCladdingKeyService
     // Retained only to clean up suspended cladding type metadata.
     public const string TypeCodeKey = "CW_2.14_CLADDING_TYPE";
     public const string FrameConfigKey = "CW_1.08_FRAME_CONFIG";
+    // Hand-filled frame type; the plug-in only reads it for the naming-convention sheet.
     public const string FrameTypeKey = "CW_1.09_FRAME_TYPE";
+    // Frame/extrusion assignment payload, kept in CW_1.09_FRAME_TYPE until 1.2.5.
+    public const string FrameAssignmentsKey = "UD_FRAME_ASSIGNMENTS";
+    // Panel frame, an auto value: origin;X axis;Y axis (Z points out of the facade).
+    public const string PlaneKey = "UD_PLANE";
     public const string LegacyFrameTypologyKey = "CW_1.5D_FRAME TYPOLOGY";
     public const string LegacyFrameAssignmentsKey = "CW_2.09_FRAME_ASSIGNMENTS";
     public const string LegacyTypeCodeKey = "CW_4.00_CLADDING_TYPE";
@@ -247,7 +252,7 @@ public sealed partial class PanelCladdingKeyService
             string.Equals(key, CladdingLogicKey, StringComparison.OrdinalIgnoreCase) ||
             string.Equals(key, LegacyCladdingLogicKey, StringComparison.OrdinalIgnoreCase) ||
             string.Equals(key, LegacyUserDefinedCladdingLogicKey, StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(key, FrameTypeKey, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(key, FrameAssignmentsKey, StringComparison.OrdinalIgnoreCase) ||
             string.Equals(key, LegacyFrameAssignmentsKey, StringComparison.OrdinalIgnoreCase) ||
             string.Equals(key, LegacyFrameTypologyKey, StringComparison.OrdinalIgnoreCase) ||
             IsTopologyKey(key);

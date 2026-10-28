@@ -221,7 +221,7 @@ public sealed class PanelCladdingSaveService
             }
             if (!string.IsNullOrWhiteSpace(assignmentPayload.Data))
             {
-                writes[PanelCladdingKeyService.FrameTypeKey] = assignmentPayload.Data;
+                writes[PanelCladdingKeyService.FrameAssignmentsKey] = assignmentPayload.Data;
             }
             writes[PanelCladdingKeyService.UnitWidthKey] =
                 PanelCladdingKeyService.FormatUnitDimension(layout.Width);
@@ -248,14 +248,14 @@ public sealed class PanelCladdingSaveService
                  (saveExtrusions && (
                      _keys.IsOffsetKey(key) ||
                      PanelCladdingKeyService.IsTopologyKey(key) ||
-                     string.Equals(key, PanelCladdingKeyService.FrameTypeKey, StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(key, PanelCladdingKeyService.FrameAssignmentsKey, StringComparison.OrdinalIgnoreCase) ||
                      PanelCladdingKeyService.IsRetiredFrameKey(key)))) &&
                 !writes.ContainsKey(key))
             .ToArray();
         string[] userTextDeletes = obsoleteGridKeys
             .Concat(saveExtrusions ? layout.SourceUserText.Keys.Where(key =>
                 string.Equals(key, PanelCladdingKeyService.FrameConfigKey, StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(key, PanelCladdingKeyService.FrameTypeKey, StringComparison.OrdinalIgnoreCase)) : [])
+                string.Equals(key, PanelCladdingKeyService.FrameAssignmentsKey, StringComparison.OrdinalIgnoreCase)) : [])
             .Concat(layout.SourceUserText.Keys.Where(PanelCladdingKeyService.IsRetiredCladdingTypeKey))
             .Concat([
                 PanelCladdingKeyService.SignatureKey,

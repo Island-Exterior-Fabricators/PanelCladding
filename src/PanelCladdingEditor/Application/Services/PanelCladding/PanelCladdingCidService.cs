@@ -6,22 +6,22 @@ namespace PanelCladdingEditor.Application.Services.PanelCladding;
 public static partial class PanelCladdingCidService
 {
     // Unit types: C Curved, F Flat, L Two Face, Z Three Face. Multi-face roles live in
-    // CW_5.00_DEFINITION_A as Parent / Child / Child 1 / Child 2 (flat and curved are Parent).
+    // CW_5.00_DEFINITION_A as parent / child / child 1 / child 2, lowercase (flat and curved are
+    // parent); any case is read.
     public const string UnitTypeUserTextKey = "CW_1.06_UNIT_TYPE";
     public const string RoleDefinitionKey = "CW_5.00_DEFINITION_A";
     public const string CurvedUnitType = "C";
     public const string FlatUnitType = "F";
     public const string TwoFaceUnitType = "L";
     public const string ThreeFaceUnitType = "Z";
-    public const string ParentRole = "Parent";
-    public const string ChildRole = "Child";
+    public const string ParentRole = "parent";
+    public const string ChildRole = "child";
     // '-' separates the tokens of one identifier (PID-ABC-N2-05-05, CID-ABC-N2-05-05);
     // '_' joins a panel CID to its role and component codes (CID-ABC-N2-05-05_C_0A).
     public const string IdSeparator = "-";
     public const string ComponentSeparator = "_";
     public const string PanelIdPrefix = "PID" + IdSeparator;
     public const string CidPrefix = "CID" + IdSeparator;
-    private const string ProjectCidPrefix = CidPrefix + "ABC" + IdSeparator;
     private const string ParentRoleSuffix = ComponentSeparator + "P";
     private const string ChildRoleSuffix = ComponentSeparator + "C";
 
@@ -31,11 +31,17 @@ public static partial class PanelCladdingCidService
 
     public static bool IsRole(string? value) => RoleRegex().IsMatch(value?.Trim() ?? string.Empty);
 
+    // The stored form of a role value (trimmed, lowercase); other values are returned unchanged.
+    public static string NormalizeRole(string value) =>
+        IsRole(value) ? value.Trim().ToLowerInvariant() : value;
+
+    // Object name: the CID without "CID-<project>-" (everything up to and including the second '-').
     public static string ShortName(string cid)
     {
         string value = (cid ?? string.Empty).Trim();
-        int prefixLength = value.StartsWith(ProjectCidPrefix, StringComparison.OrdinalIgnoreCase) ? ProjectCidPrefix.Length :
-            value.StartsWith(CidPrefix, StringComparison.OrdinalIgnoreCase) ? CidPrefix.Length : 0;
+        if (!value.StartsWith(CidPrefix, StringComparison.OrdinalIgnoreCase)) return value;
+        int projectEnd = value.IndexOf(IdSeparator, CidPrefix.Length, StringComparison.Ordinal);
+        int prefixLength = projectEnd >= 0 ? projectEnd + IdSeparator.Length : CidPrefix.Length;
         return value.Length > prefixLength ? value[prefixLength..] : value;
     }
 

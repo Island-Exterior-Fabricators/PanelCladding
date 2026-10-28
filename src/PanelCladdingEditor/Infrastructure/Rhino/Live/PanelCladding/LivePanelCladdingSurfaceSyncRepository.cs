@@ -275,7 +275,8 @@ public sealed class LivePanelCladdingSurfaceSyncRepository : ILivePanelCladdingS
                         panel.Geometry,
                         panelSurfaces.Select(surface => surface.Geometry).ToArray(),
                         Array.Empty<Curve>(),
-                        panel.Layout.ModelTolerance);
+                        panel.Layout.ModelTolerance,
+                        LivePanelPlane.Stored(panel.Object.Attributes));
                 if (!surfaceInferred.Success || surfaceInferred.Data is null)
                 {
                     AddPanelIssue(panel,
@@ -290,7 +291,8 @@ public sealed class LivePanelCladdingSurfaceSyncRepository : ILivePanelCladdingS
                             panel.Geometry,
                             Array.Empty<Brep>(),
                             panelCurves.Select(curve => curve.Geometry).ToArray(),
-                            panel.Layout.ModelTolerance);
+                            panel.Layout.ModelTolerance,
+                            LivePanelPlane.Stored(panel.Object.Attributes));
                     if (!curveInferred.Success || curveInferred.Data is null)
                     {
                         AddPanelIssue(panel,
@@ -312,7 +314,8 @@ public sealed class LivePanelCladdingSurfaceSyncRepository : ILivePanelCladdingS
                         panel.Geometry,
                         Array.Empty<Brep>(),
                         panelCurves.Select(curve => curve.Geometry).ToArray(),
-                        panel.Layout.ModelTolerance);
+                        panel.Layout.ModelTolerance,
+                        LivePanelPlane.Stored(panel.Object.Attributes));
                 if (!inferred.Success || inferred.Data is null)
                 {
                     AddPanelIssue(panel,
@@ -361,7 +364,8 @@ public sealed class LivePanelCladdingSurfaceSyncRepository : ILivePanelCladdingS
                         panelCurves.Select(curve => curve.Geometry).ToArray(),
                         horizontalOffsets,
                         verticalOffsets,
-                        panel.Layout.ModelTolerance);
+                        panel.Layout.ModelTolerance,
+                        LivePanelPlane.Stored(panel.Object.Attributes));
                 if (!extrusionResponse.Success || extrusionResponse.Data is null)
                 {
                     AddPanelIssue(panel, $"PANEL_CLADDING_SYNC_TOPOLOGY_INFERENCE_FAILED: {extrusionResponse.Message}");
@@ -402,7 +406,8 @@ public sealed class LivePanelCladdingSurfaceSyncRepository : ILivePanelCladdingS
                             panelCurves.Select(curve => curve.Geometry).ToArray(),
                             horizontalOffsets,
                             verticalOffsets,
-                            panel.Layout.ModelTolerance);
+                            panel.Layout.ModelTolerance,
+                            LivePanelPlane.Stored(panel.Object.Attributes));
                     if (!extrusionResponse.Success || extrusionResponse.Data is null)
                     {
                         AddPanelIssue(panel,
@@ -448,7 +453,8 @@ public sealed class LivePanelCladdingSurfaceSyncRepository : ILivePanelCladdingS
                 LivePanelCladdingGeometryPartitionService.CreateGrid(
                     panel.Geometry,
                     keySet,
-                    panel.Layout.ModelTolerance);
+                    panel.Layout.ModelTolerance,
+                    LivePanelPlane.Stored(panel.Object.Attributes));
             if (!geometryGrid.Success || geometryGrid.Data is null)
             {
                 AddPanelIssue(panel,
@@ -926,7 +932,7 @@ public sealed class LivePanelCladdingSurfaceSyncRepository : ILivePanelCladdingS
                     (panelWrite.WritesCladding && _keys.IsCladdingCellKey(key)) ||
                     PanelCladdingKeyService.IsTopologyKey(key) ||
                     PanelCladdingKeyService.IsRetiredFrameKey(key) ||
-                    string.Equals(key, PanelCladdingKeyService.FrameTypeKey, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(key, PanelCladdingKeyService.FrameAssignmentsKey, StringComparison.OrdinalIgnoreCase) ||
                     PanelCladdingKeyService.IsRetiredCladdingTypeKey(key)))
                 {
                     proposed.DeleteUserString(key);
@@ -935,7 +941,7 @@ public sealed class LivePanelCladdingSurfaceSyncRepository : ILivePanelCladdingS
             DeleteUserTextCaseInsensitive(proposed, PanelCladdingKeyService.SignatureKey);
             if (!string.IsNullOrWhiteSpace(frameType.Data))
             {
-                proposed.SetUserString(PanelCladdingKeyService.FrameTypeKey, frameType.Data);
+                proposed.SetUserString(PanelCladdingKeyService.FrameAssignmentsKey, frameType.Data);
             }
             DeleteUserTextCaseInsensitive(proposed, PanelCladdingKeyService.LegacySignatureKey);
             DeleteUserTextCaseInsensitive(proposed, PanelCladdingKeyService.UnitWidthKey);

@@ -24,7 +24,8 @@ using UnitSystem = rhinocommon::Rhino.UnitSystem;
 
 namespace PanelCladdingEditor.Infrastructure.Rhino.Live.PanelCladding;
 
-// Always-on refresh of unit dimension, width, height, area and weight on every panel of
+// Always-on refresh of unit dimension, width, height, area, weight and the panel frame (UD_PLANE,
+// computed from the geometry) on every panel of
 // <PROJECT>-IEF-Wireframe::Surfaces - PNL and its sublayers (replaces the AutoATT script and its
 // AUTO_panel=1 mark). Events only queue object ids; values are written on idle outside a command,
 // because changing the document inside object events is unsafe. Undo is left alone: it restores
@@ -132,7 +133,7 @@ internal static class LivePanelAutoAttributes
                 int updated = panels.Count(panel => Refresh(document, panel));
                 if (updated > 0)
                 {
-                    RhinoApp.WriteLine($"PanelCladdingEditor: unit dimension, area and weight refreshed on {updated} panel(s).");
+                    RhinoApp.WriteLine($"PanelCladdingEditor: unit dimension, area, weight and UD_PLANE refreshed on {updated} panel(s).");
                 }
             }
             foreach ((uint serial, HashSet<Guid> ids) in batches)
@@ -171,14 +172,14 @@ internal static class LivePanelAutoAttributes
         };
         if (brep is null) return false;
 
-        var extent = LivePanelCladdingRepository.MeasurePanelExtent(brep, document.ModelAbsoluteTolerance);
+        var measured = LivePanelCladdingRepository.MeasurePanel(brep, document.ModelAbsoluteTolerance);
         using AreaMassProperties? mass = AreaMassProperties.Compute(brep, true, false, false, false);
-        if (!extent.Success || mass is null || !double.IsFinite(mass.Area)) return false;
+        if (!measured.Success || mass is null || !double.IsFinite(mass.Area)) return false;
         double feet = RhinoMath.UnitScale(document.ModelUnitSystem, UnitSystem.Feet);
         var userText = LivePanelCladdingCidService.Read(panel.Attributes);
         var desired = PanelCladdingAutoAttributeService.CreateValues(
-            extent.Data.Width, extent.Data.Height, mass.Area * feet * feet, userText);
-        var changes = PanelCladdingAutoAttributeService.Changes(desired, userText);
+            measured.Data.Width, measured.Data.Height, mass.Area * feet * feet, userText, measured.Data.Plane);
+        var changes = PanelCladdingAutoAttributeService.Changes(desired, userText, document.ModelAbsoluteTolerance);
         if (changes.Count == 0) return false;
 
         ObjectAttributes proposed = panel.Attributes.Duplicate();

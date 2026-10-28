@@ -34,7 +34,7 @@ internal static class Program
         {
             [PanelCladdingKeyService.MergeMaskKey] = "stale-merge",
             [PanelCladdingKeyService.FrameConfigKey] = "stale-config",
-            [PanelCladdingKeyService.FrameTypeKey] = "stale-type",
+            [PanelCladdingKeyService.FrameAssignmentsKey] = "stale-type",
             [PanelCladdingKeyService.LegacyFrameAssignmentsKey] = "stale-assignments",
             [PanelCladdingKeyService.LegacyFrameTypologyKey] = "stale-typology",
             ["CW_2.03_OFFSET_H0"] = "10",
@@ -83,7 +83,7 @@ internal static class Program
             // Since 1.2.4 PCCreate writes no CW_4 placeholders and no UD_CLADDING_LOGIC.
         };
         Require(panel.UserTextWrites.Count == expectedWrites.Count, "Grid write count is incorrect.");
-        Require(new[] { PanelCladdingKeyService.FrameTypeKey, PanelCladdingKeyService.LegacyFrameAssignmentsKey,
+        Require(new[] { PanelCladdingKeyService.FrameAssignmentsKey, PanelCladdingKeyService.LegacyFrameAssignmentsKey,
                     PanelCladdingKeyService.LegacyFrameTypologyKey }
                 .All(key => panel.UserTextDeletes.Contains(key, StringComparer.OrdinalIgnoreCase)),
             "PCCreate must clear previous assignments and retired typology when resetting the grid.");

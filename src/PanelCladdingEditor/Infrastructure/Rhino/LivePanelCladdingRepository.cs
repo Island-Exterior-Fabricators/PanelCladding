@@ -235,7 +235,8 @@ public sealed partial class LivePanelCladdingRepository : ILivePanelCladdingRepo
         OperationResponse frameKeys = ValidateFrameAttributeNames(rhinoObject);
         if (!frameKeys.Success) return OperationResponse<PanelCladdingLayout>.Fail(frameKeys.Message);
 
-        OperationResponse<LocalMesh> localMeshResponse = BuildLocalMesh(brep, document.ModelAbsoluteTolerance);
+        OperationResponse<LocalMesh> localMeshResponse = BuildLocalMesh(
+            brep, document.ModelAbsoluteTolerance, LivePanelPlane.Stored(rhinoObject.Attributes));
         if (!localMeshResponse.Success || localMeshResponse.Data is null)
         {
             return OperationResponse<PanelCladdingLayout>.Fail(localMeshResponse.Message);
@@ -321,7 +322,8 @@ public sealed partial class LivePanelCladdingRepository : ILivePanelCladdingRepo
 
         OperationResponse<LocalMesh> localMeshResponse = BuildLocalMesh(
             brep,
-            document.ModelAbsoluteTolerance);
+            document.ModelAbsoluteTolerance,
+            LivePanelPlane.Stored(rhinoObject.Attributes));
         if (!localMeshResponse.Success || localMeshResponse.Data is null)
         {
             return OperationResponse<PanelCladdingMatchPanelSnapshot>.Fail(localMeshResponse.Message);
@@ -385,31 +387,32 @@ public sealed partial class LivePanelCladdingRepository : ILivePanelCladdingRepo
             });
     }
 
-    // The editor layout's width and height (render-mesh extents in the panel frame), shared with
-    // the auto attribute refresh so CW_2.00-2.02 match what PCEditor and PCSyncSrf write.
-    internal static OperationResponse<(double Width, double Height)> MeasurePanelExtent(Brep brep, double tolerance)
+    // The editor layout's width and height (render-mesh extents in the panel frame) and the frame
+    // itself, computed from the geometry for the auto attribute refresh, so CW_2.00-2.02 match what
+    // PCEditor and PCSyncSrf write and UD_PLANE follows the panel.
+    internal static OperationResponse<(double Width, double Height, PanelPlaneFrame Plane)> MeasurePanel(Brep brep, double tolerance)
     {
         OperationResponse<LocalMesh> local;
         try
         {
-            local = BuildLocalMesh(brep, tolerance);
+            local = BuildLocalMesh(brep, tolerance, storedPlane: null);
         }
         catch (InvalidOperationException exception)
         {
-            return OperationResponse<(double Width, double Height)>.Fail(exception.Message);
+            return OperationResponse<(double Width, double Height, PanelPlaneFrame Plane)>.Fail(exception.Message);
         }
         if (!local.Success || local.Data is null)
         {
-            return OperationResponse<(double Width, double Height)>.Fail(local.Message);
+            return OperationResponse<(double Width, double Height, PanelPlaneFrame Plane)>.Fail(local.Message);
         }
         double width = local.Data.XMax - local.Data.XMin;
         double height = local.Data.YMax - local.Data.YMin;
         return width <= tolerance || height <= tolerance
-            ? OperationResponse<(double Width, double Height)>.Fail("PANEL_CLADDING_PANEL_EXTENT_INVALID")
-            : OperationResponse<(double Width, double Height)>.Ok((width, height));
+            ? OperationResponse<(double Width, double Height, PanelPlaneFrame Plane)>.Fail("PANEL_CLADDING_PANEL_EXTENT_INVALID")
+            : OperationResponse<(double Width, double Height, PanelPlaneFrame Plane)>.Ok((width, height, local.Data.Frame));
     }
 
-    private static OperationResponse<LocalMesh> BuildLocalMesh(Brep brep, double tolerance)
+    private static OperationResponse<LocalMesh> BuildLocalMesh(Brep brep, double tolerance, string? storedPlane)
     {
         Mesh[] pieces = Mesh.CreateFromBrep(brep, MeshingParameters.FastRenderMesh);
         if (pieces.Length == 0)
@@ -433,7 +436,8 @@ public sealed partial class LivePanelCladdingRepository : ILivePanelCladdingRepo
             return OperationResponse<LocalMesh>.Fail("PANEL_CLADDING_PREVIEW_MESH_TOO_DENSE");
         }
 
-        (Plane Frame, string Diagnostic) frame = ResolveFrame(brep, combined, tolerance);
+        (Plane Frame, string Diagnostic) frame = LivePanelPlane.Resolve(
+            brep, combined.Vertices.Select(vertex => new Point3d(vertex)).ToArray(), tolerance, storedPlane);
         var vertices = new List<PanelPoint3>(combined.Vertices.Count);
         foreach (var vertex in combined.Vertices)
         {
@@ -462,79 +466,9 @@ public sealed partial class LivePanelCladdingRepository : ILivePanelCladdingRepo
             XMax = vertices.Max(point => point.X),
             YMin = vertices.Min(point => point.Y),
             YMax = vertices.Max(point => point.Y),
+            Frame = LivePanelPlane.ToFrame(frame.Frame),
             FrameDiagnostic = frame.Diagnostic
         });
-    }
-
-    private static (Plane Frame, string Diagnostic) ResolveFrame(Brep brep, Mesh mesh, double tolerance)
-    {
-        if (TryParseStoredPlane(brep.GetUserString("Plane"), out Plane stored))
-        {
-            return (OrientFrame(stored), "Frame: stored Plane user string.");
-        }
-        if (brep.Faces.Count > 0 && brep.Faces[0].TryGetPlane(out Plane planar, tolerance))
-        {
-            return (OrientFrame(planar), "Frame: planar Brep face.");
-        }
-
-        Point3d[] samples = mesh.Vertices.Select(vertex => new Point3d(vertex)).ToArray();
-        PlaneFitResult fit = Plane.FitPlaneToPoints(samples, out Plane fitted);
-        if (fit == PlaneFitResult.Failure || !fitted.IsValid)
-        {
-            throw new InvalidOperationException("PANEL_CLADDING_REFERENCE_PLANE_FAILED");
-        }
-        return (OrientFrame(fitted), "Frame: best-fit curved-panel plane.");
-    }
-
-    private static Plane OrientFrame(Plane source)
-    {
-        Vector3d normal = source.ZAxis;
-        normal.Unitize();
-        Vector3d up = Vector3d.ZAxis - (Vector3d.ZAxis * normal) * normal;
-        if (!up.Unitize())
-        {
-            up = source.YAxis;
-            up.Unitize();
-        }
-        if (up * Vector3d.ZAxis < 0d)
-        {
-            up.Reverse();
-        }
-        Vector3d right = Vector3d.CrossProduct(up, normal);
-        right.Unitize();
-        Vector3d referenceRight = source.XAxis - (source.XAxis * normal) * normal - (source.XAxis * up) * up;
-        if (referenceRight.Unitize() && right * referenceRight < 0d)
-        {
-            right.Reverse();
-        }
-        normal = Vector3d.CrossProduct(right, up);
-        normal.Unitize();
-        return new Plane(source.Origin, right, up);
-    }
-
-    private static bool TryParseStoredPlane(string? raw, out Plane plane)
-    {
-        plane = Plane.Unset;
-        if (string.IsNullOrWhiteSpace(raw))
-        {
-            return false;
-        }
-        double[] values = NumberRegex().Matches(raw)
-            .Select(match => double.Parse(match.Value, CultureInfo.InvariantCulture))
-            .ToArray();
-        if (values.Length < 9)
-        {
-            return false;
-        }
-        var origin = new Point3d(values[0], values[1], values[2]);
-        var right = new Vector3d(values[3], values[4], values[5]);
-        var up = new Vector3d(values[6], values[7], values[8]);
-        if (!right.Unitize() || !up.Unitize())
-        {
-            return false;
-        }
-        plane = new Plane(origin, right, up);
-        return plane.IsValid;
     }
 
     private static OperationResponse ValidateFrameAttributeNames(RhinoObject rhinoObject)
@@ -578,8 +512,7 @@ public sealed partial class LivePanelCladdingRepository : ILivePanelCladdingRepo
                 key.StartsWith("CW_4.", StringComparison.OrdinalIgnoreCase) ||
                 key.StartsWith("UD_", StringComparison.OrdinalIgnoreCase) ||
                 key.StartsWith("CW_9.", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(key, PanelCladdingKeyService.FrameConfigKey, StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(key, PanelCladdingKeyService.FrameTypeKey, StringComparison.OrdinalIgnoreCase))
+                string.Equals(key, PanelCladdingKeyService.FrameConfigKey, StringComparison.OrdinalIgnoreCase))
             {
                 payload.Append('|').Append(key).Append('=').Append(value);
             }
@@ -599,9 +532,6 @@ public sealed partial class LivePanelCladdingRepository : ILivePanelCladdingRepo
         }
     }
 
-    [GeneratedRegex(@"[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?", RegexOptions.CultureInvariant)]
-    private static partial Regex NumberRegex();
-
     private sealed class LocalMesh
     {
         public IReadOnlyList<PanelPoint3> Vertices { get; init; } = Array.Empty<PanelPoint3>();
@@ -610,6 +540,7 @@ public sealed partial class LivePanelCladdingRepository : ILivePanelCladdingRepo
         public double XMax { get; init; }
         public double YMin { get; init; }
         public double YMax { get; init; }
+        public PanelPlaneFrame Frame { get; init; }
         public string FrameDiagnostic { get; init; } = string.Empty;
     }
 }

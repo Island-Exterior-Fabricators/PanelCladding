@@ -325,7 +325,8 @@ public sealed partial class LivePanelCladdingSpawnService : ILivePanelCladdingSp
             LivePanelCladdingGeometryPartitionService.CreateGrid(
                 sourceBrep,
                 keySet,
-                layout.ModelTolerance);
+                layout.ModelTolerance,
+                LivePanelPlane.Stored(userText));
         if (!gridResponse.Success || gridResponse.Data is null)
         {
             return OperationResponse<PreparedPanel>.Fail(gridResponse.Message);

@@ -1,11 +1,13 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
+using PanelCladdingEditor.Domain.Models.PanelCladding;
 
 namespace PanelCladdingEditor.Application.Services.PanelCladding;
 
 // Values refreshed on every panel of the Surfaces - PNL branch (formerly the AutoATT script on
-// AUTO_panel=1 panels): unit width, height and dimension in model units, area in square feet and
-// weight = CW_6.01_PSF x area. Measurement happens in the Rhino adapter; this only formats.
+// AUTO_panel=1 panels): unit width, height and dimension in model units, area in square feet,
+// weight = CW_6.01_PSF x area, and the panel frame (UD_PLANE). Measurement happens in the Rhino
+// adapter; this only formats.
 public static partial class PanelCladdingAutoAttributeService
 {
     public const string AreaUnitSuffix = " sqf";
@@ -16,7 +18,8 @@ public static partial class PanelCladdingAutoAttributeService
         PanelCladdingKeyService.UnitWidthKey,
         PanelCladdingKeyService.UnitHeightKey,
         PanelCladdingKeyService.UnitAreaKey,
-        PanelCladdingKeyService.UnitWeightKey
+        PanelCladdingKeyService.UnitWeightKey,
+        PanelCladdingKeyService.PlaneKey
     });
 
     // Keys whose change (besides geometry and layer) makes a panel's values stale.
@@ -60,10 +63,24 @@ public static partial class PanelCladdingAutoAttributeService
         };
     }
 
+    // The values above plus the panel frame computed from the geometry.
+    public static IReadOnlyDictionary<string, string> CreateValues(
+        double width, double height, double areaSquareFeet, IReadOnlyDictionary<string, string> userText,
+        PanelPlaneFrame plane)
+    {
+        var values = new Dictionary<string, string>(CreateValues(width, height, areaSquareFeet, userText), StringComparer.Ordinal)
+        {
+            [PanelCladdingKeyService.PlaneKey] = PanelCladdingPlaneFormat.Format(plane)
+        };
+        return values;
+    }
+
     // Only keys whose stored value differs, or that are stored under another case. A blank
-    // value is already satisfied by a missing or blank key.
+    // value is already satisfied by a missing or blank key. A stored UD_PLANE that describes the
+    // same frame (origin within planeTolerance, parallel axes) is kept whatever its number format.
     public static IReadOnlyDictionary<string, string> Changes(
-        IReadOnlyDictionary<string, string> desired, IReadOnlyDictionary<string, string> userText)
+        IReadOnlyDictionary<string, string> desired, IReadOnlyDictionary<string, string> userText,
+        double planeTolerance = 0)
     {
         var changes = new Dictionary<string, string>(StringComparer.Ordinal);
         foreach ((string key, string value) in desired)
@@ -72,7 +89,10 @@ public static partial class PanelCladdingAutoAttributeService
                 .Where(item => string.Equals(item.Key, key, StringComparison.OrdinalIgnoreCase)).ToArray();
             bool satisfied = string.IsNullOrWhiteSpace(value)
                 ? stored.All(item => string.IsNullOrWhiteSpace(item.Value) && item.Key == key)
-                : stored.Length == 1 && stored[0].Key == key && stored[0].Value == value;
+                : stored.Length == 1 && stored[0].Key == key && (stored[0].Value == value ||
+                    (key == PanelCladdingKeyService.PlaneKey &&
+                     PanelCladdingPlaneFormat.TryParse(value, out PanelPlaneFrame frame) &&
+                     PanelCladdingPlaneFormat.Matches(stored[0].Value, frame, planeTolerance)));
             if (!satisfied) changes[key] = value;
         }
         return changes;

@@ -23,9 +23,16 @@ Since 1.1.0, panel attributes follow the project naming convention workbook
 | --- | --- |
 | `CW_1.06_UNIT_TYPE` | `C` Curved, `F` Flat, `L` Two Face, `Z` Three Face |
 | `CW_1.08_FRAME_CONFIG` | code in the project's Frame-Config format (`AA`, `AB`, … by default; no `I`/`O`) |
-| `CW_5.00_DEFINITION_A` | role: `Parent`, `Child`, `Child 1`, `Child 2` |
+| `CW_1.09_FRAME_TYPE` | hand-filled frame type (e.g. `oCornerL`); recorded in the PNL sheet's Frame-Type table, otherwise not read or written (1.2.5) |
+| `CW_5.00_DEFINITION_A` | role: `parent`, `child`, `child 1`, `child 2` (lowercase since 1.2.5; any case is read) |
 | `UD_CLADDING_LOGIC` | cell cladding JSON, e.g. `{"0A":"AL-01","0B":"0A","1A":""}` (ownership only before 1.2.4; `CW_9.01_CLADDING_LOGIC` in 1.1.0–1.2.1, `CW_2.13_CLADDING_LOGIC` before) |
 | `UD_FRAME_CONFIG` | readable configuration, e.g. `2H 1V \| delete A1 0B \| merge B0–1 \| hide 0A` (`CW_9.02_FRAME_CONFIG` in 1.1.0–1.2.1) |
+| `UD_FRAME_ASSIGNMENTS` | frame/extrusion assignment JSON (in `CW_1.09_FRAME_TYPE` before 1.2.5) |
+| `UD_PLANE` | panel frame, an auto value: `{origin};{X axis};{Y axis}` (see below; `Plane` before 1.2.5 is not read) |
+
+Since 1.2.5 the plug-in never overwrites or deletes the hand-assigned fields: `CW_1.09_FRAME_TYPE`,
+`CW_1.10_*`, `CW_1.12_INSTALL_SEQUENCE`, `CW_2.06_PENETRATION_DIMENSION`, `CW_7.00_*`. PCpid adds a
+blank placeholder only for a setup key that does not exist yet.
 
 Since 1.2.2 the user-defined `CW_9.xx` series is `UD_XXX`. Panels that still carry
 `CW_9.01`/`CW_9.02` are read as before, and the keys are renamed to `UD_` the next time a
@@ -39,7 +46,7 @@ as in the `INT-` curve codes. Codes are assigned per document when a configurati
 written and are never reused; configurations with the same intermediate counts share the
 first letter. The code table lives in the document string `PanelCladdingEditor.FrameConfigCodes`.
 Only `L` and `Z` panels take a CID role suffix (`_P`, `_C`, `_C1`, `_C2`) from Definition A;
-`C` and `F` panels are `Parent` without a suffix. PCpid reserves Definition A, moving
+`C` and `F` panels are `parent` without a suffix. PCpid reserves Definition A, moving
 existing definitions down (adding `E`, `F`, … as needed). The former JSON frame
 configuration and `flat`/`corner_parent`/`corner_child` values must be migrated.
 
@@ -54,6 +61,12 @@ Since 1.2.3 the plug-in keeps these values current on every panel of
 | `CW_2.02_UNIT_HEIGHT` | `305.00000` (model units) |
 | `CW_2.07_UNIT_AREA` | `190.625 sqf` (surface area in square feet) |
 | `CW_6.02_UNIT_WEIGHT` | `16203.125` (`CW_6.01` × area; blank without a numeric `CW_6.01`) |
+| `UD_PLANE` | `{x, y, z};{1,0,0};{0,0,1}` (since 1.2.5) |
+
+`UD_PLANE` is the panel frame every command uses: Z points out of the facade (the front face
+normal), Y is up and X is right seen from outside; the origin is the panel's lower-left corner.
+Curved panels use their best-fit plane. A stored value that describes the same frame (origin
+within the document tolerance, same axes) is kept as written.
 
 Width and height are the same measurement `PCEditor` and `PCSyncSrf` use. Values refresh after a
 panel is added, copied, edited or moved onto the branch, after `CW_6.01` changes, and for all
@@ -61,14 +74,17 @@ panels when a model opens (which marks the model modified if any value changed).
 when no command is active and is not a separate Undo step; Undo restores the previous values.
 
 Every save of the project's main model, `<PROJECT> - Wireframe.3dm` (the whole file name, any
-case), updates three tables in the PNL sheet. Since 1.2.1 other models of the project, such as
+case), updates the code tables in the PNL sheet. Since 1.2.1 other models of the project, such as
 `XYZ - Wireframe_STN.3dm` or a copy like `ABC - Wireframe - v2.3dm`, never write the sheet: they
 read its format and reserved Frame-Config codes, and print once per session that only the main
 model updates it. Each table is found by its title in row 12
-(`Unit-Type`, `Wall-Type`, `Frame-Config`, matched ignoring case, spaces and hyphens): the code
-is in the title's column, the description in the next one, and the rows start at row 13.
-Missing titles are added in E, H and J. Wall-Type codes are single letters (`A`, `B`, …, no
-`I`/`O`) for the `CW_1.07_WALL_TYPE` values. Only these six columns are written; header rows
+(`Unit-Type`, `Wall-Type`, `Frame-Config`, `Frame-Type`, matched ignoring case, spaces and
+hyphens): the code is in the title's column, the description in the next one, and the rows start
+at row 13. Missing titles are added in E, H and J; Frame-Type under its row-7 header (else L),
+and only once there is a frame type to record. Wall-Type codes are single letters (`A`, `B`, …,
+no `I`/`O`) for the `CW_1.07_WALL_TYPE` values. Since 1.2.5 the Frame-Type table lists the
+`CW_1.09_FRAME_TYPE` values with codes in the project's Frame-Type format, the same way; a row
+whose value is `NA` stands for panels with a blank frame type. Only these columns are written; header rows
 and any other tables in the sheet are left as they are, and nothing is written when the
 tables are already current. Since 1.1.1 the PNL header order is Unit-Type | Wall-Type |
 Frame-Config | Frame-Type | Cladding | Definition | Seq (1.1.0 wrote E/F, I/J and W/X from row 12).
@@ -107,7 +123,7 @@ Since 1.0.99, identifiers use `-` between the tokens of one ID and `_` between a
 CID and its role or component: `PID-ABC-N2-05-05`, panel `CID-ABC-N2-05-05_C`, cladding
 surface `CID-ABC-N2-05-05_C_0A`, and extrusion curve `CID-ABC-N2-05-05_C_FRM-0`. Curve
 codes (`CRV`) also use `-`: `FRM-0`…`FRM-3`, `INT-A0`, `INT-0A`, merged `INT-A0–1`, and
-`CW_1.09_FRAME_TYPE` keys perimeter frames as `FRM-n`. Object names follow the CID
+`UD_FRAME_ASSIGNMENTS` keys perimeter frames as `FRM-n`. Object names follow the CID
 (`N2-05-05_C`). The former `PID_ABC_N2_05_05` / `CID_ABC_N2_05_05-C` / `FRM_0` forms
 are no longer produced or matched; migrate existing documents before using 1.0.99.
 
@@ -140,7 +156,7 @@ masks. Select target panel Breps, then the source; horizontal/vertical grid coun
 must match. Profiles, quantities, formulas, parent links and length modifiers are
 replaced by the source assignments, while target dimensions, offsets and cladding
 remain intact. Configuration is stored in `CW_1.08_FRAME_CONFIG`, and profile
-assignments in `CW_1.09_FRAME_TYPE`. An unassigned source
+assignments in `UD_FRAME_ASSIGNMENTS` (`CW_1.09_FRAME_TYPE` before 1.2.5). An unassigned source
 clears target assignments. Run `PCUpdate` to rebuild existing managed curves from
 the matched panel settings, or `PCSpawnCrv` to generate curves.
 
@@ -306,9 +322,10 @@ does not rewrite an existing custom panel CID or fall back to legacy flags.
 
 Since version 1.0.86, panel and managed dependency object names use a shortened
 CID: `CID-ABC-S1-06-14` becomes `S1-06-14`, and
-`CID-ABC-S1-06-14_P_INT-B1` becomes `S1-06-14_P_INT-B1`. The leading `CID-ABC-`
-is removed without changing the full CID user text; other `CID-` identifiers lose
-only `CID-`, and custom identifiers are preserved. Prefix matching ignores case.
+`CID-ABC-S1-06-14_P_INT-B1` becomes `S1-06-14_P_INT-B1`. Since 1.2.5 the leading
+`CID-<project>-` of any project is removed (`CID-XYZ-S-04-36` becomes `S-04-36`), without
+changing the full CID user text; a `CID-` identifier without a second `-` loses only `CID-`,
+and custom identifiers are preserved. Prefix matching ignores case.
 Create, save, match, spawn, sync, and update normalize source-panel names from the
 current CID. Spawn/update/sync apply the same rule to surfaces and extrusion curves.
 Run PCUpdate on existing configured panels to refresh their dependency names.
@@ -361,7 +378,8 @@ Each field retains the existing mask encoding and grid dimensions, including the
 delete mask's original polarity. A saved default grid also gets a complete config.
 No dimensions, profile definitions or generated typology hash are included in this value.
 
-`CW_1.09_FRAME_TYPE` stores the existing version-2 assignment JSON unchanged: `f`
+`UD_FRAME_ASSIGNMENTS` (`CW_1.09_FRAME_TYPE` before 1.2.5; such old payloads are no longer read)
+stores the existing version-2 assignment JSON unchanged: `f`
 contains perimeter assignments, `s` segment assignments, `d` profile definitions
 and calculation settings, and `x` length modifiers. No assigned profiles means
 this key is removed. Generated curve attributes (`Extrusions` and per-code formulas)
@@ -382,7 +400,7 @@ Documents predating that rename still require that earlier mask/logic migration.
 The extrusion view maintains an image-backed project catalogue of framing profiles in the workbook
 `Extrusions` sheet. PDF schedule die numbers such as `ALU-H0651` import as `1D-ALU-H0651`; profile
 codes are additive per `FRM`/`INT` curve and baked curves expose the sorted codes in `Extrusions`
-user text for length take-off. Panel assignment state is stored in `CW_1.09_FRAME_TYPE`.
+user text for length take-off. Panel assignment state is stored in `UD_FRAME_ASSIGNMENTS`.
 
 The package keeps the Windows x64 Skia/HarfBuzz native binaries both in their `.deps.json` runtime
 paths and beside the RHP. Rhino's plug-in load context requires the top-level copies for native

@@ -12,7 +12,7 @@ foreach (var (input, expected) in new[]
     (cid, shortName), (cid + "_P", shortName + "_P"),
     (cid + "_C_0A", shortName + "_C_0A"), (cid + "_P_INT-B1", shortName + "_P_INT-B1"),
     (cid + "_FRM-0", shortName + "_FRM-0"), (" cid-abc-S1-06-14 ", shortName),
-    ("CID-OTHER-S1-06-14", "OTHER-S1-06-14"), ("CUSTOM-CID", "CUSTOM-CID"),
+    ("CID-OTHER-S1-06-14", "S1-06-14"), ("CUSTOM-CID", "CUSTOM-CID"),
     ("CID-ABC-", "CID-ABC-"), ("", "")
 })
     Check(PanelCladdingCidService.ShortName(input) == expected, "Short name: " + input);

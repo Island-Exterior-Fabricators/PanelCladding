@@ -88,14 +88,14 @@ public sealed class PanelCladdingCurveMatchPlanningService : IPanelCladdingMatch
             var writes = new Dictionary<string, string>(sourceMasks.Data, StringComparer.OrdinalIgnoreCase);
             if (!string.IsNullOrWhiteSpace(sourceAssignments.Data))
             {
-                writes[PanelCladdingKeyService.FrameTypeKey] = sourceAssignments.Data;
+                writes[PanelCladdingKeyService.FrameAssignmentsKey] = sourceAssignments.Data;
             }
 
             string[] deletes = target.UserText.Keys
                 .Where(key => PanelCladdingKeyService.IsTopologyKey(key) ||
                     string.Equals(
                         key,
-                        PanelCladdingKeyService.FrameTypeKey,
+                        PanelCladdingKeyService.FrameAssignmentsKey,
                         StringComparison.OrdinalIgnoreCase) ||
                     PanelCladdingKeyService.IsRetiredFrameKey(key) ||
                     string.Equals(

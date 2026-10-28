@@ -306,7 +306,7 @@ internal static class Program
                     $"{edit}/{scope}/{phase} changed cladding material/parent values.");
                 string profilePayload = Required(new PanelFrameAssignmentService().Encode(
                     layout.FrameAssignments, 3, 3, layout.Topology), "Encode edited profiles");
-                Require(profilePayload == baseline[PanelCladdingKeyService.FrameTypeKey],
+                Require(profilePayload == baseline[PanelCladdingKeyService.FrameAssignmentsKey],
                     $"{edit}/{scope}/{phase} changed extrusion profiles or length modifiers.");
                 IReadOnlySet<string> deleted = Field<HashSet<string>>(window, "_deletedExtrusions");
                 IReadOnlySet<string> hidden = Field<HashSet<string>>(window, "_hiddenExtrusions");
@@ -321,7 +321,7 @@ internal static class Program
             {
                 foreach ((string key, string value) in baseline.Where(pair => PanelCladdingKeyService.IsTopologyKey(pair.Key) ||
                     keys.IsCladdingCellKey(pair.Key) || pair.Key == PanelCladdingKeyService.CladdingLogicKey ||
-                    pair.Key == PanelCladdingKeyService.FrameTypeKey))
+                    pair.Key == PanelCladdingKeyService.FrameAssignmentsKey))
                 {
                     Require(repository.Current.SourceUserText.TryGetValue(key, out string? current) && current == value,
                         $"{edit}/{scope} changed saved layout attribute {key}.");

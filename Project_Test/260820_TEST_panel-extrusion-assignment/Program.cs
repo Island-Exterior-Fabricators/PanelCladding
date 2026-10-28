@@ -237,7 +237,7 @@ internal static class Program
             [PanelCladdingKeyService.LegacyFrameAssignmentsKey.ToLowerInvariant()] = typePayload,
             [PanelCladdingKeyService.LegacyFrameTypologyKey.ToLowerInvariant()] = "RETIRED",
             [PanelCladdingKeyService.FrameConfigKey] = " ",
-            [PanelCladdingKeyService.FrameTypeKey] = " "
+            [PanelCladdingKeyService.FrameAssignmentsKey] = " "
         };
         PanelCladdingTopologyState loaded = Required(keys.DecodeTopology(legacy, 1, 1), "legacy fallback config");
         Require(Required(keys.EncodeFrameConfiguration(loaded, 1, 1), "re-encode legacy") == config &&
@@ -247,19 +247,19 @@ internal static class Program
         var canonical = new Dictionary<string, string>(legacy)
         {
             [PanelCladdingKeyService.FrameConfigKey] = config,
-            [PanelCladdingKeyService.FrameTypeKey] = typePayload,
+            [PanelCladdingKeyService.FrameAssignmentsKey] = typePayload,
             [PanelCladdingKeyService.MergeMaskKey.ToLowerInvariant()] = "obsolete-invalid",
             [PanelCladdingKeyService.LegacyFrameAssignmentsKey.ToLowerInvariant()] = "obsolete-invalid"
         };
         Require(keys.DecodeTopology(canonical, 1, 1).Success && assignments.Decode(canonical, 1, 1, topology).Success,
             "Canonical frame values must take precedence over old keys.");
         var invalidConfig = new Dictionary<string, string>(legacy) { [PanelCladdingKeyService.FrameConfigKey] = "not-json" };
-        var invalidType = new Dictionary<string, string>(legacy) { [PanelCladdingKeyService.FrameTypeKey] = "not-json" };
+        var invalidType = new Dictionary<string, string>(legacy) { [PanelCladdingKeyService.FrameAssignmentsKey] = "not-json" };
         Require(!keys.DecodeTopology(invalidConfig, 1, 1).Success &&
                 !assignments.Decode(invalidType, 1, 1, topology).Success,
             "Malformed canonical data must fail instead of restoring legacy values.");
         var conflictConfig = new Dictionary<string, string>(canonical) { [PanelCladdingKeyService.FrameConfigKey.ToLowerInvariant()] = "different" };
-        var conflictType = new Dictionary<string, string>(canonical) { [PanelCladdingKeyService.FrameTypeKey.ToLowerInvariant()] = "different" };
+        var conflictType = new Dictionary<string, string>(canonical) { [PanelCladdingKeyService.FrameAssignmentsKey.ToLowerInvariant()] = "different" };
         Require(!keys.DecodeTopology(conflictConfig, 1, 1).Success && !assignments.Decode(conflictType, 1, 1, topology).Success,
             "Conflicting case variants must fail.");
         Require(!PanelCladdingKeyService.ValidateFrameAttributeNames(conflictConfig).Success &&
@@ -295,7 +295,7 @@ internal static class Program
         Require(legacy.Keys.Where(PanelCladdingKeyService.IsRetiredFrameKey)
                     .All(key => commit.UserTextDeletes.Contains(key, StringComparer.OrdinalIgnoreCase)) &&
                 commit.UserTextWrites[PanelCladdingKeyService.FrameConfigBackupKey] == config &&
-                commit.UserTextWrites[PanelCladdingKeyService.FrameTypeKey] == typePayload,
+                commit.UserTextWrites[PanelCladdingKeyService.FrameAssignmentsKey] == typePayload,
             "Extrusion save failed to migrate legacy data and delete retired attributes.");
         Console.WriteLine("[OK] New frame keys round-trip; legacy/blank fallback, precedence, malformed/conflict rejection and save migration pass.");
     }
@@ -326,8 +326,8 @@ internal static class Program
             throw new InvalidOperationException("Assigned extrusion save returned no result.");
         PanelAttributeCommitRequest commit = repository.LastCommit ??
             throw new InvalidOperationException("Assigned extrusion save did not commit panel attributes.");
-        Require(commit.UserTextWrites.ContainsKey(PanelCladdingKeyService.FrameTypeKey),
-            "Assigned extrusion save omitted CW_1.09_FRAME_TYPE.");
+        Require(commit.UserTextWrites.ContainsKey(PanelCladdingKeyService.FrameAssignmentsKey),
+            "Assigned extrusion save omitted UD_FRAME_ASSIGNMENTS.");
         Require(commit.UserTextWrites.TryGetValue(PanelCladdingKeyService.FrameConfigBackupKey, out string? storedConfig) &&
                 storedConfig == saveResult.FrameConfig &&
                 keys.DecodeTopology(commit.UserTextWrites, 1, 1).Success &&
@@ -612,7 +612,7 @@ internal static class Program
         string syncSource = File.ReadAllText(Path.Combine(root, "src", "PanelCladdingEditor", "Infrastructure", "Rhino", "Live", "PanelCladding", "LivePanelCladdingSurfaceSyncRepository.cs"));
         Require(keySource.Contains("CW_1.08_FRAME_CONFIG", StringComparison.Ordinal),
             "Exact frame configuration Rhino key is absent.");
-        Require(keySource.Contains("CW_1.09_FRAME_TYPE", StringComparison.Ordinal),
+        Require(keySource.Contains("UD_FRAME_ASSIGNMENTS", StringComparison.Ordinal),
             "Frame assignment persistence key is absent.");
         Require(plannerSource.Contains("AssignedExtrusionsUserTextKey = \"Extrusions\"", StringComparison.Ordinal),
             "Baked curves do not expose the extrusion take-off user-text key.");
