@@ -4,8 +4,9 @@
 
 [PLAN](../Project_Plan/261028_PLAN_regression-test-layout.md),
 [TEST evidence](../Project_Test/261028_TEST_regression-test-layout/README.md).
-Executed 2026-10-28 on branch `codex/regression-test-layout`, host NOVAN-HOME. Plug-in code and
-version 1.2.5 are unchanged.
+Executed 2026-10-28 on branch `codex/regression-test-layout` from `master` (`4d73f0e`), host
+NOVAN-HOME; commit `4e2296b`, [PR 6](https://github.com/novan-xu/PanelCladding/pull/6). Plug-in
+code and version 1.2.5 are unchanged.
 
 ## Changes
 
