@@ -62,7 +62,7 @@ foreach ((string role, string suffix) in new[] { ("L:Parent", "_P"), ("L:Child",
     Check(role.Length == 0
             ? !create.Panels[0].UserTextWrites.ContainsKey(PanelCladdingSpawnPlanningService.CidUserTextKey)
             : create.Panels[0].UserTextWrites[PanelCladdingSpawnPlanningService.CidUserTextKey] == cid + suffix,
-        "PCCreate panel CID");
+        "PCcreate panel CID");
 
     // Legacy unsuffixed outputs and already migrated outputs must both sync to the same CIDs.
     foreach (string outputSuffix in new[] { "", suffix }.Distinct())

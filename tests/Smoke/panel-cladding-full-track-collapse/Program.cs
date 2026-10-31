@@ -23,8 +23,8 @@ internal static class Program
 
         Console.WriteLine("[OK] complete H tracks collapse while partial tracks remain masked.");
         Console.WriteLine("[OK] cells, parents, offsets, masks, and unit dimensions are saved from the normalized layout.");
-        Console.WriteLine("[OK] PCSpawnSrf expands logical cells across hidden physical members.");
-        Console.WriteLine("[OK] PCEditor updates rows, labels, dimensions, and Undo immediately.");
+        Console.WriteLine("[OK] PCspawnSrf expands logical cells across hidden physical members.");
+        Console.WriteLine("[OK] PCeditor updates rows, labels, dimensions, and Undo immediately.");
         Console.WriteLine("[OK] previously saved complete-track masks normalize when the editor loads.");
     }
 

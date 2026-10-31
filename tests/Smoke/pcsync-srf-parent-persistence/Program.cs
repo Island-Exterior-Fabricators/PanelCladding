@@ -31,12 +31,12 @@ internal static class Program
             PanelCladdingObjectScope.Surfaces),
             "Run parent persistence sync");
         PanelCladdingSurfaceSyncPanelWrite write = live.LastCommitRequest?.PanelWrites.Single() ??
-            throw new InvalidOperationException("PCSyncSrf did not produce one panel write.");
+            throw new InvalidOperationException("PCsyncSrf did not produce one panel write.");
         string ownerKey = PanelCladdingKeyService.GetCellKey(0, "A");
         string childKey = PanelCladdingKeyService.GetCellKey(1, "A");
         Require(write.CellValues[ownerKey] == Material && write.CellValues[childKey] == "0A",
             "The final commit payload must preserve 0A=MPL-001 and 1A=0A.");
-        Console.WriteLine("[OK] final PCSyncSrf commit payload preserves 1A=0A");
+        Console.WriteLine("[OK] final PCsyncSrf commit payload preserves 1A=0A");
 
         OperationResponse<IReadOnlyDictionary<string, string>> blanks =
             PanelCladdingSurfaceSyncService.BuildPersistedCellValues(

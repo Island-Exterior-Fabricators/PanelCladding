@@ -63,8 +63,8 @@ internal static class Program
         string packageRoot = Path.Combine(repositoryRoot, "Packaging", "PanelCladdingEditor");
         using JsonDocument manifest = JsonDocument.Parse(
             File.ReadAllText(Path.Combine(packageRoot, "package-manifest.json")));
-        Require(manifest.RootElement.GetProperty("command").GetString() == "PCEditor",
-            "PCEditor must remain the primary package command.");
+        Require(manifest.RootElement.GetProperty("command").GetString() == "PCeditor",
+            "PCeditor must remain the primary package command.");
         Require(!manifest.RootElement.TryGetProperty("smokeCommand", out _),
             "Package metadata still exposes a smokeCommand.");
 

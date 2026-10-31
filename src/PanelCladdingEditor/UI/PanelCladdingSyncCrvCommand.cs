@@ -21,13 +21,13 @@ namespace PanelCladdingEditor.UI;
 [Guid("A91D32DD-66DF-45E4-8503-87C56D19D727")]
 public sealed class PanelCladdingSyncCrvCommand : RhinoCommand
 {
-    public override string EnglishName => "PCSyncCrv";
+    public override string EnglishName => "PCsyncCrv";
 
     protected override Result RunCommand(RhinoDoc doc, RunMode mode)
     {
         if (doc is null || string.IsNullOrWhiteSpace(doc.Path))
         {
-            RhinoApp.WriteLine("PCSyncCrv requires a saved active document.");
+            RhinoApp.WriteLine("PCsyncCrv requires a saved active document.");
             return Result.Failure;
         }
 
@@ -87,7 +87,7 @@ public sealed class PanelCladdingSyncCrvCommand : RhinoCommand
         }
         int processedPanels = response.Data.SelectedPanelIds.Count - response.Data.SkippedPanelIds.Count;
         RhinoApp.WriteLine(
-            $"PCSyncCrv processed {processedPanels} panel(s), skipped " +
+            $"PCsyncCrv processed {processedPanels} panel(s), skipped " +
             $"{response.Data.SkippedPanelIds.Count} panel(s), matched {response.Data.MatchedCurveCount} curve(s), " +
             $"refreshed {response.Data.RefreshedCurveIds.Count} curve(s), " +
             $"and wrote {response.Data.ChangedPanelIds.Count} panel layout key/value set(s).");

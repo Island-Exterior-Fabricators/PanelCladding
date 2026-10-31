@@ -68,11 +68,11 @@ internal static class Program
         Require(!plan.Targets[0].UserTextDeletes.Any(key =>
                 PanelCladdingKeyService.IsTopologyKey(key) ||
                 string.Equals(key, PanelCladdingKeyService.TypeCodeKey, StringComparison.OrdinalIgnoreCase)),
-            "PCMatchSrf must not clean up target topology or type metadata.");
+            "PCmatchSrf must not clean up target topology or type metadata.");
         Require(plan.Targets[0].UserTextDeletes.Contains(
                 PanelCladdingKeyService.SignatureKey,
                 StringComparer.OrdinalIgnoreCase),
-            "PCMatchSrf must retire the persisted Signature key on a touched target.");
+            "PCmatchSrf must retire the persisted Signature key on a touched target.");
         foreach (string preserved in new[]
         {
             "CW_1.01_PID", "CW_1.05_LOT", "CW_1.07_WALL_TYPE", "CW_1.02_CID", "Plane", "CustomNote",
@@ -123,7 +123,7 @@ internal static class Program
         Console.WriteLine("[OK] target-owned offset distances may differ while logical grid dimensions remain enforced");
 
         VerifyAssemblyContract();
-        Console.WriteLine("[OK] standalone PCMatchSrf command/service contract and unique GUID");
+        Console.WriteLine("[OK] standalone PCmatchSrf command/service contract and unique GUID");
     }
 
     private static void VerifyConfigurationWrites(IReadOnlyDictionary<string, string> writes)
@@ -150,7 +150,7 @@ internal static class Program
                     PanelCladdingKeyService.CladdingLogicKey,
                     StringComparison.OrdinalIgnoreCase)) &&
                 writes.ContainsKey(PanelCladdingKeyService.CladdingLogicKey),
-            "PCMatchSrf writes must be limited to cladding cells and their derived logic.");
+            "PCmatchSrf writes must be limited to cladding cells and their derived logic.");
     }
 
     private static void VerifyEligibilityFailures(
