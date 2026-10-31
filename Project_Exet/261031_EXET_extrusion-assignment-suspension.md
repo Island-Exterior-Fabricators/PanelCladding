@@ -5,7 +5,8 @@
 [PLAN](../Project_Plan/261031_PLAN_extrusion-assignment-suspension.md),
 [TEST evidence](../Project_Test/261031_TEST_extrusion-assignment-suspension/README.md).
 Executed 2026-10-31 on branch `codex/extrusion-assignment-suspension` from `master` (`ad23285`),
-host NOVAN-HOME. Version 1.2.5 is unchanged.
+host NOVAN-HOME; commit `a906641`, [PR 9](https://github.com/nuofan-island/PanelCladding/pull/9).
+Version 1.2.5 is unchanged.
 
 ## Changes
 
