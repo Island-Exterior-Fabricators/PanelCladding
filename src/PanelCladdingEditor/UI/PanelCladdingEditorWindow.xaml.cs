@@ -18,6 +18,8 @@ namespace PanelCladdingEditor.UI;
 public partial class PanelCladdingEditorWindow : Window
 {
     private const string FrameExtrusionDragFormat = "PanelCladdingEditor.FrameExtrusionCode";
+    // Curve profile assignment is suspended: Extrusion view edits the layout only.
+    private static bool _extrusionAssignmentEnabled = false;
     private readonly PanelCladdingEditorController _controller;
     private readonly IPanelViewportHighlight? _viewportHighlight;
     private readonly PanelCladdingLogicalCellService _logicalCells = new();
@@ -68,6 +70,7 @@ public partial class PanelCladdingEditorWindow : Window
         MaterialLegend.ItemsSource = _materials;
         MaterialSelect.ItemsSource = _materials;
         ExtrusionLegend.ItemsSource = _availableFrameExtrusions;
+        FrameConfigurationNote.Visibility = _extrusionAssignmentEnabled ? Visibility.Visible : Visibility.Collapsed;
         Closing += OnWindowClosing;
         IsVisibleChanged += (_, _) => UpdateViewportHighlightVisibility();
         StateChanged += (_, _) => UpdateViewportHighlightVisibility();
@@ -566,10 +569,12 @@ public partial class PanelCladdingEditorWindow : Window
             .ToArray();
 
     private IReadOnlyDictionary<string, IReadOnlyList<string>> VisibleAssignmentMap() =>
-        CurrentSegments().ToDictionary(
-            segment => segment.Id,
-            AssignedCodes,
-            StringComparer.OrdinalIgnoreCase);
+        _extrusionAssignmentEnabled
+            ? CurrentSegments().ToDictionary(
+                segment => segment.Id,
+                AssignedCodes,
+                StringComparer.OrdinalIgnoreCase)
+            : new Dictionary<string, IReadOnlyList<string>>(StringComparer.OrdinalIgnoreCase);
 
     private IReadOnlyList<PanelCladdingSegmentCoordinate> CaptureSegmentCoordinates(IEnumerable<string> ids)
     {
@@ -1266,8 +1271,9 @@ public partial class PanelCladdingEditorWindow : Window
             .Where(item => _selectedExtrusions.Contains(item.Id))
             .ToArray();
         int count = selected.Length;
-        ExtrusionAssignmentSection.Visibility = _activeView == PanelEditorView.Extrusion && count > 0
-            ? Visibility.Visible : Visibility.Collapsed;
+        ExtrusionAssignmentSection.Visibility =
+            _extrusionAssignmentEnabled && _activeView == PanelEditorView.Extrusion && count > 0
+                ? Visibility.Visible : Visibility.Collapsed;
         SelectedExtrusionCountText.Text = count == 1 ? "1 curve" : $"{count} curves";
         SelectedExtrusionNamesText.Text = string.Join(", ", selected.Select(item => item.Code));
         SelectedExtrusionNamesText.ToolTip = SelectedExtrusionNamesText.Text;
@@ -1530,7 +1536,8 @@ public partial class PanelCladdingEditorWindow : Window
         CladdingViewButton.Tag = extrusion ? "Unselected" : "Selected";
         ClearCellsButton.Visibility = extrusion ? Visibility.Collapsed : Visibility.Visible;
         MaterialLegendSection.Visibility = extrusion ? Visibility.Collapsed : Visibility.Visible;
-        ExtrusionLegendSection.Visibility = extrusion ? Visibility.Visible : Visibility.Collapsed;
+        ExtrusionLegendSection.Visibility = extrusion && _extrusionAssignmentEnabled
+            ? Visibility.Visible : Visibility.Collapsed;
         CladdingAssignmentSection.Visibility = extrusion ? Visibility.Collapsed : Visibility.Visible;
         ExtrusionAssignmentSection.Visibility = Visibility.Collapsed;
         FrameConfigurationSection.Visibility = extrusion ? Visibility.Visible : Visibility.Collapsed;
@@ -2339,9 +2346,14 @@ public partial class PanelCladdingEditorWindow : Window
     private void UpdateFrameConfigurationPreview()
     {
         PanelCladdingTopologyState topology = CaptureTopologyState();
-        PanelFrameAssignmentState assignments = CaptureFrameAssignmentState();
         FrameConfigurationText.Text = $"{topology.MergeRuns.Count} merged runs, " +
             $"{topology.HiddenSegments.Count} hidden, {topology.MissingSegments.Count} deleted";
+        if (!_extrusionAssignmentEnabled)
+        {
+            FrameConfigurationText.ToolTip = null;
+            return;
+        }
+        PanelFrameAssignmentState assignments = CaptureFrameAssignmentState();
         FrameConfigurationText.ToolTip = assignments.IsEmpty
             ? "No profiles assigned."
             : $"{assignments.Definitions.Count} profile definitions assigned.";
