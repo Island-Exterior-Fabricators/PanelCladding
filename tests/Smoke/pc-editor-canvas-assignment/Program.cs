@@ -23,6 +23,10 @@ internal static class Program
     [STAThread]
     private static void Main()
     {
+        // Curve assignment is suspended in the editor; keep the dormant UI covered.
+        typeof(PanelCladdingEditorWindow)
+            .GetField("_extrusionAssignmentEnabled", BindingFlags.Static | BindingFlags.NonPublic)!
+            .SetValue(null, true);
         var metadata = new Dictionary<string, string>
         {
             ["CW_1.01_PID"] = "PID-BKT-N1-03-07",
