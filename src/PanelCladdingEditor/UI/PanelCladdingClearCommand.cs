@@ -21,13 +21,13 @@ namespace PanelCladdingEditor.UI;
 [Guid("1BE39D1F-FE6E-4E82-8A2C-00E91485B71C")]
 public sealed class PanelCladdingClearCommand : RhinoCommand
 {
-    public override string EnglishName => "PCClear";
+    public override string EnglishName => "PCclear";
 
     protected override Result RunCommand(RhinoDoc doc, RunMode mode)
     {
         if (doc is null || string.IsNullOrWhiteSpace(doc.Path))
         {
-            RhinoApp.WriteLine("PCClear requires a saved active document.");
+            RhinoApp.WriteLine("PCclear requires a saved active document.");
             return Result.Failure;
         }
 
@@ -67,7 +67,7 @@ public sealed class PanelCladdingClearCommand : RhinoCommand
         }
 
         RhinoApp.WriteLine(
-            $"PCClear removed {response.Data.RemovedKeyCount} cladding key(s) " +
+            $"PCclear removed {response.Data.RemovedKeyCount} cladding key(s) " +
             $"from {response.Data.UpdatedObjectIds.Count} of {response.Data.SelectedObjectIds.Count} selected panel(s).");
         return Result.Success;
     }

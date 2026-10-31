@@ -12,10 +12,10 @@ internal static class Program
         Assembly assembly = typeof(PanelCladdingKeyService).Assembly;
         var expected = new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            ["PanelCladdingSpawnSrfCommand"] = "PCSpawnSrf",
-            ["PanelCladdingSpawnCrvCommand"] = "PCSpawnCrv",
-            ["PanelCladdingSyncSrfCommand"] = "PCSyncSrf",
-            ["PanelCladdingSyncCrvCommand"] = "PCSyncCrv"
+            ["PanelCladdingSpawnSrfCommand"] = "PCspawnSrf",
+            ["PanelCladdingSpawnCrvCommand"] = "PCspawnCrv",
+            ["PanelCladdingSyncSrfCommand"] = "PCsyncSrf",
+            ["PanelCladdingSyncCrvCommand"] = "PCsyncCrv"
         };
         foreach ((string typeName, string commandName) in expected)
         {

@@ -26,8 +26,8 @@ $shell = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
 $installArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $installer,
     '-BundleRoot', $BundleRoot, '-ProductRoot', $productRoot, '-RhinoPluginRoot', $pluginBase,
     '-LegacyRhinoPackageRoot', $legacyRoot, '-RhinoPluginRegistryRoot', $registryRoot)
-$commands = @('PCClear','PCCreate','PCCrvTemplate','PCEditor','PCMatchCrv','PCMatchSrf',
-    'PCpid','PCSpawnCrv','PCSpawnSrf','PCSyncCrv','PCSyncSrf','PCtemplatePNL','PCUpdate')
+$commands = @('PCclear','PCcreate','PCcrvTemplate','PCeditor','PCmatchCrv','PCmatchSrf',
+    'PCpid','PCspawnCrv','PCspawnSrf','PCsyncCrv','PCsyncSrf','PCtemplatePNL','PCupdate')
 
 Add-Type @'
 using System;
@@ -106,7 +106,7 @@ try {
     Require (@(Compare-Object $beforeFiles $afterFiles).Count -eq 0 -and (Test-Path $pluginKey)) 'WhatIf preserves files, manifest and registration'
     Run-Install Validate
 
-    Remove-ItemProperty -LiteralPath "$pluginKey\CommandList" -Name PCEditor
+    Remove-ItemProperty -LiteralPath "$pluginKey\CommandList" -Name PCeditor
     Run-Install Validate $false
     $script:operationStart = [DateTime]::UtcNow.ToFileTimeUtc()
     Run-Install Repair

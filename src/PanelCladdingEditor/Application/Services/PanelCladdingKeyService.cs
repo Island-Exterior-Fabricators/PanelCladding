@@ -104,7 +104,7 @@ public sealed partial class PanelCladdingKeyService
             return OperationResponse<PanelCladdingKeySet>.Fail(
                 $"PANEL_CLADDING_LOGIC_GRID_MISMATCH: {CladdingLogicKey} has {cellValues.Data.Count} cells but the " +
                 $"{horizontal.Data.Count}H {vertical.Data.Count}V grid has {keySet.Data.Cells.Count}. " +
-                "Save cladding in PCEditor, or re-run PCCreate to clear the stale logic.");
+                "Save cladding in PCeditor, or re-run PCcreate to clear the stale logic.");
         }
         OperationResponse<PanelCladdingTopologyState> topology = DecodeTopology(
             userText,

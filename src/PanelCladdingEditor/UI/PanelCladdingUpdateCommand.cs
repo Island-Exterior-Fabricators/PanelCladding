@@ -22,13 +22,13 @@ namespace PanelCladdingEditor.UI;
 [Guid("F2C41D75-2F88-4CB4-9D1C-CF6BD1D6208A")]
 public sealed class PanelCladdingUpdateCommand : RhinoCommand
 {
-    public override string EnglishName => "PCUpdate";
+    public override string EnglishName => "PCupdate";
 
     protected override Result RunCommand(RhinoDoc doc, RunMode mode)
     {
         if (doc is null || string.IsNullOrWhiteSpace(doc.Path))
         {
-            RhinoApp.WriteLine("PCUpdate requires a saved active document.");
+            RhinoApp.WriteLine("PCupdate requires a saved active document.");
             return Result.Failure;
         }
 
@@ -69,7 +69,7 @@ public sealed class PanelCladdingUpdateCommand : RhinoCommand
         RhinoApp.WriteLine($"Standardized point order on {result.ReorderedPanelIds.Count} selected surface(s).");
         foreach (string warning in result.PointOrderWarnings) RhinoApp.WriteLine("Point order skipped: " + warning);
         RhinoApp.WriteLine(
-            $"PCUpdate processed {result.SourcePanelIds.Count} panel(s): " +
+            $"PCupdate processed {result.SourcePanelIds.Count} panel(s): " +
             $"created {result.CreatedSurfaceIds.Count} surface(s) and {result.CreatedCurveIds.Count} curve(s), " +
             $"updated {result.UpdatedSurfaceIds.Count} surface(s) and {result.UpdatedCurveIds.Count} curve(s), " +
             $"deleted {result.DeletedObjectIds.Count} obsolete or duplicate object(s).");

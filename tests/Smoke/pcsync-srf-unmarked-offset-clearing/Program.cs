@@ -55,7 +55,7 @@ internal static class Program
             $"Expected current surface offsets only, found {string.Join(",", result.HorizontalOffsets)}.");
         Require(!result.HorizontalOffsets.Contains(21.375d) &&
                 !result.HorizontalOffsets.Contains(107.25d),
-            "The unmarked PCEditor parent graph preserved stale offsets.");
+            "The unmarked PCeditor parent graph preserved stale offsets.");
     }
 
     private static void VerifyUnmarkedHiddenTrackClearsWithoutGeometryEvidence()

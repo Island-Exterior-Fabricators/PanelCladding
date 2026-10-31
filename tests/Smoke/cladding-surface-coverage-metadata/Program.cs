@@ -26,7 +26,7 @@ internal static class Program
         Console.WriteLine("[OK] overlapping and incomplete baked coverage fail before offset planning");
 
         VerifySyncPlansCoverageMigrationAndCanonicalization();
-        Console.WriteLine("[OK] PCSyncSrf migrates and canonicalizes baked coverage metadata");
+        Console.WriteLine("[OK] PCsyncSrf migrates and canonicalizes baked coverage metadata");
 
         VerifyLiveReadWriteContract();
         Console.WriteLine("[OK] live sync reads, validates, rewrites, and persists coverage metadata");

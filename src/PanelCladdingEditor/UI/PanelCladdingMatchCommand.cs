@@ -21,13 +21,13 @@ namespace PanelCladdingEditor.UI;
 [Guid("998E28BC-E9B9-420D-A348-98A5F6B9C089")]
 public sealed class PanelCladdingMatchCommand : RhinoCommand
 {
-    public override string EnglishName => "PCMatchSrf";
+    public override string EnglishName => "PCmatchSrf";
 
     protected override Result RunCommand(RhinoDoc doc, RunMode mode)
     {
         if (doc is null || string.IsNullOrWhiteSpace(doc.Path))
         {
-            RhinoApp.WriteLine("PCMatchSrf requires a saved active document.");
+            RhinoApp.WriteLine("PCmatchSrf requires a saved active document.");
             return Result.Failure;
         }
 
@@ -61,7 +61,7 @@ public sealed class PanelCladdingMatchCommand : RhinoCommand
         }
 
         RhinoApp.WriteLine(
-            $"PCMatchSrf copied the cladding cell assignments from {response.Data.SourceObjectId:D} " +
+            $"PCmatchSrf copied the cladding cell assignments from {response.Data.SourceObjectId:D} " +
             $"to {response.Data.UpdatedTargetIds.Count} panel(s).");
         return Result.Success;
     }

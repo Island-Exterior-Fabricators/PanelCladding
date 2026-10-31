@@ -198,13 +198,13 @@ internal static class Program
             "create empty cladding grid");
         var planner = new PanelCladdingSpawnPlanningService(keys);
         var spawnPlan = planner.CreatePlan(panelText, keySet);
-        Require(!spawnPlan.Success, "PCSpawnSrf must retain its no-populated-cells guard.");
+        Require(!spawnPlan.Success, "PCspawnSrf must retain its no-populated-cells guard.");
         PanelCladdingSpawnPlan updatePlan = Required(
             planner.CreateUpdatePlan(panelText, keySet),
             "create empty update surface plan");
         Require(updatePlan.Regions.Count == 0,
             "A panel with blank cladding must produce an empty authoritative surface set.");
-        Console.WriteLine("[OK] PCUpdate supports an empty expected surface set without weakening PCSpawnSrf");
+        Console.WriteLine("[OK] PCupdate supports an empty expected surface set without weakening PCspawnSrf");
     }
 
     private static void VerifyCommandContract()
@@ -212,21 +212,21 @@ internal static class Program
         Assembly assembly = typeof(PanelCladdingDependencyReconciliationService).Assembly;
         Type commandType = assembly.GetType("PanelCladdingEditor.UI.PanelCladdingUpdateCommand") ??
             throw new InvalidOperationException("PanelCladdingUpdateCommand is missing.");
-        Require(typeof(Command).IsAssignableFrom(commandType), "PCUpdate is not a Rhino command.");
-        Require(commandType.GUID != Guid.Empty, "PCUpdate command GUID must be explicit and non-empty.");
+        Require(typeof(Command).IsAssignableFrom(commandType), "PCupdate is not a Rhino command.");
+        Require(commandType.GUID != Guid.Empty, "PCupdate command GUID must be explicit and non-empty.");
         object command = RuntimeHelpers.GetUninitializedObject(commandType);
         string englishName = (string?)commandType.GetProperty("EnglishName")?.GetValue(command) ?? string.Empty;
-        Require(englishName == "PCUpdate", $"Unexpected command name: {englishName}");
+        Require(englishName == "PCupdate", $"Unexpected command name: {englishName}");
 
         MethodInfo update = typeof(ILivePanelCladdingUpdateService).GetMethod(
             nameof(ILivePanelCladdingUpdateService.Update)) ??
-            throw new InvalidOperationException("Live PCUpdate contract is missing.");
+            throw new InvalidOperationException("Live PCupdate contract is missing.");
         ParameterInfo[] parameters = update.GetParameters();
         Require(parameters.Length == 2 &&
                 parameters[0].ParameterType == typeof(string) &&
                 parameters[1].ParameterType == typeof(IReadOnlyList<Guid>),
-            "PCUpdate must expose one batch service call for selected panel IDs.");
-        Console.WriteLine("[OK] PCUpdate command and batch service contract are registered");
+            "PCupdate must expose one batch service call for selected panel IDs.");
+        Console.WriteLine("[OK] PCupdate command and batch service contract are registered");
     }
 
     private static void VerifyLiveOwnershipAndMutationContract()
@@ -262,10 +262,10 @@ internal static class Program
         foreach (string token in required)
         {
             Require(source.Contains(token, StringComparison.Ordinal),
-                $"Live PCUpdate implementation is missing contract token: {token}");
+                $"Live PCupdate implementation is missing contract token: {token}");
         }
         Require(!source.Contains("DUPLICATE_SELECTED_PID", StringComparison.Ordinal),
-            "PCUpdate must not reject duplicate PIDs.");
+            "PCupdate must not reject duplicate PIDs.");
         int normalization = source.IndexOf("LivePanelCladdingCidService.Apply(document, panelCidChanges.Data)", StringComparison.Ordinal);
         int dependencyUpdate = source.IndexOf("? UpdateDependencies(document, filePath, sourcePanelIds", StringComparison.Ordinal);
         Require(normalization >= 0 && dependencyUpdate > normalization,
@@ -283,15 +283,15 @@ internal static class Program
             "package-manifest.json")));
         Require(Version.TryParse(manifest.RootElement.GetProperty("version").GetString(), out Version? version) &&
                 version >= new Version(1, 0, 73),
-            "PCUpdate requires package version 1.0.73 or later.");
+            "PCupdate requires package version 1.0.73 or later.");
         string installer = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "Packaging",
             "PanelCladdingEditor",
             "Install-PanelCladdingEditor.ps1"));
-        Require(installer.Contains("'PCUpdate'", StringComparison.Ordinal),
-            "The exact installed Rhino CommandList omits PCUpdate.");
-        Console.WriteLine("[OK] supported package registers PCUpdate");
+        Require(installer.Contains("'PCupdate'", StringComparison.Ordinal),
+            "The exact installed Rhino CommandList omits PCupdate.");
+        Console.WriteLine("[OK] supported package registers PCupdate");
     }
 
     private static PanelCladdingExpectedDependency Expected(

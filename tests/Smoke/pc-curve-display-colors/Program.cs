@@ -101,11 +101,11 @@ internal static class Program
             DesiredObjectColor = DarkGreen
         };
         Require(layerColored.ObjectColorChanged,
-            "PCSyncCrv must repair a curve that still inherits layer color.");
+            "PCsyncCrv must repair a curve that still inherits layer color.");
         Require(wrongRgb.ObjectColorChanged,
-            "PCSyncCrv must repair a wrong existing object RGB value.");
+            "PCsyncCrv must repair a wrong existing object RGB value.");
         Require(!current.ObjectColorChanged,
-            "PCSyncCrv must not report an already-correct object color as changed.");
+            "PCsyncCrv must not report an already-correct object color as changed.");
         Console.WriteLine("[OK] existing curve color source/RGB mismatch is detectable");
     }
 
@@ -127,16 +127,16 @@ internal static class Program
 
         Require(spawn.Contains("item.CurvePlan.ObjectColor.Red", StringComparison.Ordinal) &&
                 spawn.Contains("ColorSource = ObjectColorSource.ColorFromObject", StringComparison.Ordinal),
-            "PCSpawnCrv does not write planned object color.");
+            "PCspawnCrv does not write planned object color.");
         Require(update.Contains("dependency.CurvePlan.ObjectColor.Red", StringComparison.Ordinal) &&
                 update.Contains("ObjectColorSource.ColorFromObject", StringComparison.Ordinal) &&
                 update.Contains("ObjectColorSource.ColorFromLayer", StringComparison.Ordinal),
-            "PCUpdate does not branch curve/surface color sources correctly.");
+            "PCupdate does not branch curve/surface color sources correctly.");
         Require(sync.Contains("DesiredObjectColor.Red", StringComparison.Ordinal) &&
                 sync.Contains("proposed.ColorSource = ObjectColorSource.ColorFromObject", StringComparison.Ordinal),
-            "PCSyncCrv does not commit desired existing-curve color.");
+            "PCsyncCrv does not commit desired existing-curve color.");
         Require(planning.Contains("curve.ObjectColorChanged", StringComparison.Ordinal),
-            "PCSyncCrv planning does not include existing color drift.");
+            "PCsyncCrv planning does not include existing color drift.");
         Console.WriteLine("[OK] spawn, update, and sync write/repair curve object colors");
     }
 

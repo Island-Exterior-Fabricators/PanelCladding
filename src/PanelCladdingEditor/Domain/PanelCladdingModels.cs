@@ -695,7 +695,7 @@ public sealed class PanelCladdingSurfaceSyncPanelPlan
     public IReadOnlyDictionary<string, string> CellValues { get; init; } =
         new Dictionary<string, string>();
     public string CladdingLogic { get; init; } = string.Empty;
-    // False for PCSyncCrv on an unconfigured panel: its CW_4.xx keys and logic are left as they are.
+    // False for PCsyncCrv on an unconfigured panel: its CW_4.xx keys and logic are left as they are.
     public bool WritesCladding { get; init; } = true;
     public bool CladdingChanged { get; init; }
     public bool NameChanged { get; init; }
