@@ -9,7 +9,9 @@ Executed 2026-10-31 under [the user-authorized PLAN](../Project_Plan/261031_PLAN
 [TEST evidence](../Project_Test/261031_TEST_pcreport-command/README.md) with the window render;
 smoke [`tests/Smoke/pcreport-command`](../tests/Smoke/pcreport-command/Program.cs). Branch
 `codex/pcreport-command`, stacked on `codex/excluded-layer-keywords`, in the worktree
-`C:\01_Projects\Panel Cladding Full\PC-casing`.
+`C:\01_Projects\Panel Cladding Full\PC-casing`. Commit `dfd5833`;
+[PR 13](https://github.com/nuofan-island/PanelCladding/pull/13), opened and merged into `master` at the
+user's request after [PR 12](https://github.com/nuofan-island/PanelCladding/pull/12).
 
 ## Implemented scope
 
