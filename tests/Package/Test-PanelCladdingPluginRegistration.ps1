@@ -44,19 +44,19 @@ $pluginFileKey = Join-Path $pluginKey 'PlugIn'
 $commandListKey = Join-Path $pluginKey 'CommandList'
 $activeRhp = [IO.Path]::GetFullPath((Join-Path (Join-Path $pluginRoot ([string]$definition.version)) 'PanelCladdingEditor.rhp'))
 $expectedCommands = @(
-    'PCClear',
-    'PCCreate',
-    'PCCrvTemplate',
-    'PCEditor',
-    'PCMatchCrv',
-    'PCMatchSrf',
+    'PCclear',
+    'PCcreate',
+    'PCcrvTemplate',
+    'PCeditor',
+    'PCmatchCrv',
+    'PCmatchSrf',
     'PCpid',
-    'PCSpawnCrv',
-    'PCSpawnSrf',
-    'PCSyncCrv',
-    'PCSyncSrf',
+    'PCspawnCrv',
+    'PCspawnSrf',
+    'PCsyncCrv',
+    'PCsyncSrf',
     'PCtemplatePNL',
-    'PCUpdate'
+    'PCupdate'
 )
 
 function Assert-FullRegistration {
@@ -109,7 +109,7 @@ try {
     Assert-FullRegistration
     & $installer -Mode Validate @installerArgs | Out-Host
 
-    Remove-ItemProperty -LiteralPath $commandListKey -Name PCCrvTemplate
+    Remove-ItemProperty -LiteralPath $commandListKey -Name PCcrvTemplate
     Assert-ExpectedFailure {
         & $installer -Mode Validate @installerArgs | Out-Null
     } 'command registration'

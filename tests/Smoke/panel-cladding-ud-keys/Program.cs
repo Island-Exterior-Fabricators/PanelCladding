@@ -115,7 +115,7 @@ internal static class Program
         Require(!PanelCladdingKeyService.TopologyPersistenceMatches(new Dictionary<string, string> { [LegacyFrame] = Config }, writes) &&
                 !PanelCladdingKeyService.TopologyPersistenceMatches(
                     new Dictionary<string, string>(writes) { [LegacyFrame] = Config }, writes),
-            "A stored CW_9.02 is out of date, so PCSyncSrf rewrites (and renames) the panel.");
+            "A stored CW_9.02 is out of date, so PCsyncSrf rewrites (and renames) the panel.");
 
         PanelCladdingClearPlan plan = Required(new PanelCladdingClearPlanningService(service).CreatePlan(
         [
@@ -129,7 +129,7 @@ internal static class Program
             }
         ]));
         Require(plan.Panels.Single().UserTextDeletes.OrderBy(key => key, StringComparer.Ordinal).SequenceEqual(new[] { LegacyLogic, LegacyFrame }),
-            "PCClear removes legacy cladding logic and frame configuration only.");
+            "PCclear removes legacy cladding logic and frame configuration only.");
         Console.WriteLine("[OK] legacy keys are topology/clearable keys and out of date for persistence checks");
     }
 

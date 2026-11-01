@@ -22,27 +22,27 @@ namespace PanelCladdingEditor.UI;
 [System.Runtime.InteropServices.Guid("9B4D3E0C-7F25-4D71-A7EE-8BDA71580459")]
 public sealed class PanelCladdingCreateCommand : RhinoCommand
 {
-    public override string EnglishName => "PCCreate";
+    public override string EnglishName => "PCcreate";
 
     protected override RhinoResult RunCommand(RhinoDoc doc, RhinoRunMode mode)
     {
         if (doc == null || string.IsNullOrWhiteSpace(doc.Path))
         {
-            RhinoApp.WriteLine("PCCreate requires the active Rhino document to be saved first.");
+            RhinoApp.WriteLine("PCcreate requires the active Rhino document to be saved first.");
             return RhinoResult.Failure;
         }
 
         var panelIds = SelectPanels();
         if (panelIds == null)
         {
-            RhinoApp.WriteLine("PCCreate cancelled before any changes were made.");
+            RhinoApp.WriteLine("PCcreate cancelled before any changes were made.");
             return RhinoResult.Cancel;
         }
 
         var guideCurveIds = SelectGuideCurves();
         if (guideCurveIds == null)
         {
-            RhinoApp.WriteLine("PCCreate cancelled before any changes were made.");
+            RhinoApp.WriteLine("PCcreate cancelled before any changes were made.");
             return RhinoResult.Cancel;
         }
 
@@ -53,18 +53,18 @@ public sealed class PanelCladdingCreateCommand : RhinoCommand
         if (!response.Success || response.Data == null)
         {
             RhinoApp.WriteLine(string.IsNullOrWhiteSpace(response.Message)
-                ? "PCCreate failed."
+                ? "PCcreate failed."
                 : response.Message);
             return RhinoResult.Failure;
         }
 
         foreach (var warning in response.Data.Warnings)
         {
-            RhinoApp.WriteLine($"PCCreate warning: {warning}");
+            RhinoApp.WriteLine($"PCcreate warning: {warning}");
         }
 
         RhinoApp.WriteLine(
-            $"PCCreate updated {response.Data.UpdatedPanelIds.Count} of {response.Data.SelectedPanelIds.Count} panel(s), " +
+            $"PCcreate updated {response.Data.UpdatedPanelIds.Count} of {response.Data.SelectedPanelIds.Count} panel(s), " +
             $"created {response.Data.HorizontalOffsetCount} H offset(s), {response.Data.VerticalOffsetCount} V offset(s), " +
             $"and initialized {response.Data.CellCount} cell(s).");
         return RhinoResult.Success;

@@ -70,7 +70,7 @@ internal static class Program
         IReadOnlyDictionary<string, string> applied =
             PanelCladdingMatchPlanningService.ApplyUserTextPlan(targetText, targetPlan);
         Require(applied[hidden0B] == "0A" && applied[hidden1C] == "1B",
-            "Applying PCMatchSrf did not replace stale target cells with mapped parent references.");
+            "Applying PCmatchSrf did not replace stale target cells with mapped parent references.");
         Require(applied[PanelCladdingKeyService.GetHorizontalOffsetKey(0)] == "25" &&
                 applied[PanelCladdingKeyService.GetHorizontalOffsetKey(1)] == "80" &&
                 applied[PanelCladdingKeyService.GetVerticalOffsetKey(0)] == "65" &&
@@ -79,9 +79,9 @@ internal static class Program
                 applied[PanelCladdingKeyService.TypeCodeKey] == "TARGET-TYPE-PRESERVE" &&
                 !applied.ContainsKey(PanelCladdingKeyService.SignatureKey) &&
                 applied["CustomNote"] == "preserve",
-            "PCMatchSrf changed target-owned layout, topology, type metadata, unrelated text, or retained Signature.");
+            "PCmatchSrf changed target-owned layout, topology, type metadata, unrelated text, or retained Signature.");
 
-        Console.WriteLine("[OK] PCMatchSrf remaps source-collapsed regions onto target-visible 0B/1C cells.");
+        Console.WriteLine("[OK] PCmatchSrf remaps source-collapsed regions onto target-visible 0B/1C cells.");
         Console.WriteLine("[OK] surviving blanks and parent references remain logical-cell correct.");
         Console.WriteLine("[OK] target offsets, masks, metadata, and unrelated attributes remain unchanged.");
     }

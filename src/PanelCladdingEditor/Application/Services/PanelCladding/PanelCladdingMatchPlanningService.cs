@@ -182,7 +182,7 @@ public sealed partial class PanelCladdingMatchPlanningService : IPanelCladdingMa
         var writes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach ((string key, string value) in logicalValues)
         {
-            // PCMatchSrf transfers the source assignment graph, not merely an equivalent
+            // PCmatchSrf transfers the source assignment graph, not merely an equivalent
             // canonical material region. Collapse removes physical cells hidden by the source's
             // merge topology and remaps parent references to their surviving representatives.
             writes[key] = PanelCladdingKeyService.EncodeCellValueForStorage(value);
@@ -190,7 +190,7 @@ public sealed partial class PanelCladdingMatchPlanningService : IPanelCladdingMa
         foreach (PanelCladdingCell cell in parsed.Data.Cells.Where(cell =>
             writes.ContainsKey(cell.UserTextKey) || physicalValues[cell.UserTextKey].Length > 0))
         {
-            // PCMatchSrf is cell-only: the source logic's value is configuration truth even when
+            // PCmatchSrf is cell-only: the source logic's value is configuration truth even when
             // extrusion topology hides that physical cell, so parent tokens such as 1A=0A are not
             // silently discarded. Unassigned hidden cells stay absent.
             writes[cell.UserTextKey] = PanelCladdingKeyService.EncodeCellValueForStorage(

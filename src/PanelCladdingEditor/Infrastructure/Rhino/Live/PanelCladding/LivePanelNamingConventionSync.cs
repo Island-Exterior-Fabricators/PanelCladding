@@ -77,7 +77,7 @@ internal static class LivePanelNamingConventionSync
         {
             RhinoApp.WriteLine($"PanelCladdingEditor: {snapshot.MismatchedCodes} panel(s) have a {PanelCladdingKeyService.FrameConfigKey} " +
                 $"code that does not match {PanelCladdingKeyService.FrameConfigBackupKey}; the layout follows {PanelCladdingKeyService.FrameConfigBackupKey} " +
-                "and the code is corrected on the next panel write. Use PCMatchCrv or PCEditor to change a frame configuration.");
+                "and the code is corrected on the next panel write. Use PCmatchCrv or PCeditor to change a frame configuration.");
         }
         if (!exists || sheet is null)
         {

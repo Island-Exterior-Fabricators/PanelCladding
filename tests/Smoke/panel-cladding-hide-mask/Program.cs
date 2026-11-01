@@ -21,9 +21,9 @@ internal static class Program
         EditorExposesAReversibleHiddenState();
         EditorHideDoesNotCollapseTheGrid();
         Console.WriteLine("[OK] CW_2.11_HIDE_MASK round-trips with legacy two-mask compatibility.");
-        Console.WriteLine("[OK] hidden atoms retain the logical grid and are omitted from PCSpawnCrv plans.");
+        Console.WriteLine("[OK] hidden atoms retain the logical grid and are omitted from PCspawnCrv plans.");
         Console.WriteLine("[OK] full hidden tracks do not collapse or renumber cladding cells.");
-        Console.WriteLine("[OK] PCMatchCrv and PCEditor include the hide state.");
+        Console.WriteLine("[OK] PCmatchCrv and PCeditor include the hide state.");
         return 0;
     }
 
@@ -117,7 +117,7 @@ internal static class Program
             .SelectMany(curve => curve.AtomicSegments)
             .ToHashSet();
         Require(!plannedAtoms.Overlaps(keySet.Topology.HiddenSegments),
-            "PCSpawnCrv planned physical curves for hidden atoms.");
+            "PCspawnCrv planned physical curves for hidden atoms.");
         Require(curves.Count(curve => curve.Kind == PanelCladdingExtrusionCurveKind.Frame) == 4,
             "Hiding intermediate atoms changed the panel frame.");
 
@@ -171,7 +171,7 @@ internal static class Program
         Require(plan.UserTextWrites.Count == 1 &&
                 plan.UserTextWrites.ContainsKey(PanelCladdingKeyService.FrameConfigBackupKey) &&
                 Required(keys.EncodeTopology(Required(keys.DecodeTopology(plan.UserTextWrites, 3, 1)), 3, 1)).HideMask == sourceMasks.HideMask,
-            "PCMatchCrv did not copy the hide mask in combined configuration.");
+            "PCmatchCrv did not copy the hide mask in combined configuration.");
     }
 
     private static void EditorExposesAReversibleHiddenState()
