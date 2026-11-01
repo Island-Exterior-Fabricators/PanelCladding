@@ -155,11 +155,17 @@ project code of the top-level `<PROJECT>-IEF-Wireframe` layer, for example `ABC`
 A panel on `Surfaces - WT_01` gets its curves on `Curves - WT_01` under the same
 project root. The cladding family layer is the material code's leading letters, so
 `GLS-001` goes to `Surfaces - GLS::GLS-001` and `MPL-002` to `Surfaces - MPL::MPL-002`.
-Missing layers are created on spawn/update. Only these two output trees are treated
+Missing layers are created by `PCbake`. Only these two output trees are treated
 as managed dependencies; copies elsewhere (for example the wireframe
-`Surfaces - GLS` glass) are not discovered, updated or deleted by spawn, update or sync.
+`Surfaces - GLS` glass) are not discovered, updated or deleted by bake or sync.
 The former `01_CW Panels`, `02_CW Extrusions`, `04_STEP Surfaces` and
 `03_Material Surfaces (STEP)` trees are no longer recognized; re-layer older documents first.
+
+Since 1.3.0, layers whose name contains `Not in Scope` or `By Others` (any case; spaces, `-` and
+`_` ignored), at any depth under `Surfaces - PNL` or `Curves - PNL`, are not tracked: PCpid does
+not number their panels, auto attributes and the naming sync skip them, `PCbake` does not create
+curves for them or treat curves there as managed, and `PCreport` leaves them out. Values already on
+those objects stay as they are.
 
 Since 1.0.96, `PCmatchCrv` copies extrusion assignments together with the segment, merge and hide
 masks. Select target panel Breps, then the source; horizontal/vertical grid counts

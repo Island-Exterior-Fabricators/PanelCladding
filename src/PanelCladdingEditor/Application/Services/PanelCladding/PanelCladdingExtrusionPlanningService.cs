@@ -219,16 +219,27 @@ public sealed class PanelCladdingExtrusionPlanningService
             !string.IsNullOrWhiteSpace(name[..^ProjectRootLayerSuffix.Length]);
     }
 
-    // The branch root itself and every nested sublayer belong to the branch.
+    // Layers the project does not track, such as "Surfaces - Not in Scope" or "Curves - By Others".
+    // A path is excluded when any segment contains a keyword, ignoring case, spaces, '-' and '_'.
+    public static IReadOnlyList<string> ExcludedLayerKeywords { get; } =
+        Array.AsReadOnly(new[] { "Not in Scope", "By Others" });
+
+    public static bool IsExcludedLayerPath(string layerPath) =>
+        SplitLayerPath(layerPath).Any(segment => ExcludedLayerKeywords.Any(keyword =>
+            LayerWord(segment).Contains(LayerWord(keyword), StringComparison.Ordinal)));
+
+    // The branch root itself and every nested sublayer belong to the branch, except excluded ones.
     public static bool IsPanelLayerPath(string layerPath) => IsPanelLayerPath(layerPath, null);
 
     public static bool IsPanelLayerPath(string layerPath, string? projectCode) =>
-        IsProjectBranch(SplitLayerPath(layerPath), PanelSurfaceLayerName, projectCode);
+        IsProjectBranch(SplitLayerPath(layerPath), PanelSurfaceLayerName, projectCode) &&
+        !IsExcludedLayerPath(layerPath);
 
     public static bool IsCurveLayerPath(string layerPath) => IsCurveLayerPath(layerPath, null);
 
     public static bool IsCurveLayerPath(string layerPath, string? projectCode) =>
-        IsProjectBranch(SplitLayerPath(layerPath), CurveLayerName, projectCode);
+        IsProjectBranch(SplitLayerPath(layerPath), CurveLayerName, projectCode) &&
+        !IsExcludedLayerPath(layerPath);
 
     public static OperationResponse<string> ResolveCurveLayerPath(string sourcePanelLayerPath, string? projectCode = null)
     {
@@ -238,6 +249,12 @@ public sealed class PanelCladdingExtrusionPlanningService
             return OperationResponse<string>.Fail(
                 $"PANEL_CLADDING_PANEL_LAYER_NOT_SUPPORTED: {sourcePanelLayerPath}; expected " +
                 $"{PanelCladdingProjectService.PanelLayerScope(projectCode)}::{PanelTypeLayerPrefix}<type>.");
+        }
+        if (IsExcludedLayerPath(sourcePanelLayerPath))
+        {
+            return OperationResponse<string>.Fail(
+                $"PANEL_CLADDING_PANEL_LAYER_EXCLUDED: {sourcePanelLayerPath}; layers named " +
+                $"{string.Join(" or ", ExcludedLayerKeywords)} are not tracked.");
         }
 
         string[] typeSegments = segments[2..];
@@ -264,6 +281,9 @@ public sealed class PanelCladdingExtrusionPlanningService
 
     private static string[] SplitLayerPath(string layerPath) =>
         (layerPath ?? string.Empty).Trim().Split(new[] { "::" }, StringSplitOptions.None);
+
+    private static string LayerWord(string value) =>
+        new((value ?? string.Empty).Where(char.IsLetterOrDigit).Select(char.ToLowerInvariant).ToArray());
 
     private static void AddAtomicCurves(
         ICollection<PanelCladdingExtrusionCurvePlan> curves,
