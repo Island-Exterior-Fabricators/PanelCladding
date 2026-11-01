@@ -50,6 +50,23 @@ Staged for installation: `C:\01_Projects\Panel Cladding Full\PanelCladdingEditor
 from the verified zip; 33 files, every SHA-256 equal to the verified bundle folder, `Install.cmd` at
 the top, RHP `1.4.0+8a9421b`.
 
+## Publication
+
+```powershell
+git tag -a v1.4.0 8a9421b -m '...'
+git -c credential.username=nuofan-island push -u origin codex/release-1.4.0 v1.4.0
+gh release create v1.4.0 --verify-tag --title 'PanelCladdingEditor 1.4.0' --notes-file <RELEASE-NOTES-1.4.0.md at v1.4.0> --latest <zip> <zip>.sha256
+gh release view v1.4.0 --json assets   # compare digests with the local files
+```
+
+- Release [`v1.4.0`](https://github.com/nuofan-island/PanelCladding/releases/tag/v1.4.0) by
+  `nuofan-island`, published at `2026-11-01T18:18:00Z` as GitHub reports it; not a draft or
+  prerelease; `releases/latest` returns `v1.4.0`.
+- Assets: the zip (16 005 968 bytes, `sha256:e95b54cb...29a9352`) and its `.sha256` (105 bytes,
+  `sha256:45214953...16c9df8f`); both digests equal the local files' SHA-256.
+- Tag object `3c1ca09` on GitHub equals the local annotated tag and points to `8a9421b`.
+- The installed and staged packages come from the same zip.
+
 ## Installation and attestation
 
 The user ran `Install.cmd` from the staged folder with no Rhino running. From the Terminal panel

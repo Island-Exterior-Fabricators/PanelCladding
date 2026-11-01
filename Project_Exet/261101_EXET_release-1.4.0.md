@@ -5,7 +5,9 @@
 [PLAN](../Project_Plan/261101_PLAN_release-1.4.0.md),
 [TEST evidence](../Project_Test/261101_TEST_release-1.4.0/README.md).
 Executed 2026-11-01 on branch `codex/release-1.4.0` from `master` (`97bb599`), worktree
-`C:\01_Projects\Panel Cladding Full\PC-release-1.4.0`, host NOVAN-HOME. Package commit `8a9421b`.
+`C:\01_Projects\Panel Cladding Full\PC-release-1.4.0`, host NOVAN-HOME. Package commit `8a9421b`,
+tagged `v1.4.0` (annotated); [PR 17](https://github.com/nuofan-island/PanelCladding/pull/17).
+Release: [PanelCladdingEditor v1.4.0](https://github.com/nuofan-island/PanelCladding/releases/tag/v1.4.0).
 
 ## Changes
 
@@ -16,11 +18,17 @@ Executed 2026-11-01 on branch `codex/release-1.4.0` from `master` (`97bb599`), w
 - `tests/Live/PcLive.cs` and its README: the loaded-RHP check reads the expected version from the
   plug-in (or `Parameters.version`), `excluded` expects refreshed auto values on Not in Scope
   panels, `otherdocs` expects no issue for unmanaged objects.
+- `README.md` (commit `10eeedf`, after the tag): the install section downloads
+  `PanelCladdingEditor-1.4.0-win-x64.zip` and links the 1.4.0 release notes.
 - Plug-in code, product name, existing commands and GUID are unchanged.
 
 ## Deviations from plan
 
-- None. The unreleased 1.3.1 preparation (`df86842` on `codex/release-1.3.1`, local only) was
+- The user asked on 2026-11-01 to push and publish ("推送并发布"), which the PLAN had left out of
+  scope until asked. As for 1.2.5, the tag is on the commit that built the package (`8a9421b`),
+  because the RHP's product version names it; the README change came after it and enters `master`
+  with PR 17.
+- The unreleased 1.3.1 preparation (`df86842` on `codex/release-1.3.1`, local only) was
   applied to this branch with 1.3.1 replaced by 1.4.0; `codex/release-1.3.1` is superseded and was
   never pushed.
 
@@ -60,11 +68,12 @@ generated package and the staged folder.
 
 ## Remaining limitations
 
-- Not tagged, published, merged or built as a Yak package.
+- PR 17 is not merged; no Yak package was built.
 - The PCweb Yes/No/Cancel dialog (interactive runs) was not driven; the scripted prompt and the
   command's logic were.
 
 ## Conclusion
 
 PanelCladdingEditor 1.4.0 is built and verified on `8a9421b`, installed on NOVAN-HOME with an
-independent registry attestation, and accepted live in Rhino.
+independent registry attestation, accepted live in Rhino, and published on GitHub as the latest
+release with assets identical to the verified package.
