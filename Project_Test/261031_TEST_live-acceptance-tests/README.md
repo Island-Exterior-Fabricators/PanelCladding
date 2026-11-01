@@ -78,12 +78,12 @@ and every macro sent with the history it produced.
 
 ## Findings
 
-| # | Section | What happened | Expected |
-| --- | --- | --- | --- |
-| 1 | 4 PCreport (ABC) | 2,423 "No owner panel" warnings: 2,358 are hand-drawn curves under `Curves - PNL::Curves - Mullion Wrap` (`do not include` 1,204, `Opaque vertical mullion` 798, `... optional` 356), 65 under `Curves - Snow Guards::MTL-*`. Everything under `Curves - PNL` is treated as a managed dependency; `do not include` is not an excluded keyword. | Decide: track these layers as excluded (keyword or rename to By Others / Not in Scope), or keep the warnings. |
-| 2 | 4 PCreport (ABC) | `Surfaces - GLS` copies: 1,848 Info rows (not ~2,400), part of 7,627 "PID outside the managed layers" (TER-001 5,175, MP 339, STN 263). | User decision: acceptable as Info? |
-| 3 | 3 / 2 PCbake | On a Not in Scope panel whose `UD_PLANE` and sizes are stale (they are no longer refreshed there), PCbake reports `PANEL_CLADDING_PANEL_EXTENT_INVALID` instead of `PANEL_CLADDING_PANEL_LAYER_EXCLUDED`; the extent is read before the layer is checked. No curve is created either way. | The excluded-layer error first. |
-| 4 | 4 PCreport window | At the default width the Detail column is cut off; it needs horizontal scrolling. | Detail visible. |
+| # | Section | What happened | Expected | Outcome |
+| --- | --- | --- | --- | --- |
+| 1 | 4 PCreport (ABC) | 2,423 "No owner panel" warnings: 2,358 are hand-drawn curves under `Curves - PNL::Curves - Mullion Wrap` (`do not include` 1,204, `Opaque vertical mullion` 798, `... optional` 356), 65 under `Curves - Snow Guards::MTL-*`. Everything under `Curves - PNL` is treated as a managed dependency; `do not include` is not an excluded keyword. | Decide: track these layers as excluded (keyword or rename to By Others / Not in Scope), or keep the warnings. | User (2026-10-31): model issue; these curves do not belong on that layer. No plug-in change. |
+| 2 | 4 PCreport (ABC) | `Surfaces - GLS` copies: 1,848 Info rows (not ~2,400), part of 7,627 "PID outside the managed layers" (TER-001 5,175, MP 339, STN 263). | User decision: acceptable as Info? | Answered: D07 lists objects that carry a PID on layers the plug-in does not manage (wireframe copies); not missing attributes. Info, by design. |
+| 3 | 3 / 2 PCbake | On a Not in Scope panel whose `UD_PLANE` and sizes are stale (they are no longer refreshed there), PCbake reports `PANEL_CLADDING_PANEL_EXTENT_INVALID` instead of `PANEL_CLADDING_PANEL_LAYER_EXCLUDED`; the extent is read before the layer is checked. No curve is created either way. | The excluded-layer error first. | Fixed on `codex/live-test-followups` (0f2f792): auto values are refreshed on excluded panels again; no curves for them stays. |
+| 4 | 4 PCreport window | At the default width the Detail column is cut off; it needs horizontal scrolling. | Detail visible. | Fixed on `codex/live-test-followups` (0f2f792): Detail fills the remaining width. |
 
 Not plug-in defects, recorded for the test data: the XYZ model has 7 duplicate PID groups (PCpid
 refuses until they are resolved; the suite suffixes `-LIVEDUPn`, which shows as 7 A05 warnings) and
