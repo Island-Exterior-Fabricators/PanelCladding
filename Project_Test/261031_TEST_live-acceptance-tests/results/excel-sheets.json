@@ -1,0 +1,29 @@
+﻿{
+    "path":  "C:\\01_Projects\\MCP_Rhino\\.claude\\worktrees\\release-1.3.9\\Project_Test\\261031_TEST_release-1.3.9\\MET - Wireframe LIVE TEST - PC Report.xlsx",
+    "sheets":  [
+                   {
+                       "name":  "Summary",
+                       "rows":  18,
+                       "columns":  2,
+                       "header":  [
+                                      "Model",
+                                      "MET - Wireframe LIVE TEST.3dm"
+                                  ]
+                   },
+                   {
+                       "name":  "Issues",
+                       "rows":  11116,
+                       "columns":  8,
+                       "header":  [
+                                      "Severity",
+                                      "Category",
+                                      "Rule",
+                                      "Object",
+                                      "Layer",
+                                      "Detail",
+                                      "Fix",
+                                      "Object ID"
+                                  ]
+                   }
+               ]
+}

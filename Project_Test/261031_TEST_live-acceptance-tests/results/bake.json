@@ -1,0 +1,264 @@
+{
+  "suite": "bake",
+  "status": "done",
+  "started": "2026-10-31T22:12:06",
+  "updated": "2026-10-31T22:12:09",
+  "step": "",
+  "passed": 18,
+  "failed": 0,
+  "error": "",
+  "checks": [
+    {
+      "id": "2.1 prompt shows Scope=Surfaces",
+      "pass": true,
+      "step": "2.1 preselected panel, default scope",
+      "evidence": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces )\nStandardized point order on 0 selected surface(s).\nPCbake (Surfaces) processed 1 panel(s): created 4 surface(s) and 0 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\n"
+    },
+    {
+      "id": "2.1 Enter bakes surfaces only",
+      "pass": true,
+      "step": "2.1 preselected panel, default scope",
+      "evidence": {
+        "surfaces": 4
+      }
+    },
+    {
+      "id": "2.1 curves unchanged",
+      "pass": true,
+      "step": "2.1 preselected panel, default scope",
+      "evidence": null
+    },
+    {
+      "id": "2.1 preselected panel stays selected",
+      "pass": true,
+      "step": "2.1 preselected panel, default scope",
+      "evidence": null
+    },
+    {
+      "id": "2.2 selection prompt offers Scope",
+      "pass": true,
+      "step": "2.2 no preselection offers Scope; Curves",
+      "evidence": "Command: _-PCbake\nSelect panel Breps to bake ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake ( Scope=Curves ): \u0027_SelID\nObject ID to select: 9923c5e2-a146-4d9d-af4b-b26130c987dd\n1 surface added to selection.\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nStandardized point order on 0 selected surface(s).\nPCbake (Curves) processed 1 panel(s): created 0 surface(s) and 8 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\n"
+    },
+    {
+      "id": "2.2 Scope=Curves processes curves only",
+      "pass": true,
+      "step": "2.2 no preselection offers Scope; Curves",
+      "evidence": {
+        "curves": 8
+      }
+    },
+    {
+      "id": "2.6 curves are coloured by type",
+      "pass": true,
+      "step": "2.2 no preselection offers Scope; Curves",
+      "evidence": {
+        "kinds": {
+          "frame": [
+            "0,0,255"
+          ],
+          "vertical": [
+            "0,100,0"
+          ],
+          "horizontal": [
+            "128,0,128"
+          ]
+        },
+        "codes": [
+          "FRM-0",
+          "FRM-1",
+          "FRM-2",
+          "FRM-3",
+          "INT-0A",
+          "INT-0B",
+          "INT-A0",
+          "INT-A1"
+        ],
+        "sources": [
+          "ColorFromObject"
+        ]
+      }
+    },
+    {
+      "id": "2.2 panel picked at the prompt is not left selected",
+      "pass": true,
+      "step": "2.2 no preselection offers Scope; Curves",
+      "evidence": null
+    },
+    {
+      "id": "2.3 Scope=All processes surfaces and curves",
+      "pass": true,
+      "step": "2.3 Scope=All",
+      "evidence": {
+        "history": "Command: _-PCbake\nSelect panel Breps to bake ( Scope=Surfaces ): _Scope=_All\nSelect panel Breps to bake ( Scope=All ): \u0027_SelID\nObject ID to select: 51ad8ae0-0767-43c1-bb5c-5237768487ce\n1 surface added to selection.\nSelect panel Breps to bake. Press Enter when done ( Scope=All ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=All )\nCreating meshes... Press Esc to cancel\nStandardized point order on 0 selected surface(s).\nPCbake (All) processed 1 panel(s): created 4 surface(s) and 8 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\n",
+        "surfaces": 4,
+        "curves": 8
+      }
+    },
+    {
+      "id": "2.4 the run after Scope=All starts at Scope=Surfaces",
+      "pass": true,
+      "step": "2.4 next run starts at Surfaces",
+      "evidence": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces )\nStandardized point order on 0 selected surface(s).\nPCbake (Surfaces) processed 1 panel(s): created 0 surface(s) and 0 curve(s), updated 4 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\n"
+    },
+    {
+      "id": "2.5 Curves leaves every curve of the panel unchanged",
+      "pass": true,
+      "step": "2.5 panel with curves keeps them",
+      "evidence": {
+        "edited": "e60afc4c-19b9-4902-892d-7c1a3152b122"
+      }
+    },
+    {
+      "id": "2.5 All leaves every curve of the panel unchanged",
+      "pass": true,
+      "step": "2.5 panel with curves keeps them",
+      "evidence": null
+    },
+    {
+      "id": "2.5 command line reports kept curves",
+      "pass": true,
+      "step": "2.5 panel with curves keeps them",
+      "evidence": {
+        "curvesRun": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nStandardized point order on 0 selected surface(s).\nPCbake (Curves) processed 1 panel(s): created 0 surface(s) and 0 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\nKept the existing curves of 1 panel(s); delete a panel\u0027s curves to bake new ones.\n",
+        "allRun": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_All\nSelect panel Breps to bake. Press Enter when done ( Scope=All ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=All )\nCreating meshes... Press Esc to cancel\nStandardized point order on 0 selected surface(s).\nPCbake (All) processed 1 panel(s): created 4 surface(s) and 0 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\nKept the existing curves of 1 panel(s); delete a panel\u0027s curves to bake new ones.\n"
+      }
+    },
+    {
+      "id": "2.7 Curves creates them again",
+      "pass": true,
+      "step": "2.7 curves are baked again after deleting them",
+      "evidence": {
+        "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nStandardized point order on 0 selected surface(s).\nPCbake (Curves) processed 1 panel(s): created 0 surface(s) and 8 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\n",
+        "curves": 8
+      }
+    },
+    {
+      "id": "2.8 default run rebuilds the surfaces and deletes the extra ones",
+      "pass": true,
+      "step": "2.8 changed cladding rebuilds; one undo",
+      "evidence": {
+        "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces )\nStandardized point order on 0 selected surface(s).\nPCbake (Surfaces) processed 1 panel(s): created 0 surface(s) and 0 curve(s), updated 2 surface(s) and 0 curve(s), deleted 2 obsolete or duplicate object(s).\n",
+        "surfacesAfter": 2
+      }
+    },
+    {
+      "id": "2.8 one undo restores the whole run",
+      "pass": true,
+      "step": "2.8 changed cladding rebuilds; one undo",
+      "evidence": {
+        "undoRecordsUsedByRun": 1,
+        "undo": "Command: _Undo\nUndoing PCbake\n"
+      }
+    },
+    {
+      "id": "2.9 locked and hidden surfaces are updated",
+      "pass": true,
+      "step": "2.9 locked and hidden surfaces",
+      "evidence": {
+        "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces )\nCreating meshes... Press Esc to cancel\nStandardized point order on 0 selected surface(s).\nPCbake (Surfaces) processed 1 panel(s): created 0 surface(s) and 0 curve(s), updated 4 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\n"
+      }
+    },
+    {
+      "id": "2.9 they stay locked and hidden",
+      "pass": true,
+      "step": "2.9 locked and hidden surfaces",
+      "evidence": {
+        "locked": "37cda581-d592-4e95-9550-f75cc2fbf941",
+        "hidden": "868b7b1b-ba78-4572-8632-742046d44b5d"
+      }
+    }
+  ],
+  "notes": {
+    "panel A": {
+      "id": "77327b6e-e3aa-44d8-b69b-d52bbbd36d46",
+      "pid": "PID-MET-W-01-01",
+      "cid": "CID-MET-W-01-01",
+      "removedFromEarlierRun": 4
+    },
+    "panel B": {
+      "id": "9923c5e2-a146-4d9d-af4b-b26130c987dd",
+      "pid": "PID-MET-W-01-11",
+      "cid": "CID-MET-W-01-11",
+      "removedFromEarlierRun": 12
+    },
+    "panel C": {
+      "id": "51ad8ae0-0767-43c1-bb5c-5237768487ce",
+      "pid": "PID-MET-W-01-12",
+      "cid": "CID-MET-W-01-12",
+      "removedFromEarlierRun": 12
+    }
+  },
+  "commands": [
+    {
+      "step": "2.1 preselected panel, default scope",
+      "macro": "_-PCbake _Enter",
+      "result": true,
+      "seconds": 0.16,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces )\nStandardized point order on 0 selected surface(s).\nPCbake (Surfaces) processed 1 panel(s): created 4 surface(s) and 0 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\n"
+    },
+    {
+      "step": "2.2 no preselection offers Scope; Curves",
+      "macro": "_-PCbake _Scope=_Curves \u0027_SelID 9923c5e2-a146-4d9d-af4b-b26130c987dd _Enter",
+      "result": true,
+      "seconds": 0.222,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake ( Scope=Curves ): \u0027_SelID\nObject ID to select: 9923c5e2-a146-4d9d-af4b-b26130c987dd\n1 surface added to selection.\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nStandardized point order on 0 selected surface(s).\nPCbake (Curves) processed 1 panel(s): created 0 surface(s) and 8 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\n"
+    },
+    {
+      "step": "2.3 Scope=All",
+      "macro": "_-PCbake _Scope=_All \u0027_SelID 51ad8ae0-0767-43c1-bb5c-5237768487ce _Enter",
+      "result": true,
+      "seconds": 0.309,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake ( Scope=Surfaces ): _Scope=_All\nSelect panel Breps to bake ( Scope=All ): \u0027_SelID\nObject ID to select: 51ad8ae0-0767-43c1-bb5c-5237768487ce\n1 surface added to selection.\nSelect panel Breps to bake. Press Enter when done ( Scope=All ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=All )\nCreating meshes... Press Esc to cancel\nStandardized point order on 0 selected surface(s).\nPCbake (All) processed 1 panel(s): created 4 surface(s) and 8 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\n"
+    },
+    {
+      "step": "2.4 next run starts at Surfaces",
+      "macro": "_-PCbake _Enter",
+      "result": true,
+      "seconds": 0.16,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces )\nStandardized point order on 0 selected surface(s).\nPCbake (Surfaces) processed 1 panel(s): created 0 surface(s) and 0 curve(s), updated 4 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\n"
+    },
+    {
+      "step": "2.5 panel with curves keeps them",
+      "macro": "_-PCbake _Scope=_Curves _Enter",
+      "result": true,
+      "seconds": 0.123,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nStandardized point order on 0 selected surface(s).\nPCbake (Curves) processed 1 panel(s): created 0 surface(s) and 0 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\nKept the existing curves of 1 panel(s); delete a panel\u0027s curves to bake new ones.\n"
+    },
+    {
+      "step": "2.5 panel with curves keeps them",
+      "macro": "_-PCbake _Scope=_All _Enter",
+      "result": true,
+      "seconds": 0.226,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_All\nSelect panel Breps to bake. Press Enter when done ( Scope=All ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=All )\nCreating meshes... Press Esc to cancel\nStandardized point order on 0 selected surface(s).\nPCbake (All) processed 1 panel(s): created 4 surface(s) and 0 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\nKept the existing curves of 1 panel(s); delete a panel\u0027s curves to bake new ones.\n"
+    },
+    {
+      "step": "2.7 curves are baked again after deleting them",
+      "macro": "_-PCbake _Scope=_Curves _Enter",
+      "result": true,
+      "seconds": 0.159,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nStandardized point order on 0 selected surface(s).\nPCbake (Curves) processed 1 panel(s): created 0 surface(s) and 8 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\n"
+    },
+    {
+      "step": "2.8 changed cladding rebuilds; one undo",
+      "macro": "_-PCbake _Enter",
+      "result": true,
+      "seconds": 0.134,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces )\nStandardized point order on 0 selected surface(s).\nPCbake (Surfaces) processed 1 panel(s): created 0 surface(s) and 0 curve(s), updated 2 surface(s) and 0 curve(s), deleted 2 obsolete or duplicate object(s).\n"
+    },
+    {
+      "step": "2.8 changed cladding rebuilds; one undo",
+      "macro": "_Undo",
+      "result": true,
+      "seconds": 0.062,
+      "history": "Command: _Undo\nUndoing PCbake\n"
+    },
+    {
+      "step": "2.9 locked and hidden surfaces",
+      "macro": "_-PCbake _Enter",
+      "result": true,
+      "seconds": 0.202,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces )\nCreating meshes... Press Esc to cancel\nStandardized point order on 0 selected surface(s).\nPCbake (Surfaces) processed 1 panel(s): created 0 surface(s) and 0 curve(s), updated 4 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\n"
+    }
+  ]
+}

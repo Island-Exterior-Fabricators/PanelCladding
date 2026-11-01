@@ -1,0 +1,41 @@
+{
+  "suite": "export",
+  "status": "done",
+  "started": "2026-10-31T22:25:39",
+  "updated": "2026-10-31T22:25:43",
+  "step": "",
+  "passed": 2,
+  "failed": 0,
+  "error": "",
+  "checks": [
+    {
+      "id": "4.10 default name is \u0027\u003Cmodel\u003E - PC Report.xlsx\u0027 next to the model",
+      "pass": true,
+      "step": "4.10 export with the default name",
+      "evidence": {
+        "expected": "C:\\01_Projects\\MCP_Rhino\\.claude\\worktrees\\release-1.3.9\\Project_Test\\261031_TEST_release-1.3.9\\MET - Wireframe LIVE TEST - PC Report.xlsx",
+        "status": "Exported MET - Wireframe LIVE TEST - PC Report.xlsx"
+      }
+    },
+    {
+      "id": "4.10 exporting over the open workbook shows an error instead of crashing",
+      "pass": true,
+      "step": "4.10 export while the workbook is open in Excel",
+      "evidence": {
+        "holding": "Summary, Issues\r\n",
+        "status": "PANEL_CLADDING_REPORT_EXPORT_FAILED: Access to the path is denied.",
+        "leftover": []
+      }
+    }
+  ],
+  "notes": {},
+  "commands": [
+    {
+      "step": "4.10 export while the workbook is open in Excel",
+      "macro": "_SelNone",
+      "result": true,
+      "seconds": 0.014,
+      "history": "Command: _SelNone\n"
+    }
+  ]
+}

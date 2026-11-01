@@ -10,6 +10,7 @@ evidence of one change (README, RESULTS, screenshots, summaries) and are never b
 | `Package/` | Package, installer, registration, identity and Yak checks against a built bundle. |
 | `Checks/` | Static checks that need no build. |
 | `Probes/` | Manual probes that take arguments, such as an installed bundle path. |
+| `Live/` | Live acceptance checks of a release's manual test list, run inside Rhino against the installed plug-in on a test model, with helpers that answer its dialogs and hold Excel workbooks. Not run by `Run-Regression.ps1`: they need the installed RHP, Rhino and a desktop session. See [`Live/README.md`](Live/README.md). |
 | `Run-Regression.ps1` | Builds and runs the smokes. |
 
 ## Running

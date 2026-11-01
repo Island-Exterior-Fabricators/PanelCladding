@@ -1,0 +1,263 @@
+{
+  "panels": 401,
+  "surfaces": 12,
+  "curves": 9521,
+  "rules": [
+    {
+      "id": "A05",
+      "title": "CID does not match PID and role",
+      "severity": "Warning",
+      "category": "Attributes",
+      "count": 7,
+      "objectIssues": 7,
+      "samples": [
+        {
+          "objectId": "ad4ae37a-350e-4444-aae1-4dd9881192ba",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::PNL-EXT-1A.1",
+          "detail": "CID-MET-S-01-30_P; expected CID-MET-S-01-30-LIVEDUP1_P"
+        },
+        {
+          "objectId": "f9cce2e9-bbb4-4704-b4bf-5cddc22f70fd",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::PNL-EXT-1A.2",
+          "detail": "CID-MET-S-02-30_P; expected CID-MET-S-02-30-LIVEDUP1_P"
+        },
+        {
+          "objectId": "95f4b39d-1e10-4ecc-b663-54828c86e168",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::PNL-EXT-1A.4",
+          "detail": "CID-MET-W-04-35_P; expected CID-MET-W-04-35-LIVEDUP1_P"
+        },
+        {
+          "objectId": "f6e2e4b7-402b-4a46-834c-95343cea55a2",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::PNL-EXT-1A.4",
+          "detail": "CID-MET-N-04-17_C; expected CID-MET-N-04-17-LIVEDUP1_C"
+        },
+        {
+          "objectId": "293540f8-d634-4f0d-9ae8-cc1c74ee9def",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::PNL-EXT-2B.1",
+          "detail": "CID-MET-S-02B-11_P; expected CID-MET-S-02B-11-LIVEDUP1_P"
+        }
+      ]
+    },
+    {
+      "id": "A06",
+      "title": "Name does not match CID",
+      "severity": "Warning",
+      "category": "Attributes",
+      "count": 397,
+      "objectIssues": 397,
+      "samples": [
+        {
+          "objectId": "1ea37655-7cb9-43ee-9943-da3b5cc5574e",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::PNL-EXT-1A.1",
+          "detail": "\u0027\u0027; expected \u0027N-01-23\u0027"
+        },
+        {
+          "objectId": "845dabac-1a43-4b39-abee-f92942cf0fcc",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::PNL-EXT-1A.1",
+          "detail": "\u0027\u0027; expected \u0027W-01-13\u0027"
+        },
+        {
+          "objectId": "f9e0d5ce-ed9f-4c8b-acf3-32f96472fcfc",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::PNL-EXT-1A.1",
+          "detail": "\u0027\u0027; expected \u0027N-02-23\u0027"
+        },
+        {
+          "objectId": "eb3ac884-a295-42fb-9d75-7f9792720d76",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::PNL-EXT-1A.1",
+          "detail": "\u0027\u0027; expected \u0027N-01-22\u0027"
+        },
+        {
+          "objectId": "254a3659-2c84-47e6-97a1-ab394e1f5b20",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::PNL-EXT-1A.1",
+          "detail": "\u0027\u0027; expected \u0027N-01-19\u0027"
+        }
+      ]
+    },
+    {
+      "id": "A10",
+      "title": "Setup keys missing",
+      "severity": "Info",
+      "category": "Attributes",
+      "count": 400,
+      "objectIssues": 400,
+      "samples": [
+        {
+          "objectId": "1ea37655-7cb9-43ee-9943-da3b5cc5574e",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::PNL-EXT-1A.1",
+          "detail": "CW_2.06_PENETRATION_DIMENSION, CW_7.00_BLIND_SINGLE, CW_7.00_BLIND_DOUBLE"
+        },
+        {
+          "objectId": "845dabac-1a43-4b39-abee-f92942cf0fcc",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::PNL-EXT-1A.1",
+          "detail": "CW_2.06_PENETRATION_DIMENSION, CW_7.00_BLIND_SINGLE, CW_7.00_BLIND_DOUBLE"
+        },
+        {
+          "objectId": "f9e0d5ce-ed9f-4c8b-acf3-32f96472fcfc",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::PNL-EXT-1A.1",
+          "detail": "CW_2.06_PENETRATION_DIMENSION, CW_7.00_BLIND_SINGLE, CW_7.00_BLIND_DOUBLE"
+        },
+        {
+          "objectId": "eb3ac884-a295-42fb-9d75-7f9792720d76",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::PNL-EXT-1A.1",
+          "detail": "CW_2.06_PENETRATION_DIMENSION, CW_7.00_BLIND_SINGLE, CW_7.00_BLIND_DOUBLE"
+        },
+        {
+          "objectId": "254a3659-2c84-47e6-97a1-ab394e1f5b20",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::PNL-EXT-1A.1",
+          "detail": "CW_2.06_PENETRATION_DIMENSION, CW_7.00_BLIND_SINGLE, CW_7.00_BLIND_DOUBLE"
+        }
+      ]
+    },
+    {
+      "id": "A11",
+      "title": "Legacy keys",
+      "severity": "Info",
+      "category": "Attributes",
+      "count": 400,
+      "objectIssues": 400,
+      "samples": [
+        {
+          "objectId": "1ea37655-7cb9-43ee-9943-da3b5cc5574e",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::PNL-EXT-1A.1",
+          "detail": "AUTO_panel, CW_9.02_FRAME_CONFIG"
+        },
+        {
+          "objectId": "845dabac-1a43-4b39-abee-f92942cf0fcc",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::PNL-EXT-1A.1",
+          "detail": "AUTO_panel, CW_9.02_FRAME_CONFIG"
+        },
+        {
+          "objectId": "f9e0d5ce-ed9f-4c8b-acf3-32f96472fcfc",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::PNL-EXT-1A.1",
+          "detail": "AUTO_panel, CW_9.02_FRAME_CONFIG"
+        },
+        {
+          "objectId": "eb3ac884-a295-42fb-9d75-7f9792720d76",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::PNL-EXT-1A.1",
+          "detail": "AUTO_panel, CW_9.02_FRAME_CONFIG"
+        },
+        {
+          "objectId": "254a3659-2c84-47e6-97a1-ab394e1f5b20",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::PNL-EXT-1A.1",
+          "detail": "AUTO_panel, CW_9.02_FRAME_CONFIG"
+        }
+      ]
+    },
+    {
+      "id": "D01",
+      "title": "No owner panel",
+      "severity": "Warning",
+      "category": "Dependencies",
+      "count": 9505,
+      "objectIssues": 9505,
+      "samples": [
+        {
+          "objectId": "e8f5d781-328b-458a-9c27-086db26f2a36",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Curves - PNL::Curves - Extrusions",
+          "detail": "PID-MET-W-04-52; no CID"
+        },
+        {
+          "objectId": "284cf317-cdf3-41be-ba4d-016a1f8793f0",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Curves - PNL::Curves - Extrusions",
+          "detail": "PID-MET-W-04-53; no CID"
+        },
+        {
+          "objectId": "17251658-1eb5-48a3-8246-5b7a2f0372f2",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Curves - PNL::Curves - Extrusions",
+          "detail": "PID-MET-W-04-48; no CID"
+        },
+        {
+          "objectId": "dd3483eb-caa9-49a7-b395-bc1b0f881e6c",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Curves - PNL::Curves - Extrusions",
+          "detail": "PID-MET-W-04-51; no CID"
+        },
+        {
+          "objectId": "a4a5473a-e294-4764-8c9c-98630418b599",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Curves - PNL::Curves - Extrusions",
+          "detail": "PID-MET-W-04-54; no CID"
+        }
+      ]
+    },
+    {
+      "id": "D07",
+      "title": "PID outside the managed layers",
+      "severity": "Info",
+      "category": "Dependencies",
+      "count": 406,
+      "objectIssues": 406,
+      "samples": [
+        {
+          "objectId": "ceccdc47-c312-4d8f-9f77-a61ad1d44d5c",
+          "name": "",
+          "layer": "Reference::Surfaces - STN::STN-EXT-1A.1",
+          "detail": "PID-MET-N-01-23"
+        },
+        {
+          "objectId": "24fdcaf7-880e-41aa-a58a-cc81ead70c99",
+          "name": "",
+          "layer": "Reference::Surfaces - STN::STN-EXT-1A.1",
+          "detail": "PID-MET-W-01-14"
+        },
+        {
+          "objectId": "12a3f597-908b-4d17-9e95-2729a6ed04be",
+          "name": "",
+          "layer": "Reference::Surfaces - STN::STN-EXT-1A.1",
+          "detail": "PID-MET-W-01-15"
+        },
+        {
+          "objectId": "f20f4ebd-4fe8-463d-9d32-d27c21752231",
+          "name": "",
+          "layer": "Reference::Surfaces - STN::STN-EXT-1A.1",
+          "detail": "PID-MET-W-01-17"
+        },
+        {
+          "objectId": "f96b04c1-47c9-4ffd-886b-06f543076d3d",
+          "name": "",
+          "layer": "Reference::Surfaces - STN::STN-EXT-1A.1",
+          "detail": "PID-MET-W-01-18"
+        }
+      ]
+    },
+    {
+      "id": "L07",
+      "title": "Not tracked layer",
+      "severity": "Info",
+      "category": "Layers",
+      "count": 1,
+      "objectIssues": 0,
+      "samples": [
+        {
+          "objectId": "00000000-0000-0000-0000-000000000000",
+          "name": "",
+          "layer": "MET-IEF-Wireframe::Surfaces - PNL::Surfaces - Not in Scope",
+          "detail": "1 object(s) not tracked"
+        }
+      ]
+    }
+  ]
+}
