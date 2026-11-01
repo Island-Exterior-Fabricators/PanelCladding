@@ -9,7 +9,9 @@ Executed 2026-10-31 under [the user-authorized PLAN](../Project_Plan/261031_PLAN
 [TEST evidence](../Project_Test/261031_TEST_pcbake-command/README.md); new smoke
 [`tests/Smoke/pcbake-command`](../tests/Smoke/pcbake-command/Program.cs). Branch
 `codex/pcbake-command` from `codex/command-name-casing` (`0f308e1`), in the worktree
-`C:\01_Projects\Panel Cladding Full\PC-casing`. No commit or PR was requested or created.
+`C:\01_Projects\Panel Cladding Full\PC-casing`. Commit `4a1f007`;
+[PR 11](https://github.com/nuofan-island/PanelCladding/pull/11), opened and merged into `master` at the
+user's request after [PR 10](https://github.com/nuofan-island/PanelCladding/pull/10).
 
 ## Implemented scope
 
