@@ -53,19 +53,19 @@ internal static class Program
         foreach (string token in required)
         {
             Require(source.Contains(token, StringComparison.Ordinal),
-                $"PCUpdate protected-object contract is missing: {token}");
+                $"PCupdate protected-object contract is missing: {token}");
         }
 
         Require(Regex.IsMatch(
                 source,
                 @"document\.Objects\.Replace\(\s*objectId,\s*dependency\.Geometry,\s*ignoreModes:\s*true\)",
                 RegexOptions.CultureInvariant),
-            "PCUpdate retained dependencies must use mode-bypassing geometry replacement.");
+            "PCupdate retained dependencies must use mode-bypassing geometry replacement.");
         Require(Regex.IsMatch(
                 source,
                 @"document\.Objects\.Delete\(\s*existingObject,\s*quiet:\s*true,\s*ignoreModes:\s*true\)",
                 RegexOptions.CultureInvariant),
-            "PCUpdate stale/duplicate dependencies must use mode-bypassing deletion.");
+            "PCupdate stale/duplicate dependencies must use mode-bypassing deletion.");
 
         string[] forbidden =
         {
@@ -78,10 +78,10 @@ internal static class Program
         foreach (string token in forbidden)
         {
             Require(!source.Contains(token, StringComparison.Ordinal),
-                $"PCUpdate retained a mode-sensitive or state-changing mutation: {token}");
+                $"PCupdate retained a mode-sensitive or state-changing mutation: {token}");
         }
         Console.WriteLine(
-            "[OK] PCUpdate bypasses lock/visibility modes while preserving retained object mode");
+            "[OK] PCupdate bypasses lock/visibility modes while preserving retained object mode");
     }
 
     private static void VerifyPackageContract()
@@ -93,8 +93,8 @@ internal static class Program
             "package-manifest.json")));
         Require(Version.TryParse(manifest.RootElement.GetProperty("version").GetString(), out Version? version) &&
                 version >= new Version(1, 0, 73),
-            "Protected-object PCUpdate support requires package 1.0.73 or later.");
-        Console.WriteLine("[OK] package supports protected-object PCUpdate");
+            "Protected-object PCupdate support requires package 1.0.73 or later.");
+        Console.WriteLine("[OK] package supports protected-object PCupdate");
     }
 
     private static string FindRepositoryRoot()

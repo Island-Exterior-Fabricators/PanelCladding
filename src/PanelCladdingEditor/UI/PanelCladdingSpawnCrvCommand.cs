@@ -22,13 +22,13 @@ namespace PanelCladdingEditor.UI;
 [Guid("A8426A74-3F42-49CE-8B52-A3797942D30E")]
 public sealed class PanelCladdingSpawnCrvCommand : RhinoCommand
 {
-    public override string EnglishName => "PCSpawnCrv";
+    public override string EnglishName => "PCspawnCrv";
 
     protected override Result RunCommand(RhinoDoc doc, RunMode mode)
     {
         if (doc is null || string.IsNullOrWhiteSpace(doc.Path))
         {
-            RhinoApp.WriteLine("PCSpawnCrv requires a saved active document.");
+            RhinoApp.WriteLine("PCspawnCrv requires a saved active document.");
             return Result.Failure;
         }
         RhinoObject[] selected = doc.Objects.GetSelectedObjects(false, false)
@@ -76,7 +76,7 @@ public sealed class PanelCladdingSpawnCrvCommand : RhinoCommand
             return Result.Failure;
         }
         RhinoApp.WriteLine(
-            $"PCSpawnCrv created {response.Data.CreatedCurveIds.Count} extrusion curve(s) " +
+            $"PCspawnCrv created {response.Data.CreatedCurveIds.Count} extrusion curve(s) " +
             $"from {response.Data.SourcePanelIds.Count} panel(s): {string.Join(", ", response.Data.Cids)}");
         return Result.Success;
     }

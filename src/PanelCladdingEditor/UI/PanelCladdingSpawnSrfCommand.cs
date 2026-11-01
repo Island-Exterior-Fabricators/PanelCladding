@@ -23,13 +23,13 @@ namespace PanelCladdingEditor.UI;
 [Guid("38EEFE95-EDFC-4071-AB39-F52D9F5EBC82")]
 public sealed class PanelCladdingSpawnSrfCommand : RhinoCommand
 {
-    public override string EnglishName => "PCSpawnSrf";
+    public override string EnglishName => "PCspawnSrf";
 
     protected override Result RunCommand(RhinoDoc doc, RunMode mode)
     {
         if (doc is null || string.IsNullOrWhiteSpace(doc.Path))
         {
-            RhinoApp.WriteLine("PCSpawnSrf requires a saved active document.");
+            RhinoApp.WriteLine("PCspawnSrf requires a saved active document.");
             return Result.Failure;
         }
 
@@ -65,7 +65,7 @@ public sealed class PanelCladdingSpawnSrfCommand : RhinoCommand
         }
 
         RhinoApp.WriteLine(
-            $"PCSpawnSrf created {response.Data.CreatedSurfaceIds.Count} material surface(s) " +
+            $"PCspawnSrf created {response.Data.CreatedSurfaceIds.Count} material surface(s) " +
             $"from {response.Data.SourcePanelIds.Count} panel(s): " +
             string.Join(", ", response.Data.Cids));
         return Result.Success;

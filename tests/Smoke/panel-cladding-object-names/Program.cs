@@ -80,7 +80,7 @@ var syncSource = Source(live + "LivePanelCladdingSurfaceSyncRepository.cs");
 Check(syncSource.Contains("ShortName(surfaceWrite.DesiredCid)") && syncSource.Contains("ShortName(curveWrite.DesiredCid)"),
     "Both sync families must name from full CID");
 var createSource = Source(live + "LivePanelCladdingCreateService.cs");
-Check(createSource.Contains("identityChanged || !UserTextEquals(original, proposed)"), "PCCreate must commit name-only correction");
+Check(createSource.Contains("identityChanged || !UserTextEquals(original, proposed)"), "PCcreate must commit name-only correction");
 foreach (string path in new[] {live + "LivePanelCladdingCreateService.cs", live + "LivePanelCladdingMatchService.cs",
     live + "LivePanelCladdingSurfaceSyncRepository.cs", "Infrastructure/Rhino/LivePanelCladdingRepository.cs"})
     Check(Source(path).Contains("LivePanelCladdingCidService.Normalize("), "Panel identity route: " + path);

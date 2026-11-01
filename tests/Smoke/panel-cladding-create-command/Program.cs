@@ -22,10 +22,10 @@ internal static class Program
         VerifyCommandContract();
 
         Console.WriteLine("[OK] H/V guides create canonical bottom-up and left-right panel cells.");
-        Console.WriteLine("[OK] PCCreate writes per-panel dimensions, refreshes stale keys, and uses invariant five-decimal values.");
+        Console.WriteLine("[OK] PCcreate writes per-panel dimensions, refreshes stale keys, and uses invariant five-decimal values.");
         Console.WriteLine("[OK] Remote, exterior, diagonal, and duplicate guides are handled deterministically.");
         Console.WriteLine("[OK] Existing grid/type/signature metadata resets while unrelated panel metadata is preserved.");
-        Console.WriteLine("[OK] PCCreate exposes the required panel-first, curve-second Rhino command flow.");
+        Console.WriteLine("[OK] PCcreate exposes the required panel-first, curve-second Rhino command flow.");
     }
 
     private static void VerifyGridPlanning(PanelCladdingCreatePlanningService planner)
@@ -80,13 +80,13 @@ internal static class Program
             ["CW_2.02_UNIT_HEIGHT"] = "80.00000",
             ["CW_2.03_OFFSET_H0"] = "20",
             ["CW_2.04_OFFSET_V0"] = "40"
-            // Since 1.2.4 PCCreate writes no CW_4 placeholders and no UD_CLADDING_LOGIC.
+            // Since 1.2.4 PCcreate writes no CW_4 placeholders and no UD_CLADDING_LOGIC.
         };
         Require(panel.UserTextWrites.Count == expectedWrites.Count, "Grid write count is incorrect.");
         Require(new[] { PanelCladdingKeyService.FrameAssignmentsKey, PanelCladdingKeyService.LegacyFrameAssignmentsKey,
                     PanelCladdingKeyService.LegacyFrameTypologyKey }
                 .All(key => panel.UserTextDeletes.Contains(key, StringComparer.OrdinalIgnoreCase)),
-            "PCCreate must clear previous assignments and retired typology when resetting the grid.");
+            "PCcreate must clear previous assignments and retired typology when resetting the grid.");
         foreach ((string key, string value) in expectedWrites)
         {
             Require(panel.UserTextWrites.TryGetValue(key, out string? actual) && actual == value,
@@ -212,8 +212,8 @@ internal static class Program
     {
         Assembly assembly = typeof(PanelCladdingCreatePlanningService).Assembly;
         Type createCommand = RequireType(assembly, "PanelCladdingEditor.UI.PanelCladdingCreateCommand");
-        Require(typeof(Command).IsAssignableFrom(createCommand), "PCCreate is not a Rhino command.");
-        Require(createCommand.GUID != Guid.Empty, "PCCreate command GUID must be explicit and non-empty.");
+        Require(typeof(Command).IsAssignableFrom(createCommand), "PCcreate is not a Rhino command.");
+        Require(createCommand.GUID != Guid.Empty, "PCcreate command GUID must be explicit and non-empty.");
 
         Type[] commands = assembly.GetTypes()
             .Where(type => !type.IsAbstract && typeof(Command).IsAssignableFrom(type))
@@ -237,7 +237,7 @@ internal static class Program
 
         string commandSource = File.ReadAllText(Path.Combine(
             FindRepositoryRoot(), "src", "PanelCladdingEditor", "UI", "PanelCladdingCreateCommand.cs"));
-        Require(commandSource.Contains("EnglishName => \"PCCreate\"", StringComparison.Ordinal),
+        Require(commandSource.Contains("EnglishName => \"PCcreate\"", StringComparison.Ordinal),
             "The exact requested Rhino command name is missing.");
         int panelPrompt = commandSource.IndexOf(
             "Select panel surfaces to create cladding grid attributes", StringComparison.Ordinal);
@@ -251,7 +251,7 @@ internal static class Program
         string[] forbidden = { "MCP_Rhino", "ModelContextProtocol", "Microsoft.Extensions.Hosting" };
         Require(!assembly.GetReferencedAssemblies().Any(reference => forbidden.Any(token =>
                 (reference.Name ?? string.Empty).Contains(token, StringComparison.OrdinalIgnoreCase))),
-            "PCCreate introduced an MCP_Rhino or MCP SDK dependency.");
+            "PCcreate introduced an MCP_Rhino or MCP SDK dependency.");
     }
 
     private static PanelCladdingCreatePanelSnapshot Snapshot(

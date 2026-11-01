@@ -22,7 +22,7 @@ internal static class Program
         Console.WriteLine("[OK] a genuinely unmatched curve adds a new structural track");
 
         VerifyLiveRepositoryUsesRoleAwareLayoutOverload();
-        Console.WriteLine("[OK] live PCSyncSrf uses role-aware offset refresh planning");
+        Console.WriteLine("[OK] live PCsyncSrf uses role-aware offset refresh planning");
     }
 
     private static void VerifyReportedMovedHeightsReplaceOldOffsets()

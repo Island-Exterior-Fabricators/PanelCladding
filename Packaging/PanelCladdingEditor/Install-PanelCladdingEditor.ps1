@@ -52,19 +52,19 @@ function Assert-DirectPanelRhp([string] $Root) {
 
 function Get-PanelExpectedCommands {
     return @(
-        'PCClear',
-        'PCCreate',
-        'PCCrvTemplate',
-        'PCEditor',
-        'PCMatchCrv',
-        'PCMatchSrf',
+        'PCclear',
+        'PCcreate',
+        'PCcrvTemplate',
+        'PCeditor',
+        'PCmatchCrv',
+        'PCmatchSrf',
         'PCpid',
-        'PCSpawnCrv',
-        'PCSpawnSrf',
-        'PCSyncCrv',
-        'PCSyncSrf',
+        'PCspawnCrv',
+        'PCspawnSrf',
+        'PCsyncCrv',
+        'PCsyncSrf',
         'PCtemplatePNL',
-        'PCUpdate'
+        'PCupdate'
     )
 }
 

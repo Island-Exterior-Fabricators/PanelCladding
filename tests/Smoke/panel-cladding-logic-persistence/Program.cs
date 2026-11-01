@@ -21,9 +21,9 @@ internal static class Program
         OtherCladdingMutationsMaintainLogic();
 
         Console.WriteLine("[OK] UD_CLADDING_LOGIC stores deterministic cell logic with owner materials (1.2.4).");
-        Console.WriteLine("[OK] PCSyncSrf preserves valid saved owners and uses geometry for edited splits/merges.");
+        Console.WriteLine("[OK] PCsyncSrf preserves valid saved owners and uses geometry for edited splits/merges.");
         Console.WriteLine("[OK] missing logic is backward-compatible and malformed logic fails before mutation.");
-        Console.WriteLine("[OK] Save, PCCreate, PCMatchSrf, PCSyncSrf, and PCClear maintain the logic attribute.");
+        Console.WriteLine("[OK] Save, PCcreate, PCmatchSrf, PCsyncSrf, and PCclear maintain the logic attribute.");
     }
 
     private static void EncodingContainsOnlyCellLogic()
@@ -166,9 +166,9 @@ internal static class Program
             PanelCladdingObjectScope.Surfaces),
             "Run logic backfill sync");
         PanelCladdingSurfaceSyncPanelWrite write = live.LastCommit?.PanelWrites.Single() ??
-            throw new InvalidOperationException("PCSyncSrf did not schedule one panel write.");
+            throw new InvalidOperationException("PCsyncSrf did not schedule one panel write.");
         Require(write.CladdingLogic == "{\"0A\":\"MPL-001\",\"1A\":\"0A\"}",
-            "The PCSyncSrf panel write omitted the derived logic.");
+            "The PCsyncSrf panel write omitted the derived logic.");
 
         var applied = new Dictionary<string, string>(write.CellValues, StringComparer.OrdinalIgnoreCase)
         {
@@ -206,7 +206,7 @@ internal static class Program
         string savedLogic = saveRepository.LastCommit?.UserTextWrites.GetValueOrDefault(
             PanelCladdingKeyService.CladdingLogicKey) ?? string.Empty;
         Require(savedLogic == "{\"0A\":\"MPL-001\",\"1A\":\"0A\"}",
-            "PCEditor cladding Save omitted the logic attribute or its material.");
+            "PCeditor cladding Save omitted the logic attribute or its material.");
 
         PanelCladdingCreatePlan create = Required(new PanelCladdingCreatePlanningService(keys).CreatePlan(new[]
         {
@@ -235,9 +235,9 @@ internal static class Program
                 }
             }
         }), "Create panel grid");
-        // Since 1.2.4 PCCreate leaves an unconfigured panel unconfigured: no placeholder logic.
+        // Since 1.2.4 PCcreate leaves an unconfigured panel unconfigured: no placeholder logic.
         Require(!create.Panels.Single().UserTextWrites.ContainsKey(PanelCladdingKeyService.CladdingLogicKey),
-            "PCCreate generated cladding logic for an unconfigured panel.");
+            "PCcreate generated cladding logic for an unconfigured panel.");
 
         PanelCladdingMatchGeometryDescriptor geometry = new()
         {
@@ -274,7 +274,7 @@ internal static class Program
                 matchTarget.UserTextDeletes.Contains(
                     PanelCladdingKeyService.CladdingLogicKey,
                     StringComparer.OrdinalIgnoreCase),
-            "PCMatchSrf did not replace the target logic with the source graph.");
+            "PCmatchSrf did not replace the target logic with the source graph.");
 
         PanelCladdingClearPlan clear = Required(new PanelCladdingClearPlanningService(keys).CreatePlan(new[]
         {
@@ -291,7 +291,7 @@ internal static class Program
         Require(clear.Panels.Single().UserTextDeletes.Contains(
                 PanelCladdingKeyService.CladdingLogicKey,
                 StringComparer.OrdinalIgnoreCase),
-            "PCClear did not remove the derived cladding logic.");
+            "PCclear did not remove the derived cladding logic.");
     }
 
     private static PanelCladdingLayout BuildLayout(
