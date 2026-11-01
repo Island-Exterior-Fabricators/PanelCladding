@@ -10,6 +10,8 @@ Executed 2026-10-31 under [the user-authorized PLAN](../Project_Plan/261031_PLAN
 [`tests/Smoke/excluded-layer-keywords`](../tests/Smoke/excluded-layer-keywords/Program.cs). Branch
 `codex/excluded-layer-keywords` from `master` (`717e155`), commit `00bd7ae`, in the worktree
 `C:\01_Projects\Panel Cladding Full\PC-casing`. `codex/pcreport-command` is stacked on it.
+[PR 12](https://github.com/nuofan-island/PanelCladding/pull/12), opened and merged into `master` at the
+user's request.
 
 ## Implemented scope
 
