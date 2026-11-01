@@ -37,8 +37,10 @@ output), Warning (non-compliant, tolerated or corrected on the next write) or In
   CID and name against PID and role, unit type and role, old payloads in `CW_1.09_FRAME_TYPE`,
   missing setup keys (Info), legacy keys, role case and `UD_PLANE`.
 - Cladding surfaces and curves: missing or untracked owner panel, duplicate CIDs, `Cladding` against
-  the layer, curves off their panel's curve layer, panels with materials but no surfaces, and
-  objects with a PID outside the managed layers.
+  the layer, curves off their panel's curve layer, and panels with materials but no surfaces.
+
+Objects the plug-in does not manage, such as the wireframe `Surfaces - GLS` copies, are not
+checked, even when they carry a PID.
 
 Select issue rows to select and zoom to their objects in Rhino; Rescan reads the model again and
 Export writes `<model> - PC Report.xlsx` (Summary and Issues sheets).
@@ -180,9 +182,9 @@ The former `01_CW Panels`, `02_CW Extrusions`, `04_STEP Surfaces` and
 
 Since 1.3.0, layers whose name contains `Not in Scope` or `By Others` (any case; spaces, `-` and
 `_` ignored), at any depth under `Surfaces - PNL` or `Curves - PNL`, are not tracked: PCpid does
-not number their panels, auto attributes and the naming sync skip them, `PCbake` does not create
-curves for them or treat curves there as managed, and `PCreport` leaves them out. Values already on
-those objects stay as they are.
+not number their panels, the naming sync skips them, `PCbake` does not create curves for them or
+treat curves there as managed, and `PCreport` leaves them out. The auto attributes (sizes, area,
+weight, `UD_PLANE`) are still kept current on those panels.
 
 Since 1.0.96, `PCmatchCrv` copies extrusion assignments together with the segment, merge and hide
 masks. Select target panel Breps, then the source; horizontal/vertical grid counts
