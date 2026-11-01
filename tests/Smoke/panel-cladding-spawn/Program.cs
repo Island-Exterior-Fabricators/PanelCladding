@@ -1,5 +1,4 @@
 using System.Reflection;
-using PanelCladdingEditor.Application.Interfaces;
 using PanelCladdingEditor.Application.Services.PanelCladding;
 using PanelCladdingEditor.Contracts.Responses;
 using PanelCladdingEditor.Domain.Models.PanelCladding;
@@ -131,30 +130,32 @@ internal static class Program
         Console.WriteLine("[OK] canonical metadata is required, aliases are ignored, and invalid layer names fail closed");
 
         VerifyCommandContract();
-        Console.WriteLine("[OK] standalone PanelCladdingSpawn Rhino command contract and unique GUID");
+        Console.WriteLine("[OK] PCbake generates through the live spawn adapter; command GUIDs are unique");
     }
 
+    // Since 1.3.0 PCbake is the only command that generates cladding geometry. The live spawn
+    // adapter remains its per-panel generator and no longer has a batch entry of its own.
     private static void VerifyCommandContract()
     {
         Assembly assembly = typeof(PanelCladdingSpawnPlanningService).Assembly;
-        Type spawnCommand = assembly.GetType("PanelCladdingEditor.UI.PanelCladdingSpawnSrfCommand") ??
-            throw new InvalidOperationException("PanelCladdingSpawnSrf command is missing.");
-        Type spawnCurveCommand = assembly.GetType("PanelCladdingEditor.UI.PanelCladdingSpawnCrvCommand") ??
-            throw new InvalidOperationException("PanelCladdingSpawnCrv command is missing.");
+        Type bakeCommand = assembly.GetType("PanelCladdingEditor.UI.PanelCladdingBakeCommand") ??
+            throw new InvalidOperationException("PanelCladdingBake command is missing.");
         Type editorCommand = assembly.GetType("PanelCladdingEditor.UI.PanelCladdingEditorCommand") ??
             throw new InvalidOperationException("PanelCladdingEditor command is missing.");
-        Require(spawnCommand.GUID != Guid.Empty, "Spawn command GUID must be explicit and non-empty.");
-        Require(new[] { spawnCommand.GUID, spawnCurveCommand.GUID, editorCommand.GUID }.Distinct().Count() == 3,
-            "Rhino command GUIDs must be unique.");
-        Require(assembly.GetType("PanelCladdingEditor.Infrastructure.Rhino.Live.PanelCladding.LivePanelCladdingSpawnService") is not null,
-            "Live spawn adapter is missing.");
+        Require(bakeCommand.GUID != Guid.Empty, "Bake command GUID must be explicit and non-empty.");
+        Require(bakeCommand.GUID != editorCommand.GUID, "Rhino command GUIDs must be unique.");
+        Type generator = assembly.GetType("PanelCladdingEditor.Infrastructure.Rhino.Live.PanelCladding.LivePanelCladdingSpawnService") ??
+            throw new InvalidOperationException("Live spawn adapter is missing.");
+        Require(generator.GetMethod("Spawn") is null &&
+                assembly.GetType("PanelCladdingEditor.Application.Interfaces.ILivePanelCladdingSpawnService") is null,
+            "The batch spawn entry point must be gone.");
 
-        MethodInfo spawn = typeof(ILivePanelCladdingSpawnService).GetMethod(nameof(ILivePanelCladdingSpawnService.Spawn)) ??
-            throw new InvalidOperationException("Live spawn contract is missing.");
-        ParameterInfo[] parameters = spawn.GetParameters();
-        Require(parameters.Length == 3 && parameters[1].ParameterType == typeof(IReadOnlyList<Guid>) &&
-                parameters[2].ParameterType == typeof(PanelCladdingObjectScope),
-            "Live spawn contract must accept selected panel object IDs and an object-family scope.");
+        MethodInfo prepare = generator.GetMethod("PreparePanel", BindingFlags.Instance | BindingFlags.NonPublic) ??
+            throw new InvalidOperationException("Live per-panel generation contract is missing.");
+        ParameterInfo[] parameters = prepare.GetParameters();
+        Require(parameters.Length == 5 && parameters[2].ParameterType == typeof(Guid) &&
+                parameters[3].ParameterType == typeof(PanelCladdingObjectScope),
+            "Live generation must take one panel object ID and an object-family scope.");
 
         string[] forbidden = { "MCP_Rhino", "ModelContextProtocol", "Microsoft.Extensions.Hosting" };
         Require(!assembly.GetReferencedAssemblies().Any(reference => forbidden.Any(token =>

@@ -71,7 +71,7 @@ internal static class Program
         Require(crossPid.ProcessableSources.Count == 0 && crossPid.DuplicateCidGroups.Single().PanelObjectIds.Count == 2,
             "CID duplicates must compare case-insensitively across PIDs, ignoring surrounding whitespace.");
         var allDuplicate = PanelCladdingUpdateSelectionService.CreatePlan([parent, duplicateParent]);
-        var emptyPlan = Required(new PanelCladdingDependencyReconciliationService().CreatePlan([], []), "empty update");
+        var emptyPlan = Required(new PanelCladdingDependencyReconciliationService().CreatePlan([], [], PanelCladdingBakeScope.All), "empty update");
         Require(allDuplicate.ProcessableSources.Count == 0 && allDuplicate.DuplicateCidGroups.Count == 1 &&
                 emptyPlan.Creates.Count + emptyPlan.Updates.Count + emptyPlan.Deletes.Count == 0,
             "An all-duplicate selection must permit an empty geometry plan.");
@@ -119,7 +119,8 @@ internal static class Program
         var plan = Required(new PanelCladdingDependencyReconciliationService().CreatePlan(
             [parentDependency, childDependency],
             [Existing(SurfaceKeep, "PID-A", "CID-A_P_0A", PanelCladdingDependencyKind.Surface),
-             Existing(SurfaceDuplicate, "PID-A", "CID-A_C_0A", PanelCladdingDependencyKind.Surface)]), "shared PID roles");
+             Existing(SurfaceDuplicate, "PID-A", "CID-A_C_0A", PanelCladdingDependencyKind.Surface)],
+            PanelCladdingBakeScope.All), "shared PID roles");
         Require(plan.Updates.Count == 2 && plan.Creates.Count == 0 && plan.Deletes.Count == 0,
             "Parent and child dependencies with the same PID must both be retained.");
         Console.WriteLine("[OK] same-PID role ownership, skipped-panel isolation, legacy ambiguity, and shared-PID reconciliation");
@@ -148,17 +149,20 @@ internal static class Program
                     Existing(SurfaceStale, "PID-A", "CID-A_OLD", PanelCladdingDependencyKind.Surface),
                     Existing(CurveKeep, "PID-A", "CID-A_FRM-0", PanelCladdingDependencyKind.Curve),
                     Existing(WrongKind, "PID-A", "CID-A_FRM-0", PanelCladdingDependencyKind.Surface)
-                ]),
+                ],
+                PanelCladdingBakeScope.All),
             "create dependency reconciliation");
 
         Require(plan.Creates.Count == 1 && ReferenceEquals(plan.Creates[0], surfaceB),
             "The missing surface was not the only create action.");
-        Require(plan.Updates.Select(action => action.ObjectId).ToHashSet().SetEquals(
-                [SurfaceKeep, CurveKeep]),
-            "Existing canonical surface/curve objects were not retained for replacement.");
+        Require(plan.Updates.Select(action => action.ObjectId).ToHashSet().SetEquals([SurfaceKeep]),
+            "The existing canonical surface was not retained for replacement.");
         Require(plan.Deletes.ToHashSet().SetEquals([SurfaceDuplicate, SurfaceStale, WrongKind]),
             "Duplicate, obsolete, or wrong-kind managed objects were not scheduled for deletion.");
-        Console.WriteLine("[OK] reconciliation creates missing, updates retained, and deletes stale/duplicate CIDs");
+        // Since 1.3.0 (PCbake) an existing curve is never rebuilt or deleted; its panel keeps all curves.
+        Require(plan.PreservedCurvePanelIds.SequenceEqual([PanelId]),
+            "The panel that owns an existing curve must keep its curves.");
+        Console.WriteLine("[OK] reconciliation creates missing, updates retained, and deletes stale/duplicate surface CIDs; existing curves are kept");
     }
 
     private static void VerifyDuplicateExpectedRejection()
@@ -176,7 +180,8 @@ internal static class Program
         };
         var result = new PanelCladdingDependencyReconciliationService().CreatePlan(
             [expected, duplicate],
-            []);
+            [],
+            PanelCladdingBakeScope.All);
         Require(!result.Success && result.Message.Contains(
                 "PANEL_CLADDING_UPDATE_DUPLICATE_EXPECTED_CID",
                 StringComparison.Ordinal),
@@ -198,35 +203,40 @@ internal static class Program
             "create empty cladding grid");
         var planner = new PanelCladdingSpawnPlanningService(keys);
         var spawnPlan = planner.CreatePlan(panelText, keySet);
-        Require(!spawnPlan.Success, "PCspawnSrf must retain its no-populated-cells guard.");
+        Require(!spawnPlan.Success, "Strict surface planning must retain its no-populated-cells guard.");
         PanelCladdingSpawnPlan updatePlan = Required(
             planner.CreateUpdatePlan(panelText, keySet),
             "create empty update surface plan");
         Require(updatePlan.Regions.Count == 0,
             "A panel with blank cladding must produce an empty authoritative surface set.");
-        Console.WriteLine("[OK] PCupdate supports an empty expected surface set without weakening PCspawnSrf");
+        Console.WriteLine("[OK] PCbake supports an empty expected surface set without weakening strict surface planning");
     }
 
     private static void VerifyCommandContract()
     {
         Assembly assembly = typeof(PanelCladdingDependencyReconciliationService).Assembly;
-        Type commandType = assembly.GetType("PanelCladdingEditor.UI.PanelCladdingUpdateCommand") ??
-            throw new InvalidOperationException("PanelCladdingUpdateCommand is missing.");
-        Require(typeof(Command).IsAssignableFrom(commandType), "PCupdate is not a Rhino command.");
-        Require(commandType.GUID != Guid.Empty, "PCupdate command GUID must be explicit and non-empty.");
+        Type commandType = assembly.GetType("PanelCladdingEditor.UI.PanelCladdingBakeCommand") ??
+            throw new InvalidOperationException("PanelCladdingBakeCommand is missing.");
+        Require(typeof(Command).IsAssignableFrom(commandType), "PCbake is not a Rhino command.");
+        // PCbake keeps the GUID of the former PCupdate command.
+        Require(commandType.GUID == Guid.Parse("F2C41D75-2F88-4CB4-9D1C-CF6BD1D6208A"),
+            "PCbake must keep the former PCupdate command GUID.");
         object command = RuntimeHelpers.GetUninitializedObject(commandType);
         string englishName = (string?)commandType.GetProperty("EnglishName")?.GetValue(command) ?? string.Empty;
-        Require(englishName == "PCupdate", $"Unexpected command name: {englishName}");
+        Require(englishName == "PCbake", $"Unexpected command name: {englishName}");
+        Require(assembly.GetType("PanelCladdingEditor.UI.PanelCladdingUpdateCommand") is null,
+            "The PCupdate command type must be gone.");
 
         MethodInfo update = typeof(ILivePanelCladdingUpdateService).GetMethod(
             nameof(ILivePanelCladdingUpdateService.Update)) ??
-            throw new InvalidOperationException("Live PCupdate contract is missing.");
+            throw new InvalidOperationException("Live PCbake contract is missing.");
         ParameterInfo[] parameters = update.GetParameters();
-        Require(parameters.Length == 2 &&
+        Require(parameters.Length == 3 &&
                 parameters[0].ParameterType == typeof(string) &&
-                parameters[1].ParameterType == typeof(IReadOnlyList<Guid>),
-            "PCupdate must expose one batch service call for selected panel IDs.");
-        Console.WriteLine("[OK] PCupdate command and batch service contract are registered");
+                parameters[1].ParameterType == typeof(IReadOnlyList<Guid>) &&
+                parameters[2].ParameterType == typeof(PanelCladdingBakeScope),
+            "PCbake must expose one batch service call for selected panel IDs and a bake scope.");
+        Console.WriteLine("[OK] PCbake command and batch service contract are registered");
     }
 
     private static void VerifyLiveOwnershipAndMutationContract()
@@ -262,10 +272,10 @@ internal static class Program
         foreach (string token in required)
         {
             Require(source.Contains(token, StringComparison.Ordinal),
-                $"Live PCupdate implementation is missing contract token: {token}");
+                $"Live PCbake implementation is missing contract token: {token}");
         }
         Require(!source.Contains("DUPLICATE_SELECTED_PID", StringComparison.Ordinal),
-            "PCupdate must not reject duplicate PIDs.");
+            "PCbake must not reject duplicate PIDs.");
         int normalization = source.IndexOf("LivePanelCladdingCidService.Apply(document, panelCidChanges.Data)", StringComparison.Ordinal);
         int dependencyUpdate = source.IndexOf("? UpdateDependencies(document, filePath, sourcePanelIds", StringComparison.Ordinal);
         Require(normalization >= 0 && dependencyUpdate > normalization,
@@ -282,16 +292,18 @@ internal static class Program
             "PanelCladdingEditor",
             "package-manifest.json")));
         Require(Version.TryParse(manifest.RootElement.GetProperty("version").GetString(), out Version? version) &&
-                version >= new Version(1, 0, 73),
-            "PCupdate requires package version 1.0.73 or later.");
+                version >= new Version(1, 3, 0),
+            "PCbake requires package version 1.3.0 or later.");
         string installer = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "Packaging",
             "PanelCladdingEditor",
             "Install-PanelCladdingEditor.ps1"));
-        Require(installer.Contains("'PCupdate'", StringComparison.Ordinal),
-            "The exact installed Rhino CommandList omits PCupdate.");
-        Console.WriteLine("[OK] supported package registers PCupdate");
+        Require(installer.Contains("'PCbake'", StringComparison.Ordinal) &&
+                !installer.Contains("'PCupdate'", StringComparison.OrdinalIgnoreCase) &&
+                !installer.Contains("'PCspawn", StringComparison.OrdinalIgnoreCase),
+            "The exact installed Rhino CommandList must list PCbake and not PCupdate or the spawn commands.");
+        Console.WriteLine("[OK] supported package registers PCbake");
     }
 
     private static PanelCladdingExpectedDependency Expected(
@@ -312,6 +324,8 @@ internal static class Program
         PanelCladdingDependencyKind kind) => new()
         {
             ObjectId = objectId,
+            // The live service records the single selected owner, as Expected uses PanelId.
+            SourcePanelObjectId = PanelId,
             PanelId = panelId,
             Cid = cid,
             Kind = kind

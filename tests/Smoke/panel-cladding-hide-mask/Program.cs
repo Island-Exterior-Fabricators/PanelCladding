@@ -21,7 +21,7 @@ internal static class Program
         EditorExposesAReversibleHiddenState();
         EditorHideDoesNotCollapseTheGrid();
         Console.WriteLine("[OK] CW_2.11_HIDE_MASK round-trips with legacy two-mask compatibility.");
-        Console.WriteLine("[OK] hidden atoms retain the logical grid and are omitted from PCspawnCrv plans.");
+        Console.WriteLine("[OK] hidden atoms retain the logical grid and are omitted from PCbake plans.");
         Console.WriteLine("[OK] full hidden tracks do not collapse or renumber cladding cells.");
         Console.WriteLine("[OK] PCmatchCrv and PCeditor include the hide state.");
         return 0;
@@ -117,7 +117,7 @@ internal static class Program
             .SelectMany(curve => curve.AtomicSegments)
             .ToHashSet();
         Require(!plannedAtoms.Overlaps(keySet.Topology.HiddenSegments),
-            "PCspawnCrv planned physical curves for hidden atoms.");
+            "PCbake planned physical curves for hidden atoms.");
         Require(curves.Count(curve => curve.Kind == PanelCladdingExtrusionCurveKind.Frame) == 4,
             "Hiding intermediate atoms changed the panel frame.");
 

@@ -71,11 +71,9 @@ while (root is not null && !File.Exists(Path.Combine(root.FullName, "AGENTS.md")
 Check(root is not null, "Repository root");
 string Source(string relative) => File.ReadAllText(Path.Combine(root!.FullName, "src/PanelCladdingEditor", relative));
 const string live = "Infrastructure/Rhino/Live/PanelCladding/";
-var spawnSource = Source(live + "LivePanelCladdingSpawnService.cs");
-Check(spawnSource.Contains("ShortName(item.Region.Cid)") && spawnSource.Contains("ShortName(item.CurvePlan.Cid)"),
-    "Both spawn families must name from full CID");
+// Since 1.3.0 PCbake is the only generator (the spawn commands' own write path is gone).
 Check(Source(live + "LivePanelCladdingUpdateService.cs").Contains("ShortName(dependency.Expected.Cid)"),
-    "Update replacements and creations use dependency CID");
+    "PCbake replacements and creations use dependency CID");
 var syncSource = Source(live + "LivePanelCladdingSurfaceSyncRepository.cs");
 Check(syncSource.Contains("ShortName(surfaceWrite.DesiredCid)") && syncSource.Contains("ShortName(curveWrite.DesiredCid)"),
     "Both sync families must name from full CID");
