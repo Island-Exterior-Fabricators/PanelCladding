@@ -46,7 +46,7 @@ full regression passed 82/82 in Debug and Release on the same commit; the packag
 - RHP version and GUID; installer registers 13 commands: met.
 - Staged bundle equals the verified archive: met.
 - Live acceptance after installation: met. The user installed the staged bundle; the Terminal-panel
-  attestation found `plugin.4.0`, the verified RHP hash, the exact 13-command `CommandList` and a
+  attestation found `plugin\1.4.0`, the verified RHP hash, the exact 13-command `CommandList` and a
   valid `-Mode Validate`, and after Rhino started only the root and `CommandList` times had
   advanced. Live suites against the installed plug-in: commands 9/9, bake 18/18, excluded 14/14,
   report 10/10, web 13/13, the registered `-PCweb` with `LastSave`, otherdocs on ABC 5/5 (see TEST).
@@ -54,7 +54,9 @@ full regression passed 82/82 in Debug and Release on the same commit; the packag
 
 ## Rollback
 
-Delete the branch, the generated package and the staged folder; 1.3.0 stays installed.
+Reinstall 1.3.0 from `C:\01_Projects\Panel Cladding Full\PanelCladdingEditor-1.3.0` (or its zip) with
+`Install.cmd`; the 1.4.0 installer also kept 1.3.0 in its rollback folder. Delete the branch, the
+generated package and the staged folder.
 
 ## Remaining limitations
 
