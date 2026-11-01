@@ -26,8 +26,8 @@ $shell = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
 $installArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $installer,
     '-BundleRoot', $BundleRoot, '-ProductRoot', $productRoot, '-RhinoPluginRoot', $pluginBase,
     '-LegacyRhinoPackageRoot', $legacyRoot, '-RhinoPluginRegistryRoot', $registryRoot)
-$commands = @('PCclear','PCcreate','PCcrvTemplate','PCeditor','PCmatchCrv','PCmatchSrf',
-    'PCpid','PCspawnCrv','PCspawnSrf','PCsyncCrv','PCsyncSrf','PCtemplatePNL','PCupdate')
+$commands = @('PCbake','PCclear','PCcreate','PCcrvTemplate','PCeditor','PCmatchCrv','PCmatchSrf',
+    'PCpid','PCsyncCrv','PCsyncSrf','PCtemplatePNL')
 
 Add-Type @'
 using System;

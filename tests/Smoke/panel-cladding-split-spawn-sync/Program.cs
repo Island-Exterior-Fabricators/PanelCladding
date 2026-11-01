@@ -10,10 +10,11 @@ internal static class Program
     private static void Main()
     {
         Assembly assembly = typeof(PanelCladdingKeyService).Assembly;
+        // Since 1.3.0 PCbake bakes surfaces and/or curves by its Scope option; the scoped spawn
+        // commands are gone. Sync stays split by object family.
         var expected = new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            ["PanelCladdingSpawnSrfCommand"] = "PCspawnSrf",
-            ["PanelCladdingSpawnCrvCommand"] = "PCspawnCrv",
+            ["PanelCladdingBakeCommand"] = "PCbake",
             ["PanelCladdingSyncSrfCommand"] = "PCsyncSrf",
             ["PanelCladdingSyncCrvCommand"] = "PCsyncCrv"
         };
@@ -24,9 +25,15 @@ internal static class Program
             var command = (Command)System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(type);
             Require(command.EnglishName == commandName, $"{typeName} registered {command.EnglishName}.");
         }
-        Require(assembly.GetType("PanelCladdingEditor.UI.PanelCladdingSpawnCommand") is null &&
-                assembly.GetType("PanelCladdingEditor.UI.PanelCladdingSyncCommand") is null,
-            "A combined spawn or sync command remains compiled.");
+        Require(new[]
+                {
+                    "PanelCladdingSpawnCommand", "PanelCladdingSyncCommand",
+                    "PanelCladdingSpawnSrfCommand", "PanelCladdingSpawnCrvCommand", "PanelCladdingUpdateCommand"
+                }.All(name => assembly.GetType($"PanelCladdingEditor.UI.{name}") is null),
+            "A removed spawn, update or combined sync command remains compiled.");
+        Require(Enum.GetValues<PanelCladdingBakeScope>().SequenceEqual(
+                [PanelCladdingBakeScope.Surfaces, PanelCladdingBakeScope.Curves, PanelCladdingBakeScope.All]),
+            "PCbake scope order changed; Surfaces must stay the first (default) option.");
 
         var keys = new PanelCladdingKeyService();
         PanelCladdingKeySet blankGrid = Required(keys.CreateKeySet(
@@ -42,7 +49,7 @@ internal static class Program
         Require(Enum.GetValues<PanelCladdingObjectScope>().SequenceEqual(
                 [PanelCladdingObjectScope.Surfaces, PanelCladdingObjectScope.Curves]),
             "Object-family scope contract changed unexpectedly.");
-        Console.WriteLine("[OK] legacy combined spawn/sync commands are absent and four scoped commands are registered.");
+        Console.WriteLine("[OK] removed spawn/update commands are absent; PCbake and the two scoped sync commands are registered.");
         Console.WriteLine("[OK] curve spawn planning succeeds with blank cladding assignments.");
         Console.WriteLine("[OK] surface/curve scope is explicit in the shared application contract.");
     }

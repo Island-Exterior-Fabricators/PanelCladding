@@ -97,14 +97,14 @@ internal static class NativePointOrderSmoke
         foreach (bool ambient in new[] { false, true })
         {
             uint undo = ambient ? doc.BeginUndoRecord("Point-order test ambient") : 0;
-            var failed = (OperationResponse<PanelCladdingUpdateResult>)apply.Invoke(update, [doc, doc.Path, new[] { id }])!;
-            Check(!failed.Success && observer.SawStandardizedPanel, "PCupdate generates from standardized geometry");
+            var failed = (OperationResponse<PanelCladdingUpdateResult>)apply.Invoke(update, [doc, doc.Path, new[] { id }, PanelCladdingBakeScope.All])!;
+            Check(!failed.Success && observer.SawStandardizedPanel, "PCbake generates from standardized geometry");
             Check(doc.Objects.FindId(id).Attributes.GetUserString("CW_1.02_CID") is null, "Failure restores generated CID");
             using var restored = Required(service.Prepare((Brep)doc.Objects.FindId(id).Geometry, 1e-5));
             Check(restored.Changed, "Failure restores original source point order");
             if (ambient) { Check(doc.CurrentUndoRecordSerialNumber == undo, "Ambient record retained"); doc.EndUndoRecord(undo); }
         }
-        Console.WriteLine("[OK] PCpid selection scope, metadata, repeat and single Undo; PCupdate generation order and owned/ambient failure rollback");
+        Console.WriteLine("[OK] PCpid selection scope, metadata, repeat and single Undo; PCbake generation order and owned/ambient failure rollback");
     }
 
     private static Brep MakePanel() => Brep.CreateFromCornerPoints(new(0, 0, 0), new(-30, 0, 0), new(-30, 0, 20), new(0, 0, 20), 1e-5);

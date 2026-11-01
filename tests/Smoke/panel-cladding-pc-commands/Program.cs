@@ -17,11 +17,9 @@ internal static class Program
             ["PanelCladdingCurveTemplateCommand"] = "PCcrvTemplate",
             ["PanelCladdingMatchCommand"] = "PCmatchSrf",
             ["PanelCladdingMatchCurveCommand"] = "PCmatchCrv",
-            ["PanelCladdingSpawnCrvCommand"] = "PCspawnCrv",
-            ["PanelCladdingSpawnSrfCommand"] = "PCspawnSrf",
             ["PanelCladdingSyncCrvCommand"] = "PCsyncCrv",
             ["PanelCladdingSyncSrfCommand"] = "PCsyncSrf",
-            ["PanelCladdingUpdateCommand"] = "PCupdate",
+            ["PanelCladdingBakeCommand"] = "PCbake",
             ["PanelCladdingPidCommand"] = "PCpid",
             ["PanelCladdingTemplatePnlCommand"] = "PCtemplatePNL"
         };
@@ -36,7 +34,7 @@ internal static class Program
             VerifyPackageMetadata(repositoryRoot);
             VerifyNoFormerSpellings(repositoryRoot);
 
-            Console.WriteLine("[OK] All thirteen user-facing PanelCladdingEditor Rhino commands use the PC prefix.");
+            Console.WriteLine("[OK] All eleven user-facing PanelCladdingEditor Rhino commands use the PC prefix.");
             Console.WriteLine("[OK] Command names follow the PC + camel case rule; source and installer use no former spelling.");
             Console.WriteLine("[OK] No legacy PanelCladding-prefixed command alias remains registered.");
             Console.WriteLine("[OK] Command GUIDs remain explicit and unique, and package metadata names PCeditor only.");
@@ -128,11 +126,16 @@ internal static class Program
 
     // Spellings before 1.3.0 still run in Rhino (names are case-insensitive) but must not be
     // written in source messages or the installer. The package README names them on purpose.
+    // PCupdate, PCspawnSrf and PCspawnCrv no longer exist (PCbake replaces them) in any case;
+    // comment lines may still mention them.
     private static void VerifyNoFormerSpellings(string repositoryRoot)
     {
         var formerSpelling = new Regex(
-            "(?<![A-Za-z0-9])PC(?:Clear|Create|CrvTemplate|Editor|MatchCrv|MatchSrf|SpawnCrv|SpawnSrf|SyncCrv|SyncSrf|Update)\\b",
+            "(?<![A-Za-z0-9])PC(?:Clear|Create|CrvTemplate|Editor|MatchCrv|MatchSrf|SyncCrv|SyncSrf)\\b",
             RegexOptions.CultureInvariant);
+        var removedCommand = new Regex(
+            "(?<![A-Za-z0-9])PC(?:update|spawnSrf|spawnCrv)\\b",
+            RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
         string sourceRoot = Path.Combine(repositoryRoot, "src", "PanelCladdingEditor");
         string packageRoot = Path.Combine(repositoryRoot, "Packaging", "PanelCladdingEditor");
         IEnumerable<string> files = Directory.EnumerateFiles(sourceRoot, "*", SearchOption.AllDirectories)
@@ -143,9 +146,15 @@ internal static class Program
                 .Select(name => Path.Combine(packageRoot, name)));
         foreach (string path in files)
         {
-            Match match = formerSpelling.Match(File.ReadAllText(path));
+            string text = File.ReadAllText(path);
+            Match match = formerSpelling.Match(text);
             Require(!match.Success,
                 $"{Path.GetRelativePath(repositoryRoot, path)} still writes the former spelling {match.Value}.");
+            string code = string.Join('\n', text.Split('\n')
+                .Where(line => !line.TrimStart().StartsWith("//", StringComparison.Ordinal)));
+            Match removed = removedCommand.Match(code);
+            Require(!removed.Success,
+                $"{Path.GetRelativePath(repositoryRoot, path)} still names the removed command {removed.Value}.");
         }
     }
 
