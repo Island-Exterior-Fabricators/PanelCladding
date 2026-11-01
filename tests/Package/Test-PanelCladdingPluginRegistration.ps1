@@ -55,7 +55,8 @@ $expectedCommands = @(
     'PCreport',
     'PCsyncCrv',
     'PCsyncSrf',
-    'PCtemplatePNL'
+    'PCtemplatePNL',
+    'PCweb'
 )
 
 function Assert-FullRegistration {

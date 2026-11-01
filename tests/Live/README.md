@@ -12,6 +12,7 @@ and an interactive desktop session. They send no keyboard or mouse input, so the
 | `New-NamingSheet.ps1` | Writes a minimal `<CODE> - Naming Convention.xlsx` for the naming-convention check. |
 | `Restart-Rhino.ps1` | Closes Rhino normally (`WM_CLOSE`, "Don't Save") and/or starts it on a model, then waits for the MCP_Rhino route. |
 | `Show-Results.py` | Prints a suite's results file, one line per check. |
+| `SaveProbe.cs` | Saves the open model on the next idle tick and logs its read-only and lock state around the save (`SaveProbe.Queue(doc, tag)`, `SaveProbe.Read()`); used to find why Rhino stopped saving after PCweb. |
 
 ## Suites
 
@@ -25,6 +26,7 @@ and an interactive desktop session. They send no keyboard or mouse input, so the
 | `export` | 4. Export | `Watch-Dialogs.ps1 -Answers Save,Save,Yes` and `Hold-Workbook.ps1` running |
 | `editor` | 5. PCeditor | `Watch-Dialogs.ps1 -Answers No,Yes` running |
 | `otherdocs` | 4. Speed on a large model, another model, unsaved document; 3. naming convention | Run on the large model; `mainModel` = a main-model-named copy with a naming sheet beside it. Opens other documents. |
+| `web` | PCweb: saved model, unsaved changes with LastSave / Save / Cancel, a second run while one waits | Wireframe Web installed; a saved model named `<CODE> - ....3dm` whose code is not a real project (PCweb links that project to it). `assembly` = a PanelCladdingEditor build to test when it is not the installed one. Saves the model; opens three browser tabs. |
 
 Suites change the test model (they write cladding layouts on a few panels of
 `XYZ-IEF-Wireframe::Surfaces - PNL::PNL-EXT-3A.1` and `PNL-EXT-3A.4`, bake, lock, hide and move
