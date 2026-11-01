@@ -22,7 +22,10 @@ is on `codex/live-acceptance-tests` (finding 3 and 4 of its TEST record).
 - `PanelCladdingReportWindow`: the issue columns are named; on the list's `SizeChanged` the Detail
   column takes the width Object (150) and Layer (340) leave, at least 240. At the default 1180 x 760
   window the three columns fit (before, their fixed 150 + 380 + 520 px were wider than the list).
-- Package README: excluded layers keep their auto values.
+- `PanelCladdingComplianceService`: rule D07 "PID outside the managed layers" and
+  `CheckOutsideManagedLayers` removed; 26 rules remain (7 layer, 13 attribute, 6 dependency).
+  Objects off the managed layers, such as the wireframe GLS/TER/MP/STN copies, are not checked.
+- Package README: excluded layers keep their auto values; PCreport does not check unmanaged objects.
 
 ## Deviations from plan
 
@@ -39,7 +42,8 @@ None.
   branch, another project's branch and `Reference::Surfaces - Not in Scope`; the auto-attribute
   source calls it and no longer calls `IsPanelLayerPath`. Panel and curve scopes unchanged.
 - `pcreport-command`: at 1280 x 800 the columns fill the list without running past it; at the
-  default 1180 x 760 they fit.
+  default 1180 x 760 they fit. All 26 rules fire on the fixture; its `Surfaces - GLS` copy and its
+  Brep on `Surfaces-PNL` (both with a PID) raise no issue; export writes 28 issue rows.
 - Targeted Debug run (`excluded-layer-keywords`, `pcreport-command`, `panel-auto-attributes`,
   `panel-cladding-layer-standard`, `panel-cladding-pid*`, `panel-cladding-naming-convention`): 9/9.
 - Full regression and builds: see the TEST record.

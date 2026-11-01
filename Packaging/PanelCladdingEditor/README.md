@@ -37,8 +37,10 @@ output), Warning (non-compliant, tolerated or corrected on the next write) or In
   CID and name against PID and role, unit type and role, old payloads in `CW_1.09_FRAME_TYPE`,
   missing setup keys (Info), legacy keys, role case and `UD_PLANE`.
 - Cladding surfaces and curves: missing or untracked owner panel, duplicate CIDs, `Cladding` against
-  the layer, curves off their panel's curve layer, panels with materials but no surfaces, and
-  objects with a PID outside the managed layers.
+  the layer, curves off their panel's curve layer, and panels with materials but no surfaces.
+
+Objects the plug-in does not manage, such as the wireframe `Surfaces - GLS` copies, are not
+checked, even when they carry a PID.
 
 Select issue rows to select and zoom to their objects in Rhino; Rescan reads the model again and
 Export writes `<model> - PC Report.xlsx` (Summary and Issues sheets).
