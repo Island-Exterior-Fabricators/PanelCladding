@@ -52,6 +52,7 @@ $expectedCommands = @(
     'PCmatchCrv',
     'PCmatchSrf',
     'PCpid',
+    'PCreport',
     'PCsyncCrv',
     'PCsyncSrf',
     'PCtemplatePNL'

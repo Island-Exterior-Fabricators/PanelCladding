@@ -354,18 +354,29 @@ internal static class Program
         Console.WriteLine("[OK] a live BKT panel plans STEP surfaces and Curves - WT_11 extrusion curves");
     }
 
+    // PCreport (1.3.0) names the retired roots once, in its RetiredRootLayers list, to report them;
+    // no predicate accepts them (checked above), and no other source file names them.
+    private const string ComplianceSource = "PanelCladdingComplianceService.cs";
+
     private static void VerifyNoLegacyLayerNamesInSource()
     {
         string sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "PanelCladdingEditor");
         string[] retired = { "01_CW Panels", "02_CW Extrusions", "04_STEP Surfaces", "03_Material Surfaces", "Surfaces-PNL", "Curves-PNL" };
-        string[] hits = Directory.EnumerateFiles(sourceRoot, "*.*", SearchOption.AllDirectories)
+        string[] files = Directory.EnumerateFiles(sourceRoot, "*.*", SearchOption.AllDirectories)
             .Where(path => path.EndsWith(".cs", StringComparison.OrdinalIgnoreCase) || path.EndsWith(".xaml", StringComparison.OrdinalIgnoreCase))
             .Where(path => !path.Split(Path.DirectorySeparatorChar).Any(part => part is "bin" or "obj" or "bin-testhost" or "obj-testhost"))
+            .ToArray();
+        string[] hits = files
+            .Where(path => !string.Equals(Path.GetFileName(path), ComplianceSource, StringComparison.Ordinal))
             .SelectMany(path => retired.Where(name => File.ReadAllText(path).Contains(name, StringComparison.OrdinalIgnoreCase))
                 .Select(name => $"{Path.GetFileName(path)}: {name}"))
             .ToArray();
         Require(hits.Length == 0, "Retired layer names remain in plug-in source: " + string.Join("; ", hits));
-        Console.WriteLine("[OK] plug-in source no longer references the retired 01/02/04 layer tree");
+        string[] complianceLines = File.ReadAllLines(files.Single(path => Path.GetFileName(path) == ComplianceSource));
+        Require(complianceLines.Where(line => retired.Any(name => line.Contains(name, StringComparison.OrdinalIgnoreCase)))
+                .All(line => line.Contains("\"01_CW Panels\", \"02_CW Extrusions\"", StringComparison.Ordinal)),
+            "PCreport may name the retired roots only in its RetiredRootLayers list.");
+        Console.WriteLine("[OK] plug-in source no longer references the retired 01/02/04 layer tree (PCreport only lists it to report it)");
     }
 
     private static string FindRepositoryRoot()
