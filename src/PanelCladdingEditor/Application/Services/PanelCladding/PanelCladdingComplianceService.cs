@@ -5,7 +5,8 @@ using PanelCladdingEditor.Domain.Models.PanelCladding;
 namespace PanelCladdingEditor.Application.Services.PanelCladding;
 
 // PCreport's rules. Each rule reuses the predicate or service the commands use, so the report and
-// the commands agree on what is compliant. Pure and read-only.
+// the commands agree on what is compliant. Objects the plug-in does not manage (wireframe copies
+// such as Surfaces - GLS, even with a PID) are not checked. Pure and read-only.
 public sealed class PanelCladdingComplianceService
 {
     private const string CladdingUserTextKey = "Cladding";
@@ -72,8 +73,6 @@ public sealed class PanelCladdingComplianceService
         PanelCladdingReportSeverity.Warning, "Move the curve to its panel's Curves - <type> layer.");
     public static readonly PanelCladdingReportRule PanelNotBaked = Dependency("D06", "Panel with materials but no surfaces",
         PanelCladdingReportSeverity.Info, "Run PCbake.");
-    public static readonly PanelCladdingReportRule OutsideManagedLayers = Dependency("D07", "PID outside the managed layers",
-        PanelCladdingReportSeverity.Info, "Not managed by the plug-in; wireframe copies are expected here.");
 
     public static IReadOnlyList<PanelCladdingReportRule> Rules { get; } = Array.AsReadOnly(new[]
     {
@@ -82,7 +81,7 @@ public sealed class PanelCladdingComplianceService
         KeyCaseDuplicate, DuplicateCid, UnreadableData, PidFormat, CidMismatch, NameMismatch, UnitTypeInvalid,
         RoleMismatch, FrameTypePayload, MissingSetupKeys, LegacyKeys, RoleCase, PlaneMissing,
         OrphanDependency, NotTrackedOwner, DuplicateDependencyCid, CladdingLayerMismatch, CurveLayerMismatch,
-        PanelNotBaked, OutsideManagedLayers
+        PanelNotBaked
     });
 
     private readonly PanelCladdingKeyService _keys = new();
@@ -133,7 +132,6 @@ public sealed class PanelCladdingComplianceService
             }
         }
         CheckDependencies(panels, notTrackedPanels, surfaces, curves, project, issues);
-        CheckOutsideManagedLayers(snapshot.Objects, panels, notTrackedPanels, surfaces, curves, project, issues);
 
         var order = Rules.Select((rule, index) => (rule.Id, index)).ToDictionary(item => item.Id, item => item.index);
         return new PanelCladdingReport
@@ -402,28 +400,6 @@ public sealed class PanelCladdingComplianceService
         foreach (Panel panel in panels.Where(panel => !bakedPanels.Contains(panel.Object.Id) && HasMaterials(panel)))
         {
             issues.Add(Issue(PanelNotBaked, panel.Object, panel.Cid));
-        }
-    }
-
-    private static void CheckOutsideManagedLayers(
-        IReadOnlyList<PanelCladdingReportObject> objects,
-        IReadOnlyList<Panel> panels,
-        IReadOnlyList<Panel> notTrackedPanels,
-        IReadOnlyList<PanelCladdingReportObject> surfaces,
-        IReadOnlyList<PanelCladdingReportObject> curves,
-        string project,
-        List<PanelCladdingReportIssue> issues)
-    {
-        var known = panels.Select(panel => panel.Object.Id)
-            .Concat(notTrackedPanels.Select(panel => panel.Object.Id))
-            .Concat(surfaces.Select(item => item.Id))
-            .Concat(curves.Select(item => item.Id))
-            .ToHashSet();
-        foreach (PanelCladdingReportObject item in objects.Where(item => !known.Contains(item.Id) &&
-                     Pid(item).Length > 0 &&
-                     !PanelCladdingExtrusionPlanningService.IsExcludedLayerPath(item.LayerPath)))
-        {
-            issues.Add(Issue(OutsideManagedLayers, item, Pid(item)));
         }
     }
 

@@ -89,9 +89,7 @@ internal static class Program
             (PanelCladdingComplianceService.DuplicateDependencyCid, DupSurfaceB, StepGlass),
             (PanelCladdingComplianceService.CladdingLayerMismatch, CladdingOff, StepGlass),
             (PanelCladdingComplianceService.CurveLayerMismatch, CurveOff, OrphanCurveLayer),
-            (PanelCladdingComplianceService.PanelNotBaked, Unbaked, PanelLayer),
-            (PanelCladdingComplianceService.OutsideManagedLayers, GlassCopy, WireframeGlass),
-            (PanelCladdingComplianceService.OutsideManagedLayers, OffBranch, NearMiss)
+            (PanelCladdingComplianceService.PanelNotBaked, Unbaked, PanelLayer)
         };
         foreach ((PanelCladdingReportRule rule, Guid objectId, string layer) in expected)
         {
@@ -120,7 +118,9 @@ internal static class Program
         Require(noisy is null, $"A compliant panel, surface or curve was reported: {noisy?.Rule.Id} {noisy?.Detail}");
         Require(!report.Issues.Any(issue => issue.ObjectId == Excluded),
             "A panel on a Not in Scope layer must not be checked.");
-        Console.WriteLine("[OK] a compliant panel, surface and curve raise nothing; not-tracked panels are skipped");
+        Require(!report.Issues.Any(issue => issue.ObjectId == GlassCopy || issue.ObjectId == OffBranch),
+            "Objects with a PID outside the managed layers (a Surfaces - GLS copy, a Brep on a near-miss layer) must not be reported.");
+        Console.WriteLine("[OK] a compliant panel, surface and curve raise nothing; not-tracked panels and unmanaged objects are skipped");
     }
 
     private static void VerifyProjectRoot()

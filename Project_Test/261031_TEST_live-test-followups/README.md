@@ -2,7 +2,8 @@
 
 Evidence for [the PLAN](../../Project_Plan/261031_PLAN_live-test-followups.md) and
 [the EXET](../../Project_Exet/261031_EXET_live-test-followups.md): auto attributes on Not in Scope /
-By Others panels, and PCreport's Detail column.
+By Others panels, PCreport's Detail column, and PCreport no longer reporting objects the plug-in does
+not manage (rule D07 removed).
 
 ## Commands
 
@@ -20,7 +21,7 @@ dotnet build .\PanelCladding.sln -c Release -m:1
 | Run | Result |
 | --- | --- |
 | Production RHP build, Debug and Release | 0 warnings, 0 errors |
-| Targeted Debug smokes (list above) | 9/9 passed |
+| Targeted Debug smokes (list above) | 9/9 passed; after the D07 removal `pcreport-command`, `panel-cladding-layer-standard`, `excluded-layer-keywords` 3/3 |
 | `Run-Regression.ps1` Debug | 81/81 passed ([`regression-Debug.json`](regression-Debug.json)) |
 | `Run-Regression.ps1` Release | 81/81 passed ([`regression-Release.json`](regression-Release.json)) |
 | `Verify-PluginAssemblyIdentity.ps1` Debug and Release | `7c1a4d3b-5e29-4f68-9a72-1d8c6b0f4e35`, one distinct id |
@@ -33,7 +34,9 @@ dotnet build .\PanelCladding.sln -c Release -m:1
   attributes call `IsPanelBranchPath`; curve routing for an excluded panel still fails with
   `PANEL_CLADDING_PANEL_LAYER_EXCLUDED`.
 - `pcreport-command`: at 1280 x 800 the Object, Layer and Detail columns fill the issue list without
-  running past it, Detail at least 240 px; at the default 1180 x 760 they fit.
+  running past it, Detail at least 240 px; at the default 1180 x 760 they fit. All 26 rules fire on
+  the fixture; its `Surfaces - GLS` copy and its Brep on `Surfaces-PNL`, both with a PID, raise no
+  issue (they were the two D07 cases); export writes 28 issue rows.
 
 ## Renders
 
