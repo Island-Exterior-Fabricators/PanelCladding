@@ -18,6 +18,8 @@ public partial class PanelCladdingReportWindow : Window
     private static readonly Brush ErrorBrush = Frozen(Color.FromRgb(0xB2, 0x33, 0x2C));
     private static readonly Brush WarningBrush = Frozen(Color.FromRgb(0xD0, 0x8A, 0x00));
     private static readonly Brush InfoBrush = Frozen(Color.FromRgb(0x8A, 0x96, 0x9C));
+    private const double MinimumDetailWidth = 240d;
+    private const double DetailColumnMargin = 8d;   // list border and padding
 
     private readonly Func<OperationResponse<PanelCladdingReport>> _scan;
     private readonly IPanelReportNavigator _navigator;
@@ -100,6 +102,14 @@ public partial class PanelCladdingReportWindow : Window
         {
             _navigator.Show(ids);
         }
+    }
+
+    // Detail takes the width Object and Layer leave, so it is not cut off at the window's edge.
+    private void OnIssueListSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        double available = IssueList.ActualWidth - ObjectColumn.ActualWidth - LayerColumn.ActualWidth -
+            SystemParameters.VerticalScrollBarWidth - DetailColumnMargin;
+        DetailColumn.Width = Math.Max(MinimumDetailWidth, available);
     }
 
     private void OnRescanClick(object sender, RoutedEventArgs e) => Rescan();

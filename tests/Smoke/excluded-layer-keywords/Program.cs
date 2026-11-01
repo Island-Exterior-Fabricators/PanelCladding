@@ -3,7 +3,8 @@ using PanelCladdingEditor.Contracts.Responses;
 
 namespace ExcludedLayerKeywordsSmoke;
 
-// Since 1.3.0 layers named "Not in Scope" or "By Others" are not tracked by any panel or curve scope.
+// Since 1.3.0 layers named "Not in Scope" or "By Others" are not tracked by any panel or curve scope;
+// after 1.3.0 the auto attributes still refresh panels on them.
 internal static class Program
 {
     private const string PanelBranch = "BKT-IEF-Wireframe::Surfaces - PNL";
@@ -56,11 +57,25 @@ internal static class Program
         Require(!PanelCladdingPidPlanningService.IsPanelLayerPath(PanelBranch + "::Surfaces - Not in Scope") &&
                 !PanelCladdingExtrusionPlanningService.IsPanelLayerPath(PanelBranch + "::Surfaces - By Others::WT_01", "BKT") &&
                 PanelCladdingPidPlanningService.IsPanelLayerPath(PanelBranch + "::Surfaces - WT_01"),
-            "Panel scope (PCpid, auto attributes, naming sync, report) must skip excluded layers only.");
+            "Panel scope (PCpid, naming sync, report) must skip excluded layers only.");
+        // Auto attributes keep excluded panels' sizes and UD_PLANE current (after 1.3.0).
+        Require(PanelCladdingExtrusionPlanningService.IsPanelBranchPath(PanelBranch + "::Surfaces - Not in Scope", "BKT") &&
+                PanelCladdingExtrusionPlanningService.IsPanelBranchPath(PanelBranch + "::Surfaces - By Others::WT_01", "BKT") &&
+                PanelCladdingExtrusionPlanningService.IsPanelBranchPath(PanelBranch + "::Surfaces - WT_01", "BKT") &&
+                PanelCladdingExtrusionPlanningService.IsPanelBranchPath(PanelBranch, "BKT") &&
+                !PanelCladdingExtrusionPlanningService.IsPanelBranchPath(CurveBranch + "::Curves - WT_01", "BKT") &&
+                !PanelCladdingExtrusionPlanningService.IsPanelBranchPath("MET-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_01", "BKT") &&
+                !PanelCladdingExtrusionPlanningService.IsPanelBranchPath("Reference::Surfaces - Not in Scope", "BKT"),
+            "The panel branch includes its excluded sublayers and nothing outside the project's Surfaces - PNL.");
+        string autoAttributes = File.ReadAllText(Path.Combine(RegressionPaths.RepositoryRoot,
+            "src", "PanelCladdingEditor", "Infrastructure", "Rhino", "Live", "PanelCladding", "LivePanelAutoAttributes.cs"));
+        Require(autoAttributes.Contains("PanelCladdingExtrusionPlanningService.IsPanelBranchPath(layerPath, project)", StringComparison.Ordinal) &&
+                !autoAttributes.Contains("IsPanelLayerPath", StringComparison.Ordinal),
+            "The auto attributes must refresh the whole panel branch, excluded sublayers included.");
         Require(!PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath(CurveBranch + "::Curves - Not in Scope", "BKT") &&
                 PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath(CurveBranch + "::Curves - WT_01", "BKT"),
             "Managed curve scope must skip excluded layers only.");
-        Console.WriteLine("[OK] panel and managed-curve scopes skip excluded layers");
+        Console.WriteLine("[OK] panel and managed-curve scopes skip excluded layers; auto attributes cover the whole panel branch");
     }
 
     private static void VerifyCurveRouting()

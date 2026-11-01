@@ -197,6 +197,15 @@ internal static class Program
         rules.SelectedItem = rules.Items.OfType<PanelCladdingReportWindow.RuleRow>()
             .Single(row => row.Rule == PanelCladdingComplianceService.CidMismatch);
         Render((FrameworkElement)window.Content, 1280, 800, "pcreport-window-1280x800.png");
+        GridViewColumnCollection columns = ((GridView)issues.View).Columns;
+        double columnsWidth = columns.Sum(column => column.ActualWidth);
+        Require(columnsWidth <= issues.ActualWidth && columns[2].ActualWidth >= 240d &&
+                columnsWidth >= issues.ActualWidth - SystemParameters.VerticalScrollBarWidth - 20d,
+            $"Object, Layer and Detail must fill the issue list without running past it: columns {columnsWidth:0}, list {issues.ActualWidth:0}.");
+        Render((FrameworkElement)window.Content, 1180, 760, "pcreport-window-1180x760.png");
+        double defaultWidth = columns.Sum(column => column.ActualWidth);
+        Require(defaultWidth <= issues.ActualWidth,
+            $"At the default window size the Detail column must fit: columns {defaultWidth:0}, list {issues.ActualWidth:0}.");
         window.ShowReport(new PanelCladdingReport { DocumentPath = DocumentPath });
         Require(Named<TextBlock>(window, "EmptyText").Visibility == Visibility.Visible, "An empty report shows No issues.");
         Console.WriteLine("[OK] window shows counts, grouped rules and issues; rows select their objects");
