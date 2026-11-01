@@ -10,7 +10,9 @@ Executed 2026-10-31 under [the user-authorized PLAN](../Project_Plan/261031_PLAN
 [`tests/Smoke/panel-cladding-pc-commands`](../tests/Smoke/panel-cladding-pc-commands/Program.cs).
 Branch `codex/command-name-casing` from `master` `ad23285`, in a separate worktree
 (`C:\01_Projects\Panel Cladding Full\PC-casing`) so the checkout on
-`codex/extrusion-assignment-suspension` was not touched. No commit or PR was requested or created.
+`codex/extrusion-assignment-suspension` was not touched. Commit `0f308e1`;
+[PR 10](https://github.com/nuofan-island/PanelCladding/pull/10), opened and merged into `master` at the
+user's request.
 
 ## Implemented scope
 
