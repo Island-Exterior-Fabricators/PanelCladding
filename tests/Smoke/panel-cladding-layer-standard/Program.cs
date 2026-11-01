@@ -250,7 +250,7 @@ internal static class Program
             if (row.Layer.StartsWith(StepRoot + "::", StringComparison.Ordinal))
             {
                 Require(response.Success && response.Data == row.Cladding,
-                    $"PCSyncSrf must read {row.Cladding} from {row.Layer}: {response.Message}");
+                    $"PCsyncSrf must read {row.Cladding} from {row.Layer}: {response.Message}");
             }
             else
             {
@@ -274,7 +274,7 @@ internal static class Program
             Require(!response.Success && response.Message.Contains(StepRoot + "::<family>::<material>", StringComparison.Ordinal),
                 "Invalid STEP layer shape must fail with the expected pattern: " + invalid);
         }
-        Console.WriteLine("[OK] PCSyncSrf reads materials only from Reference::Surfaces - STEP::<family>::<material>");
+        Console.WriteLine("[OK] PCsyncSrf reads materials only from Reference::Surfaces - STEP::<family>::<material>");
     }
 
     private static void VerifyMaterialCategories()

@@ -22,13 +22,13 @@ namespace PanelCladdingEditor.UI;
 [Guid("4A0E749F-021B-41E5-9A43-D0D5A0F043A7")]
 public sealed class PanelCladdingMatchCurveCommand : RhinoCommand
 {
-    public override string EnglishName => "PCMatchCrv";
+    public override string EnglishName => "PCmatchCrv";
 
     protected override Result RunCommand(RhinoDoc doc, RunMode mode)
     {
         if (doc is null || string.IsNullOrWhiteSpace(doc.Path))
         {
-            RhinoApp.WriteLine("PCMatchCrv requires a saved active document.");
+            RhinoApp.WriteLine("PCmatchCrv requires a saved active document.");
             return Result.Failure;
         }
 
@@ -61,7 +61,7 @@ public sealed class PanelCladdingMatchCurveCommand : RhinoCommand
         }
 
         RhinoApp.WriteLine(
-            $"PCMatchCrv copied the segment, merge, and hide masks and extrusion assignments from {response.Data.SourceObjectId:D} " +
+            $"PCmatchCrv copied the segment, merge, and hide masks and extrusion assignments from {response.Data.SourceObjectId:D} " +
             $"to {response.Data.UpdatedTargetIds.Count} panel(s).");
         return Result.Success;
     }

@@ -22,27 +22,27 @@ namespace PanelCladdingEditor.UI;
 [Guid("6D026D22-A99A-4EF4-83C0-6140427248D2")]
 public sealed class PanelCladdingCurveTemplateCommand : RhinoCommand
 {
-    public override string EnglishName => "PCCrvTemplate";
+    public override string EnglishName => "PCcrvTemplate";
 
     protected override Result RunCommand(RhinoDoc doc, RunMode mode)
     {
         if (doc is null || string.IsNullOrWhiteSpace(doc.Path))
         {
-            RhinoApp.WriteLine("PCCrvTemplate requires a saved active document.");
+            RhinoApp.WriteLine("PCcrvTemplate requires a saved active document.");
             return Result.Failure;
         }
 
         IReadOnlyList<Guid>? panelIds = SelectPanels();
         if (panelIds is null)
         {
-            RhinoApp.WriteLine("PCCrvTemplate panel selection cancelled before any changes were made.");
+            RhinoApp.WriteLine("PCcrvTemplate panel selection cancelled before any changes were made.");
             return Result.Cancel;
         }
 
         PanelCladdingCurveTemplatePriority? priority = SelectPriority();
         if (priority is null)
         {
-            RhinoApp.WriteLine("PCCrvTemplate priority selection cancelled before any changes were made.");
+            RhinoApp.WriteLine("PCcrvTemplate priority selection cancelled before any changes were made.");
             return Result.Cancel;
         }
 
@@ -57,7 +57,7 @@ public sealed class PanelCladdingCurveTemplateCommand : RhinoCommand
         if (!response.Success || response.Data is null)
         {
             RhinoApp.WriteLine(string.IsNullOrWhiteSpace(response.Message)
-                ? "PCCrvTemplate failed."
+                ? "PCcrvTemplate failed."
                 : response.Message);
             return Result.Failure;
         }
@@ -66,7 +66,7 @@ public sealed class PanelCladdingCurveTemplateCommand : RhinoCommand
             ? "H priority"
             : "V priority";
         RhinoApp.WriteLine(
-            $"PCCrvTemplate applied {label} to {response.Data.UpdatedPanelIds.Count} of " +
+            $"PCcrvTemplate applied {label} to {response.Data.UpdatedPanelIds.Count} of " +
             $"{response.Data.SelectedPanelIds.Count} selected panel(s), producing " +
             $"{response.Data.MergeRunCount} merge run(s).");
         if (response.Data.SkippedPanelIds.Count > 0)

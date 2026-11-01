@@ -7,14 +7,12 @@ using PanelCladdingEditor.Domain.Models.PanelCladding;
 using Brep = rhinocommon::Rhino.Geometry.Brep;
 using Curve = rhinocommon::Rhino.Geometry.Curve;
 using Layer = rhinocommon::Rhino.DocObjects.Layer;
-using ObjectAttributes = rhinocommon::Rhino.DocObjects.ObjectAttributes;
-using ObjectColorSource = rhinocommon::Rhino.DocObjects.ObjectColorSource;
 using RhinoDoc = rhinocommon::Rhino.RhinoDoc;
 using RhinoObject = rhinocommon::Rhino.DocObjects.RhinoObject;
 
 namespace PanelCladdingEditor.Infrastructure.Rhino.Live.PanelCladding;
 
-public sealed partial class LivePanelCladdingSpawnService : ILivePanelCladdingSpawnService
+public sealed partial class LivePanelCladdingSpawnService
 {
     private readonly ILivePanelCladdingRepository _layoutRepository;
     private readonly PanelCladdingKeyService _keys;
@@ -29,209 +27,6 @@ public sealed partial class LivePanelCladdingSpawnService : ILivePanelCladdingSp
         _layoutRepository = layoutRepository;
         _keys = keys;
         _planning = planning;
-    }
-
-    public OperationResponse<PanelCladdingSpawnResult> Spawn(
-        string filePath,
-        IReadOnlyList<Guid> objectIds,
-        PanelCladdingObjectScope scope)
-    {
-        OperationResponse<RhinoDoc> resolved = ResolveDocument(filePath);
-        if (!resolved.Success || resolved.Data is null)
-        {
-            return OperationResponse<PanelCladdingSpawnResult>.Fail(resolved.Message);
-        }
-        RhinoDoc document = resolved.Data;
-        Guid[] sourcePanelIds = (objectIds ?? Array.Empty<Guid>())
-            .Where(objectId => objectId != Guid.Empty)
-            .Distinct()
-            .ToArray();
-        if (sourcePanelIds.Length == 0)
-        {
-            return OperationResponse<PanelCladdingSpawnResult>.Fail("PANEL_CLADDING_PANEL_SELECTION_REQUIRED");
-        }
-
-        var preparedRegions = new List<PreparedRegion>();
-        var preparedCurves = new List<PreparedCurve>();
-        try
-        {
-            foreach (Guid sourcePanelId in sourcePanelIds)
-            {
-                OperationResponse<PreparedPanel> panel = PreparePanel(
-                    document,
-                    filePath,
-                    sourcePanelId,
-                    scope);
-                if (!panel.Success || panel.Data is null)
-                {
-                    return OperationResponse<PanelCladdingSpawnResult>.Fail(
-                        $"PANEL_CLADDING_PANEL_PREPARE_FAILED: {sourcePanelId:D}: {panel.Message}");
-                }
-                preparedRegions.AddRange(panel.Data.Regions);
-                preparedCurves.AddRange(panel.Data.Curves);
-            }
-
-            string? duplicateCid = preparedRegions.Select(item => item.Region.Cid)
-                .Concat(preparedCurves.Select(item => item.CurvePlan.Cid))
-                .GroupBy(cid => cid, StringComparer.OrdinalIgnoreCase)
-                .FirstOrDefault(group => group.Count() > 1)
-                ?.Key;
-            if (duplicateCid is not null)
-            {
-                return OperationResponse<PanelCladdingSpawnResult>.Fail(
-                    $"PANEL_CLADDING_DUPLICATE_BATCH_CID: {duplicateCid}");
-            }
-            foreach (string cid in preparedRegions.Select(item => item.Region.Cid)
-                .Concat(preparedCurves.Select(item => item.CurvePlan.Cid)))
-            {
-                RhinoObject[]? existing = document.Objects.FindByUserString(
-                    PanelCladdingSpawnPlanningService.CidUserTextKey,
-                    cid,
-                    caseSensitive: false);
-                if (existing is { Length: > 0 } && existing.Any(item =>
-                        IsManagedCidConflict(document, item, scope)))
-                {
-                    return OperationResponse<PanelCladdingSpawnResult>.Fail(
-                        $"PANEL_CLADDING_CID_ALREADY_EXISTS: {cid}");
-                }
-            }
-
-            var panelCidChanges = LivePanelCladdingCidService.Prepare(document, sourcePanelIds);
-            if (!panelCidChanges.Success || panelCidChanges.Data is null)
-            {
-                return OperationResponse<PanelCladdingSpawnResult>.Fail(panelCidChanges.Message);
-            }
-            uint undoRecord = document.BeginUndoRecord(
-                scope == PanelCladdingObjectScope.Surfaces
-                    ? "Spawn Panel Cladding Surfaces"
-                    : "Spawn Panel Cladding Curves");
-            var createdIds = new List<Guid>(preparedRegions.Count + preparedCurves.Count);
-            var surfaceIds = new List<Guid>(preparedRegions.Count);
-            var curveIds = new List<Guid>(preparedCurves.Count);
-            try
-            {
-                foreach (PreparedRegion item in preparedRegions)
-                {
-                    OperationResponse<int> layer = EnsureMaterialLayer(document, item.Region);
-                    if (!layer.Success)
-                    {
-                        RollBackCreatedObjects(document, createdIds);
-                        return OperationResponse<PanelCladdingSpawnResult>.Fail(layer.Message);
-                    }
-
-                    var attributes = new ObjectAttributes
-                    {
-                        Name = PanelCladdingCidService.ShortName(item.Region.Cid),
-                        LayerIndex = layer.Data,
-                        ColorSource = ObjectColorSource.ColorFromLayer
-                    };
-                    foreach ((string key, string value) in item.Region.UserTextWrites)
-                    {
-                        attributes.SetUserString(key, value);
-                    }
-
-                    Guid createdId = document.Objects.AddBrep(item.Geometry, attributes);
-                    if (createdId == Guid.Empty)
-                    {
-                        RollBackCreatedObjects(document, createdIds);
-                        return OperationResponse<PanelCladdingSpawnResult>.Fail(
-                            $"PANEL_CLADDING_OBJECT_CREATE_FAILED: {item.Region.Cid}");
-                    }
-                    createdIds.Add(createdId);
-                    surfaceIds.Add(createdId);
-                }
-
-                if (preparedCurves.Count > 0)
-                {
-                    var curveLayers = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                    foreach (PreparedCurve item in preparedCurves)
-                    {
-                        if (!curveLayers.TryGetValue(item.CurvePlan.LayerPath, out int curveLayerIndex))
-                        {
-                            OperationResponse<int> curveLayer = EnsureLayer(
-                                document,
-                                item.CurvePlan.LayerPath);
-                            if (!curveLayer.Success)
-                            {
-                                RollBackCreatedObjects(document, createdIds);
-                                return OperationResponse<PanelCladdingSpawnResult>.Fail(curveLayer.Message);
-                            }
-                            curveLayerIndex = curveLayer.Data;
-                            curveLayers[item.CurvePlan.LayerPath] = curveLayerIndex;
-                        }
-                        var attributes = new ObjectAttributes
-                        {
-                            Name = PanelCladdingCidService.ShortName(item.CurvePlan.Cid),
-                            LayerIndex = curveLayerIndex,
-                            ObjectColor = System.Drawing.Color.FromArgb(
-                                item.CurvePlan.ObjectColor.Red,
-                                item.CurvePlan.ObjectColor.Green,
-                                item.CurvePlan.ObjectColor.Blue),
-                            ColorSource = ObjectColorSource.ColorFromObject
-                        };
-                        foreach ((string key, string value) in item.CurvePlan.UserTextWrites)
-                        {
-                            attributes.SetUserString(key, value);
-                        }
-                        Guid createdId = document.Objects.AddCurve(item.Geometry, attributes);
-                        if (createdId == Guid.Empty)
-                        {
-                            RollBackCreatedObjects(document, createdIds);
-                            return OperationResponse<PanelCladdingSpawnResult>.Fail(
-                                $"PANEL_CLADDING_CURVE_CREATE_FAILED: {item.CurvePlan.Code}");
-                        }
-                        createdIds.Add(createdId);
-                        curveIds.Add(createdId);
-                    }
-                }
-
-                OperationResponse cidCommit = LivePanelCladdingCidService.Apply(document, panelCidChanges.Data);
-                if (!cidCommit.Success)
-                {
-                    RollBackCreatedObjects(document, createdIds);
-                    bool restored = LivePanelCladdingCidService.Restore(document, panelCidChanges.Data);
-                    return OperationResponse<PanelCladdingSpawnResult>.Fail(cidCommit.Message +
-                        (restored ? string.Empty : "; PANEL_CLADDING_CID_ROLLBACK_FAILED"));
-                }
-                document.Views.Redraw();
-                return OperationResponse<PanelCladdingSpawnResult>.Ok(new PanelCladdingSpawnResult
-                {
-                    SourcePanelIds = sourcePanelIds,
-                    CreatedObjectIds = createdIds.ToArray(),
-                    CreatedSurfaceIds = surfaceIds.ToArray(),
-                    CreatedCurveIds = curveIds.ToArray(),
-                    Cids = preparedRegions.Select(item => item.Region.Cid)
-                        .Concat(preparedCurves.Select(item => item.CurvePlan.Cid))
-                        .ToArray()
-                });
-            }
-            catch (Exception ex)
-            {
-                RollBackCreatedObjects(document, createdIds);
-                bool restored = LivePanelCladdingCidService.Restore(document, panelCidChanges.Data);
-                return OperationResponse<PanelCladdingSpawnResult>.Fail(
-                    $"PANEL_CLADDING_SPAWN_FAILED: {ex.Message}" +
-                    (restored ? string.Empty : "; PANEL_CLADDING_CID_ROLLBACK_FAILED"));
-            }
-            finally
-            {
-                if (undoRecord != 0U)
-                {
-                    document.EndUndoRecord(undoRecord);
-                }
-            }
-        }
-        finally
-        {
-            foreach (PreparedRegion item in preparedRegions)
-            {
-                item.Geometry.Dispose();
-            }
-            foreach (PreparedCurve item in preparedCurves)
-            {
-                item.Geometry.Dispose();
-            }
-        }
     }
 
     internal OperationResponse<PreparedPanel> PreparePanel(
@@ -439,66 +234,11 @@ public sealed partial class LivePanelCladdingSpawnService : ILivePanelCladdingSp
         return result;
     }
 
-    private static bool IsManagedCidConflict(
-        RhinoDoc document,
-        RhinoObject rhinoObject,
-        PanelCladdingObjectScope scope)
-    {
-        string layerPath = rhinoObject.Attributes.LayerIndex >= 0
-            ? document.Layers[rhinoObject.Attributes.LayerIndex]?.FullPath ?? string.Empty
-            : string.Empty;
-        return scope switch
-        {
-            PanelCladdingObjectScope.Surfaces => rhinoObject.Geometry is Brep &&
-                PanelCladdingSpawnPlanningService.IsManagedSurfaceLayerPath(layerPath),
-            PanelCladdingObjectScope.Curves => rhinoObject.Geometry is Curve &&
-                PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath(layerPath,
-                    PanelCladdingProjectService.CodeFromDocumentPath(document.Path)),
-            _ => false
-        };
-    }
-
     private static string GetRequiredUserText(
         IReadOnlyDictionary<string, string> userText,
         string key) => userText.TryGetValue(key, out string? value)
             ? (value ?? string.Empty).Trim()
             : string.Empty;
-
-    private static OperationResponse<RhinoDoc> ResolveDocument(string filePath)
-    {
-        RhinoDoc? document = RhinoDoc.ActiveDoc;
-        if (document is null)
-        {
-            return OperationResponse<RhinoDoc>.Fail("NO_ACTIVE_DOCUMENT");
-        }
-        if (string.IsNullOrWhiteSpace(document.Path))
-        {
-            return OperationResponse<RhinoDoc>.Fail("ACTIVE_DOC_UNSAVED");
-        }
-        try
-        {
-            if (!string.Equals(
-                Path.GetFullPath(document.Path).TrimEnd(Path.DirectorySeparatorChar),
-                Path.GetFullPath(filePath).TrimEnd(Path.DirectorySeparatorChar),
-                StringComparison.OrdinalIgnoreCase))
-            {
-                return OperationResponse<RhinoDoc>.Fail("FILE_NOT_ACTIVE");
-            }
-        }
-        catch (Exception ex)
-        {
-            return OperationResponse<RhinoDoc>.Fail($"DOCUMENT_PATH_INVALID: {ex.Message}");
-        }
-        return OperationResponse<RhinoDoc>.Ok(document);
-    }
-
-    private static void RollBackCreatedObjects(RhinoDoc document, IEnumerable<Guid> objectIds)
-    {
-        foreach (Guid objectId in objectIds.Reverse())
-        {
-            document.Objects.Delete(objectId, quiet: true);
-        }
-    }
 
     internal sealed record PreparedRegion(
         Guid SourcePanelId,

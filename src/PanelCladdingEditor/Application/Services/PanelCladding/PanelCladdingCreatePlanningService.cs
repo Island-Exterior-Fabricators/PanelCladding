@@ -191,7 +191,7 @@ public sealed partial class PanelCladdingCreatePlanningService
                 $"PANEL_CLADDING_CREATE_TOPOLOGY_INVALID: {panel.ObjectId:D}: {masks.Message}");
         }
 
-        // PCCreate owns the grid only. CW_4.xx and the cladding logic stay as they are, except a
+        // PCcreate owns the grid only. CW_4.xx and the cladding logic stay as they are, except a
         // logic that no longer fits the new grid, which is removed so the panel loads unconfigured.
         bool staleLogic = !LogicFitsGrid(panel.UserText, keySet.Data.Cells);
         string[] deletes = panel.UserText.Keys

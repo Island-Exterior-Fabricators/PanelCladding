@@ -101,20 +101,18 @@ internal static class Program
             DesiredObjectColor = DarkGreen
         };
         Require(layerColored.ObjectColorChanged,
-            "PCSyncCrv must repair a curve that still inherits layer color.");
+            "PCsyncCrv must repair a curve that still inherits layer color.");
         Require(wrongRgb.ObjectColorChanged,
-            "PCSyncCrv must repair a wrong existing object RGB value.");
+            "PCsyncCrv must repair a wrong existing object RGB value.");
         Require(!current.ObjectColorChanged,
-            "PCSyncCrv must not report an already-correct object color as changed.");
+            "PCsyncCrv must not report an already-correct object color as changed.");
         Console.WriteLine("[OK] existing curve color source/RGB mismatch is detectable");
     }
 
     private static void VerifyRhinoAttributeWriteContracts()
     {
         string root = FindRepositoryRoot();
-        string spawn = File.ReadAllText(Path.Combine(
-            root, "src", "PanelCladdingEditor", "Infrastructure", "Rhino", "Live",
-            "PanelCladding", "LivePanelCladdingSpawnService.cs"));
+        // PCbake (1.3.0) is the only generator; the PCspawnCrv write path was removed with the command.
         string update = File.ReadAllText(Path.Combine(
             root, "src", "PanelCladdingEditor", "Infrastructure", "Rhino", "Live",
             "PanelCladding", "LivePanelCladdingUpdateService.cs"));
@@ -125,19 +123,16 @@ internal static class Program
             root, "src", "PanelCladdingEditor", "Application", "Services", "PanelCladding",
             "PanelCladdingSurfaceSyncPlanningService.cs"));
 
-        Require(spawn.Contains("item.CurvePlan.ObjectColor.Red", StringComparison.Ordinal) &&
-                spawn.Contains("ColorSource = ObjectColorSource.ColorFromObject", StringComparison.Ordinal),
-            "PCSpawnCrv does not write planned object color.");
         Require(update.Contains("dependency.CurvePlan.ObjectColor.Red", StringComparison.Ordinal) &&
                 update.Contains("ObjectColorSource.ColorFromObject", StringComparison.Ordinal) &&
                 update.Contains("ObjectColorSource.ColorFromLayer", StringComparison.Ordinal),
-            "PCUpdate does not branch curve/surface color sources correctly.");
+            "PCbake does not branch curve/surface color sources correctly.");
         Require(sync.Contains("DesiredObjectColor.Red", StringComparison.Ordinal) &&
                 sync.Contains("proposed.ColorSource = ObjectColorSource.ColorFromObject", StringComparison.Ordinal),
-            "PCSyncCrv does not commit desired existing-curve color.");
+            "PCsyncCrv does not commit desired existing-curve color.");
         Require(planning.Contains("curve.ObjectColorChanged", StringComparison.Ordinal),
-            "PCSyncCrv planning does not include existing color drift.");
-        Console.WriteLine("[OK] spawn, update, and sync write/repair curve object colors");
+            "PCsyncCrv planning does not include existing color drift.");
+        Console.WriteLine("[OK] bake and sync write/repair curve object colors");
     }
 
     private static T Required<T>(

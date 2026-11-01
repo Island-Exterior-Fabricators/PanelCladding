@@ -21,13 +21,13 @@ namespace PanelCladdingEditor.UI;
 [Guid("15F873A5-5B00-4232-89DB-78C234E2DBBB")]
 public sealed class PanelCladdingSyncSrfCommand : RhinoCommand
 {
-    public override string EnglishName => "PCSyncSrf";
+    public override string EnglishName => "PCsyncSrf";
 
     protected override Result RunCommand(RhinoDoc doc, RunMode mode)
     {
         if (doc is null || string.IsNullOrWhiteSpace(doc.Path))
         {
-            RhinoApp.WriteLine("PCSyncSrf requires a saved active document.");
+            RhinoApp.WriteLine("PCsyncSrf requires a saved active document.");
             return Result.Failure;
         }
 
@@ -87,7 +87,7 @@ public sealed class PanelCladdingSyncSrfCommand : RhinoCommand
         }
         int processedPanels = response.Data.SelectedPanelIds.Count - response.Data.SkippedPanelIds.Count;
         RhinoApp.WriteLine(
-            $"PCSyncSrf processed {processedPanels} panel(s), skipped " +
+            $"PCsyncSrf processed {processedPanels} panel(s), skipped " +
             $"{response.Data.SkippedPanelIds.Count} panel(s), matched {response.Data.MatchedSurfaceCount} surface(s), " +
             $"refreshed {response.Data.RefreshedSurfaceIds.Count} surface Cladding value(s), " +
             $"and wrote {response.Data.ChangedPanelIds.Count} panel cladding key/value set(s)." );

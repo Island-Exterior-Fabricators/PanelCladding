@@ -43,7 +43,7 @@ internal static class Program
             [Snapshot(TargetId, BuildTarget(keys, horizontal: false))])).Targets.Single();
         AssertWrite(nonCanonicalPlan, keys, "0A", "1A");
         AssertWrite(nonCanonicalPlan, keys, "1A", "MPL-001");
-        Console.WriteLine("[OK] PCMatchSrf preserves source parent direction instead of canonicalizing it.");
+        Console.WriteLine("[OK] PCmatchSrf preserves source parent direction instead of canonicalizing it.");
 
         IReadOnlyDictionary<string, string> committed =
             PanelCladdingMatchPlanningService.ApplyUserTextPlan(

@@ -75,7 +75,7 @@ version: $Version
 authors:
   - Panel Cladding Editor contributors
 description: Standalone Rhino 8 panel cladding type editor
-url: https://github.com/novan-xu/PanelCladding
+url: https://github.com/nuofan-island/PanelCladding
 keywords:
   - cladding
   - curtain-wall

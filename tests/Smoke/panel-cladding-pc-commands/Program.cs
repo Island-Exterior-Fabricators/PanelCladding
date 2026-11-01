@@ -11,17 +11,15 @@ internal static class Program
     private static readonly IReadOnlyDictionary<string, string> ExpectedCommands =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            ["PanelCladdingEditorCommand"] = "PCEditor",
-            ["PanelCladdingCreateCommand"] = "PCCreate",
-            ["PanelCladdingClearCommand"] = "PCClear",
-            ["PanelCladdingCurveTemplateCommand"] = "PCCrvTemplate",
-            ["PanelCladdingMatchCommand"] = "PCMatchSrf",
-            ["PanelCladdingMatchCurveCommand"] = "PCMatchCrv",
-            ["PanelCladdingSpawnCrvCommand"] = "PCSpawnCrv",
-            ["PanelCladdingSpawnSrfCommand"] = "PCSpawnSrf",
-            ["PanelCladdingSyncCrvCommand"] = "PCSyncCrv",
-            ["PanelCladdingSyncSrfCommand"] = "PCSyncSrf",
-            ["PanelCladdingUpdateCommand"] = "PCUpdate",
+            ["PanelCladdingEditorCommand"] = "PCeditor",
+            ["PanelCladdingCreateCommand"] = "PCcreate",
+            ["PanelCladdingClearCommand"] = "PCclear",
+            ["PanelCladdingCurveTemplateCommand"] = "PCcrvTemplate",
+            ["PanelCladdingMatchCommand"] = "PCmatchSrf",
+            ["PanelCladdingMatchCurveCommand"] = "PCmatchCrv",
+            ["PanelCladdingSyncCrvCommand"] = "PCsyncCrv",
+            ["PanelCladdingSyncSrfCommand"] = "PCsyncSrf",
+            ["PanelCladdingBakeCommand"] = "PCbake",
             ["PanelCladdingPidCommand"] = "PCpid",
             ["PanelCladdingTemplatePnlCommand"] = "PCtemplatePNL"
         };
@@ -34,10 +32,12 @@ internal static class Program
             VerifyAssemblyCommandTypes();
             VerifyRegisteredNames(repositoryRoot);
             VerifyPackageMetadata(repositoryRoot);
+            VerifyNoFormerSpellings(repositoryRoot);
 
-            Console.WriteLine("[OK] All thirteen user-facing PanelCladdingEditor Rhino commands use the PC prefix.");
+            Console.WriteLine("[OK] All eleven user-facing PanelCladdingEditor Rhino commands use the PC prefix.");
+            Console.WriteLine("[OK] Command names follow the PC + camel case rule; source and installer use no former spelling.");
             Console.WriteLine("[OK] No legacy PanelCladding-prefixed command alias remains registered.");
-            Console.WriteLine("[OK] Command GUIDs remain explicit and unique, and package metadata names PCEditor only.");
+            Console.WriteLine("[OK] Command GUIDs remain explicit and unique, and package metadata names PCeditor only.");
             return 0;
         }
         catch (Exception ex)
@@ -84,6 +84,9 @@ internal static class Program
                 $"{commandType} registers '{actualName}' instead of '{expectedName}'.");
             Require(actualName.StartsWith("PC", StringComparison.Ordinal),
                 $"{actualName} does not use the PC prefix.");
+            // Since 1.3.0: PC, the first word lowercase, later words capitalized; PNL stays an acronym.
+            Require(Regex.IsMatch(actualName, "^PC[a-z]+(?:[A-Z][a-z]+|PNL)*$", RegexOptions.CultureInvariant),
+                $"{actualName} does not follow the PC + camel case naming rule.");
             Require(!actualName.StartsWith("PanelCladding", StringComparison.OrdinalIgnoreCase),
                 $"Legacy command prefix remains registered as {actualName}.");
 
@@ -115,10 +118,44 @@ internal static class Program
         JsonElement root = manifest.RootElement;
         Require(root.GetProperty("name").GetString() == "PanelCladdingEditor",
             "The product identity must remain PanelCladdingEditor.");
-        Require(root.GetProperty("command").GetString() == "PCEditor",
-            "Package metadata must name PCEditor as the primary command.");
+        Require(root.GetProperty("command").GetString() == "PCeditor",
+            "Package metadata must name PCeditor as the primary command.");
         Require(!root.TryGetProperty("smokeCommand", out _),
             "Package metadata must not expose a production smoke command.");
+    }
+
+    // Spellings before 1.3.0 still run in Rhino (names are case-insensitive) but must not be
+    // written in source messages or the installer. The package README names them on purpose.
+    // PCupdate, PCspawnSrf and PCspawnCrv no longer exist (PCbake replaces them) in any case;
+    // comment lines may still mention them.
+    private static void VerifyNoFormerSpellings(string repositoryRoot)
+    {
+        var formerSpelling = new Regex(
+            "(?<![A-Za-z0-9])PC(?:Clear|Create|CrvTemplate|Editor|MatchCrv|MatchSrf|SyncCrv|SyncSrf)\\b",
+            RegexOptions.CultureInvariant);
+        var removedCommand = new Regex(
+            "(?<![A-Za-z0-9])PC(?:update|spawnSrf|spawnCrv)\\b",
+            RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+        string sourceRoot = Path.Combine(repositoryRoot, "src", "PanelCladdingEditor");
+        string packageRoot = Path.Combine(repositoryRoot, "Packaging", "PanelCladdingEditor");
+        IEnumerable<string> files = Directory.EnumerateFiles(sourceRoot, "*", SearchOption.AllDirectories)
+            .Where(path => path.EndsWith(".cs", StringComparison.OrdinalIgnoreCase) ||
+                path.EndsWith(".xaml", StringComparison.OrdinalIgnoreCase))
+            .Where(path => !path.Split(Path.DirectorySeparatorChar).Any(part => part is "bin" or "obj"))
+            .Concat(new[] { "Install-PanelCladdingEditor.ps1", "Install-Package.ps1", "QUICKSTART.txt", "package-manifest.json" }
+                .Select(name => Path.Combine(packageRoot, name)));
+        foreach (string path in files)
+        {
+            string text = File.ReadAllText(path);
+            Match match = formerSpelling.Match(text);
+            Require(!match.Success,
+                $"{Path.GetRelativePath(repositoryRoot, path)} still writes the former spelling {match.Value}.");
+            string code = string.Join('\n', text.Split('\n')
+                .Where(line => !line.TrimStart().StartsWith("//", StringComparison.Ordinal)));
+            Match removed = removedCommand.Match(code);
+            Require(!removed.Success,
+                $"{Path.GetRelativePath(repositoryRoot, path)} still names the removed command {removed.Value}.");
+        }
     }
 
     private static string FindRepositoryRoot()

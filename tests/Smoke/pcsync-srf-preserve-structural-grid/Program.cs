@@ -18,13 +18,13 @@ internal static class Program
         Console.WriteLine("[OK] coverage-blind surface planning uses current boundaries exactly");
 
         VerifyCurveScopeCanRemoveOffsets();
-        Console.WriteLine("[OK] PCSyncCrv remains authoritative and can remove stored offsets");
+        Console.WriteLine("[OK] PCsyncCrv remains authoritative and can remove stored offsets");
 
         VerifySpanningSurfaceReconstructsParent();
         Console.WriteLine("[OK] preserved V0 keeps 1A in the grid and reconstructs 1A=0A");
 
         VerifyLiveRepositoryUsesEffectiveOffsets();
-        Console.WriteLine("[OK] live PCSyncSrf grid construction uses the scope-aware effective offsets");
+        Console.WriteLine("[OK] live PCsyncSrf grid construction uses the scope-aware effective offsets");
     }
 
     private static void VerifyCoverageBlindSurfaceScopeClearsStructuralOffsets()
@@ -89,7 +89,7 @@ internal static class Program
         Require(ReferenceEquals(result, inferred) ||
                 (result.HorizontalOffsets.SequenceEqual(new[] { 100d }) &&
                  result.VerticalOffsets.Count == 0),
-            "PCSyncCrv must continue using only curve-inferred tracks.");
+            "PCsyncCrv must continue using only curve-inferred tracks.");
     }
 
     private static void VerifySpanningSurfaceReconstructsParent()

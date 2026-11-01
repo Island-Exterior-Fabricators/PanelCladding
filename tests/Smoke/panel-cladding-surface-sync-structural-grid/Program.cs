@@ -16,7 +16,7 @@ internal static class Program
     private static void Main()
     {
         VerifySurfaceScopeUsesAssociatedCurves();
-        Console.WriteLine("[OK] PCSyncSrf supplies associated curves to offset inference");
+        Console.WriteLine("[OK] PCsyncSrf supplies associated curves to offset inference");
 
         VerifyLogicalParentReconstruction();
         Console.WriteLine("[OK] spanning cladding reconstructs 0A material plus 1A=0A parent");
@@ -57,21 +57,21 @@ internal static class Program
                     "panelCurves.Select(curve => curve.Geometry).ToArray()",
                     StringComparison.Ordinal) &&
                 source.Contains("curveInferredData", StringComparison.Ordinal),
-            "PCSyncSrf must reconcile associated curve tracks with cladding-surface boundaries.");
+            "PCsyncSrf must reconcile associated curve tracks with cladding-surface boundaries.");
         Require(!source.Contains(
                 "scope == PanelCladdingObjectScope.Curves\r\n                        ? panelCurves.Select",
                 StringComparison.Ordinal) &&
                 !source.Contains(
                     "scope == PanelCladdingObjectScope.Curves\n                        ? panelCurves.Select",
                     StringComparison.Ordinal),
-            "Associated curves must not be restricted to PCSyncCrv scope.");
+            "Associated curves must not be restricted to PCsyncCrv scope.");
         Require(!source.Contains(
                 "scope == PanelCladdingObjectScope.Curves &&\r\n                rhinoObject.Geometry is Curve",
                 StringComparison.Ordinal) &&
                 !source.Contains(
                     "scope == PanelCladdingObjectScope.Curves &&\n                rhinoObject.Geometry is Curve",
                     StringComparison.Ordinal),
-            "PCSyncSrf must discover associated structural curves before offset inference.");
+            "PCsyncSrf must discover associated structural curves before offset inference.");
         Require(source.Contains(
                 "if (rhinoObject.Geometry is Curve curveGeometry &&",
                 StringComparison.Ordinal) && source.Contains(

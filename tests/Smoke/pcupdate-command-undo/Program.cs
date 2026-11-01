@@ -54,7 +54,7 @@ internal static class Program
         foreach (string token in required)
         {
             Require(source.Contains(token, StringComparison.Ordinal),
-                $"PCUpdate ambient Undo contract is missing: {token}");
+                $"PCbake ambient Undo contract is missing: {token}");
         }
 
         int beginIndex = source.IndexOf(
@@ -65,7 +65,7 @@ internal static class Program
             beginIndex,
             StringComparison.Ordinal);
         Require(ownershipGuardIndex >= 0 && ownershipGuardIndex < beginIndex,
-            "PCUpdate must guard BeginUndoRecord with service ownership.");
+            "PCbake must guard BeginUndoRecord with service ownership.");
 
         int finallyIndex = source.IndexOf("finally", beginIndex, StringComparison.Ordinal);
         int endIndex = source.IndexOf("document.EndUndoRecord(undoRecord);", finallyIndex, StringComparison.Ordinal);
@@ -75,10 +75,10 @@ internal static class Program
             endIndex,
             StringComparison.Ordinal);
         Require(finalOwnershipGuardIndex > finallyIndex && finalOwnershipGuardIndex < endIndex,
-            "PCUpdate must not end an ambient Rhino command Undo record.");
+            "PCbake must not end an ambient Rhino command Undo record.");
         Require(rollbackIndex > endIndex,
             "Service-owned failure rollback must remain after EndUndoRecord.");
-        Console.WriteLine("[OK] PCUpdate opens, closes, and rolls back only service-owned Undo records");
+        Console.WriteLine("[OK] PCbake opens, closes, and rolls back only service-owned Undo records");
     }
 
     private static void VerifyPackageContract()
@@ -90,14 +90,14 @@ internal static class Program
             "package-manifest.json")));
         Require(Version.TryParse(manifest.RootElement.GetProperty("version").GetString(), out Version? version) &&
                 version >= new Version(1, 0, 73),
-            "PCUpdate Undo support requires package 1.0.73 or later.");
-        Console.WriteLine("[OK] package supports PCUpdate Undo handling");
+            "PCbake Undo support requires package 1.0.73 or later.");
+        Console.WriteLine("[OK] package supports PCbake Undo handling");
     }
 
     private static void VerifyAmbientUndoRecordIsReused()
     {
         using RhinoDoc document = RhinoDoc.CreateHeadless(null);
-        uint ambientUndoRecord = document.BeginUndoRecord("PCUpdate ambient command simulation");
+        uint ambientUndoRecord = document.BeginUndoRecord("PCbake ambient command simulation");
         Require(ambientUndoRecord != 0U, "The Rhino test host did not open an ambient Undo record.");
 
         try
@@ -115,14 +115,14 @@ internal static class Program
 
             object response = apply.Invoke(
                 service,
-                [document, "unused-for-empty-batch", Array.Empty<Guid>()]) ??
-                throw new InvalidOperationException("PCUpdate Apply returned null.");
+                [document, "unused-for-empty-batch", Array.Empty<Guid>(), PanelCladdingBakeScope.All]) ??
+                throw new InvalidOperationException("PCbake Apply returned null.");
             bool success = (bool?)response.GetType().GetProperty("Success")?.GetValue(response) ?? false;
             string message = (string?)response.GetType().GetProperty("Message")?.GetValue(response) ?? string.Empty;
 
-            Require(success, $"PCUpdate rejected Rhino's ambient Undo record: {message}");
+            Require(success, $"PCbake rejected Rhino's ambient Undo record: {message}");
             Require(document.CurrentUndoRecordSerialNumber == ambientUndoRecord,
-                "PCUpdate replaced or closed Rhino's ambient Undo record.");
+                "PCbake replaced or closed Rhino's ambient Undo record.");
             Console.WriteLine(
                 $"[OK] native Rhino ambient Undo record {ambientUndoRecord} was reused and left open");
         }

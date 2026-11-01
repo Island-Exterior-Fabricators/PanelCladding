@@ -75,7 +75,7 @@ internal static class Program
             typeof(PanelCladdingSyncSrfCommand));
         var syncCrvCommand = (PanelCladdingSyncCrvCommand)RuntimeHelpers.GetUninitializedObject(
             typeof(PanelCladdingSyncCrvCommand));
-        Require(syncSrfCommand.EnglishName == "PCSyncSrf" && syncCrvCommand.EnglishName == "PCSyncCrv",
+        Require(syncSrfCommand.EnglishName == "PCsyncSrf" && syncCrvCommand.EnglishName == "PCsyncCrv",
             "The visible synchronization commands are not separated by object family.");
         Console.WriteLine("[OK] new surfaces target Reference::Surfaces - STEP, retired roots are rejected, and synchronization is split by object family.");
 
@@ -160,7 +160,7 @@ internal static class Program
         Require(surfaceRequest.Scope == PanelCladdingObjectScope.Surfaces &&
                 surfaceRequest.SurfaceWrites.Count == 1 && surfaceRequest.CurveWrites.Count == 0 &&
                 surfaceRequest.PanelWrites.Count == 1,
-            "PCSyncSrf must repair surfaces and panel values without writing curves.");
+            "PCsyncSrf must repair surfaces and panel values without writing curves.");
         PanelCladdingSurfaceSyncSurfacePlan surfaceWrite = surfaceRequest.SurfaceWrites.Single();
         PanelCladdingSurfaceSyncPanelWrite panelWrite = surfaceRequest.PanelWrites.Single();
         Require(surfaceWrite.PanelId == "PID-BKT-N2-06-04" && surfaceWrite.PidChanged &&
@@ -182,7 +182,7 @@ internal static class Program
         Require(curveRequest.Scope == PanelCladdingObjectScope.Curves &&
                 curveRequest.SurfaceWrites.Count == 0 && curveRequest.CurveWrites.Count == 1 &&
                 curveRequest.PanelWrites.Count == 1,
-            "PCSyncCrv must repair curves and panel topology without writing surfaces.");
+            "PCsyncCrv must repair curves and panel topology without writing surfaces.");
         PanelCladdingSurfaceSyncCurvePlan curveWrite = curveRequest.CurveWrites.Single();
         Require(curveWrite.DesiredCode == "FRM-0" &&
             curveWrite.DesiredCid == "CID-BKT-N2-06-04_FRM-0" &&

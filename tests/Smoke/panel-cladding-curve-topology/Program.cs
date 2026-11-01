@@ -21,10 +21,10 @@ internal static class Program
         VerifyCurveMaskMatch();
         VerifyCurveAssignmentMatch();
         VerifyCommandContract();
-        Console.WriteLine("[OK] PCCreate infers closed atomic segments and logical cells from on-panel guides.");
+        Console.WriteLine("[OK] PCcreate infers closed atomic segments and logical cells from on-panel guides.");
         Console.WriteLine("[OK] Continuous and split guides default to segmented curves; a 2H/2V grid emits twelve intermediate segments.");
-        Console.WriteLine("[OK] PCCreate rejects endpoint-only and cascading dangling guides.");
-        Console.WriteLine("[OK] PCMatchCrv transfers sparse masks and full extrusion assignments across equal H/V counts.");
+        Console.WriteLine("[OK] PCcreate rejects endpoint-only and cascading dangling guides.");
+        Console.WriteLine("[OK] PCmatchCrv transfers sparse masks and full extrusion assignments across equal H/V counts.");
     }
 
     private static void VerifyContinuousGridSpawnsSegments()
@@ -40,7 +40,7 @@ internal static class Program
                     Guide("40000000-0000-0000-0000-000000000004", (75d, 0d), (75d, 200d))
                 })])).Panels.Single();
         Require(!plan.UserTextWrites.ContainsKey(PanelCladdingKeyService.MergeMaskKey),
-            "Continuous PCCreate guides must default to segmented tracks without a merge mask.");
+            "Continuous PCcreate guides must default to segmented tracks without a merge mask.");
         PanelCladdingKeySet parsed = Required(keys.Parse(plan.UserTextWrites, 100d, 200d, 0.001d));
         Require(parsed.Topology.MergeRuns.Count == 0 && parsed.Topology.MissingSegments.Count == 0 &&
                 parsed.Topology.HiddenSegments.Count == 0 && parsed.Cells.Count == 9,
@@ -56,7 +56,7 @@ internal static class Program
                 curves.All(curve => curve.Kind != PanelCladdingExtrusionCurveKind.Merged) &&
                 segments.All(curve => curve.AtomicSegments.Count == 1) &&
                 segments.SelectMany(curve => curve.AtomicSegments).Distinct().Count() == 12,
-            "PCCreate attributes must produce twelve separate intermediate curves and four unchanged perimeter frames.");
+            "PCcreate attributes must produce twelve separate intermediate curves and four unchanged perimeter frames.");
     }
 
     private static void VerifyScreenshotTopology()
@@ -99,14 +99,14 @@ internal static class Program
         Require(topology.MergeRuns.Count == 0 &&
                 !plan.UserTextWrites.ContainsKey(PanelCladdingKeyService.MergeMaskKey),
             "The continuous full-height vertical guide must remain segmented around partial horizontal tracks.");
-        // Since 1.2.4 PCCreate writes no blank cell placeholders; the topology alone defines the cells.
+        // Since 1.2.4 PCcreate writes no blank cell placeholders; the topology alone defines the cells.
         Require(!plan.UserTextWrites.Keys.Any(keys.IsCladdingCellKey),
-            "PCCreate must not generate cladding cell placeholders.");
+            "PCcreate must not generate cladding cell placeholders.");
         Require(plan.UserTextDeletes.Contains(PanelCladdingKeyService.SegmentMaskKey, StringComparer.OrdinalIgnoreCase) &&
                 plan.UserTextDeletes.Contains(PanelCladdingKeyService.MergeMaskKey, StringComparer.OrdinalIgnoreCase) &&
                 plan.UserTextDeletes.Contains(PanelCladdingKeyService.HideMaskKey, StringComparer.OrdinalIgnoreCase) &&
                 !plan.UserTextDeletes.Contains("CustomNote", StringComparer.OrdinalIgnoreCase),
-            "PCCreate did not reset stale masks while preserving unrelated metadata.");
+            "PCcreate did not reset stale masks while preserving unrelated metadata.");
         Require(plan.Warnings.Count == 1 &&
                 plan.Warnings[0].Contains("GUIDE_NOT_ON_PANEL", StringComparison.Ordinal),
             "The endpoint-only guide was not reported and ignored.");
@@ -177,9 +177,9 @@ internal static class Program
         Require(targetPlan.UserTextWrites.Count == 1 &&
                 targetPlan.UserTextWrites[PanelCladdingKeyService.FrameConfigBackupKey] ==
                     Required(keys.EncodeFrameConfiguration(sourceTopology, 2, 1)),
-            "PCMatchCrv did not write the source's combined frame configuration.");
+            "PCmatchCrv did not write the source's combined frame configuration.");
         Require(targetPlan.UserTextDeletes.All(PanelCladdingKeyService.IsTopologyKey),
-            "PCMatchCrv planned a non-topology deletion.");
+            "PCmatchCrv planned a non-topology deletion.");
         IReadOnlyDictionary<string, string> applied =
             PanelCladdingMatchPlanningService.ApplyUserTextPlan(targetText, targetPlan);
         Require(applied[PanelCladdingKeyService.GetHorizontalOffsetKey(0)] == "20" &&
@@ -188,10 +188,10 @@ internal static class Program
                 applied[PanelCladdingKeyService.GetCellKey(0, "A")] == "GLS-001" &&
                 applied[PanelCladdingKeyService.TypeCodeKey] == "TARGET-TYPE" &&
                 applied["CustomNote"] == "preserve",
-            "PCMatchCrv changed target offsets, cells, type metadata, or unrelated text.");
+            "PCmatchCrv changed target offsets, cells, type metadata, or unrelated text.");
         Require(Required(keys.DecodeTopology(applied, 2, 1)).MissingSegments.ToHashSet()
                 .SetEquals(sourceTopology.MissingSegments),
-            "PCMatchCrv did not apply source topology to different target offset values.");
+            "PCmatchCrv did not apply source topology to different target offset values.");
 
         OperationResponse<PanelCladdingMatchPlan> mismatch =
             new PanelCladdingCurveMatchPlanningService(keys).CreatePlan(
@@ -307,7 +307,7 @@ internal static class Program
         Require(migrated.UserTextWrites[PanelCladdingKeyService.FrameAssignmentsKey] == encoded &&
                 migrated.UserTextWrites.ContainsKey(PanelCladdingKeyService.FrameConfigBackupKey) &&
                 !migrated.UserTextWrites.Keys.Any(PanelCladdingKeyService.IsRetiredFrameKey),
-            "PCMatchCrv must migrate an older source to the new frame keys.");
+            "PCmatchCrv must migrate an older source to the new frame keys.");
         foreach (PanelCladdingMatchTargetPlan targetPlan in plan.Targets)
         {
             PanelCladdingMatchPanelSnapshot target = targets.Single(item => item.ObjectId == targetPlan.ObjectId);
@@ -316,7 +316,7 @@ internal static class Program
             PanelCladdingKeySet parsed = Required(keys.Parse(
                 applied, target.Geometry.Width, target.Geometry.Height, 0.001d));
             Require(Required(assignments.Encode(parsed.FrameAssignments, 2, 1, parsed.Topology)) == encoded,
-                "PCMatchCrv lost profiles, definitions, quantities, parent links or modifiers.");
+                "PCmatchCrv lost profiles, definitions, quantities, parent links or modifiers.");
             Require(!parsed.FrameAssignments.Definitions.ContainsKey("1D-OLD") &&
                     parsed.FrameAssignments.SegmentAssignments.Any(item => item.Segment == hidden) &&
                     !parsed.FrameAssignments.SegmentAssignments.Any(item => item.Segment == missing),
@@ -328,15 +328,15 @@ internal static class Program
                          !item.Key.Equals(PanelCladdingKeyService.SignatureKey, StringComparison.OrdinalIgnoreCase) &&
                          !item.Key.Equals(PanelCladdingKeyService.LegacySignatureKey, StringComparison.OrdinalIgnoreCase)))
             {
-                Require(applied[key] == value, $"PCMatchCrv changed target metadata: {key}.");
+                Require(applied[key] == value, $"PCmatchCrv changed target metadata: {key}.");
             }
             Require(!applied.ContainsKey(PanelCladdingKeyService.SignatureKey) &&
                     !applied.ContainsKey(PanelCladdingKeyService.LegacySignatureKey),
-                "PCMatchCrv retained stale signatures.");
+                "PCmatchCrv retained stale signatures.");
             Require(applied[PanelCladdingKeyService.FrameConfigBackupKey] ==
                     Required(keys.EncodeFrameConfiguration(topology, 2, 1)) &&
                     !applied.ContainsKey(PanelCladdingKeyService.LegacyFrameTypologyKey),
-                "PCMatchCrv must copy topology configuration and retire frame typology.");
+                "PCmatchCrv must copy topology configuration and retire frame typology.");
             IReadOnlyList<PanelCladdingExtrusionCurvePlan> curves = Required(
                 new PanelCladdingExtrusionPlanningService().CreatePlan(
                     "TARGET-PID", "TARGET-CID", target.Geometry.Width, target.Geometry.Height, parsed,
@@ -355,10 +355,10 @@ internal static class Program
                 .Targets.Single();
             IReadOnlyDictionary<string, string> reapplied = PanelCladdingMatchPlanningService.ApplyUserTextPlan(applied, repeated);
             Require(applied.Count == reapplied.Count && applied.All(item => reapplied[item.Key] == item.Value),
-                "Repeated PCMatchCrv changed already-matched assignments or derived metadata.");
+                "Repeated PCmatchCrv changed already-matched assignments or derived metadata.");
         }
         Require(source.UserText.Count == sourceText.Count && sourceText.All(item => source.UserText[item.Key] == item.Value),
-            "PCMatchCrv mutated its source.");
+            "PCmatchCrv mutated its source.");
 
         var emptySourceText = new Dictionary<string, string>(sourceText);
         emptySourceText.Remove(PanelCladdingKeyService.FrameAssignmentsKey);
@@ -399,8 +399,8 @@ internal static class Program
             [targets[0], MatchSnapshot(targets[1].ObjectId, badTarget, 220d, 300d)]);
         RequireFailure(rejected, "TARGET_INVALID");
         Require(rejected.Data is null, "A bad later target must not return a partial match plan.");
-        Console.WriteLine("[OK] PCMatchCrv copies perimeter, merged, vertical and hidden assignments; formulas generate on target-sized curves.");
-        Console.WriteLine("[OK] PCMatchCrv copies frame configuration, replaces/clears stale assignments, supports legacy payloads and is idempotent.");
+        Console.WriteLine("[OK] PCmatchCrv copies perimeter, merged, vertical and hidden assignments; formulas generate on target-sized curves.");
+        Console.WriteLine("[OK] PCmatchCrv copies frame configuration, replaces/clears stale assignments, supports legacy payloads and is idempotent.");
         Console.WriteLine("[OK] Malformed payloads and inconsistent merged assignments reject before any target plan is returned.");
     }
 
@@ -408,20 +408,20 @@ internal static class Program
     {
         Assembly assembly = typeof(PanelCladdingCurveMatchPlanningService).Assembly;
         Type command = assembly.GetType("PanelCladdingEditor.UI.PanelCladdingMatchCurveCommand") ??
-            throw new InvalidOperationException("PCMatchCrv command type is missing.");
+            throw new InvalidOperationException("PCmatchCrv command type is missing.");
         Type[] commands = assembly.GetTypes()
             .Where(type => !type.IsAbstract && typeof(Command).IsAssignableFrom(type))
             .ToArray();
         Require(typeof(Command).IsAssignableFrom(command) && command.GUID != Guid.Empty,
-            "PCMatchCrv is not an explicitly identified Rhino command.");
+            "PCmatchCrv is not an explicitly identified Rhino command.");
         Require(commands.Select(type => type.GUID).Distinct().Count() == commands.Length,
             "PanelCladdingEditor command GUIDs are not unique.");
         string source = File.ReadAllText(Path.Combine(
             FindRepositoryRoot(), "src", "PanelCladdingEditor", "UI", "PanelCladdingMatchCurveCommand.cs"));
-        Require(source.Contains("EnglishName => \"PCMatchCrv\"", StringComparison.Ordinal),
-            "The exact PCMatchCrv public command name is missing.");
+        Require(source.Contains("EnglishName => \"PCmatchCrv\"", StringComparison.Ordinal),
+            "The exact PCmatchCrv public command name is missing.");
         Require(source.Contains("new PanelCladdingCurveMatchPlanningService(keys)", StringComparison.Ordinal),
-            "PCMatchCrv is not routed through the curve-match planner.");
+            "PCmatchCrv is not routed through the curve-match planner.");
         string geometrySource = File.ReadAllText(Path.Combine(
             FindRepositoryRoot(), "src", "PanelCladdingEditor", "Infrastructure", "Rhino", "Live",
             "PanelCladding", "LivePanelCladdingGeometryPartitionService.cs"));
@@ -429,7 +429,7 @@ internal static class Program
                     "IsOnPanel = HasMeaningfulPanelOverlap(source, guide.Curve, local, tolerance)",
                     StringComparison.Ordinal) &&
                 geometrySource.Contains("source.ClosestPoint(point)", StringComparison.Ordinal),
-            "The live PCCreate snapshot does not validate meaningful guide coverage on the Brep.");
+            "The live PCcreate snapshot does not validate meaningful guide coverage on the Brep.");
     }
 
     private static PanelCladdingCreatePanelSnapshot Snapshot(

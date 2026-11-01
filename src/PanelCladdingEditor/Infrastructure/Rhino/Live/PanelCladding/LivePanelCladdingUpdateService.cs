@@ -37,7 +37,8 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
 
     public OperationResponse<PanelCladdingUpdateResult> Update(
         string filePath,
-        IReadOnlyList<Guid> panelObjectIds)
+        IReadOnlyList<Guid> panelObjectIds,
+        PanelCladdingBakeScope scope)
     {
         OperationResponse<RhinoDoc> resolved = ResolveDocument(filePath);
         if (!resolved.Success || resolved.Data is null)
@@ -62,13 +63,14 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
             return OperationResponse<PanelCladdingUpdateResult>.Fail(sources.Message);
         }
 
-        return Apply(document, filePath, sourcePanelIds);
+        return Apply(document, filePath, sourcePanelIds, scope);
     }
 
     private OperationResponse<PanelCladdingUpdateResult> UpdateDependencies(
         RhinoDoc document,
         string filePath,
         IReadOnlyList<Guid> sourcePanelIds,
+        PanelCladdingBakeScope scope,
         ref bool documentMutationOccurred)
     {
         // Read again after the CID writes, so selection and generation use the same document state.
@@ -79,12 +81,21 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
         }
         PanelCladdingUpdateSelection selection = PanelCladdingUpdateSelectionService.CreatePlan(sources.Data);
 
+        // Existing dependencies first: panels that keep their curves need no curve plan at all.
+        var ambiguousDependencies = new List<Guid>();
+        IReadOnlyList<PanelCladdingExistingDependency> existing = ReadManagedDependencies(
+            document,
+            sources.Data,
+            selection.ProcessableSources.Select(source => source.ObjectId).ToHashSet(),
+            ambiguousDependencies);
         var generator = new LivePanelCladdingSpawnService(_layouts, _keys, _spawnPlanning);
         OperationResponse<IReadOnlyList<PreparedDependency>> preparedResponse = PrepareDependencies(
             document,
             filePath,
             selection.ProcessableSources,
-            generator);
+            generator,
+            scope,
+            PanelCladdingDependencyReconciliationService.CurvePreservedPanels(existing));
         if (!preparedResponse.Success || preparedResponse.Data is null)
         {
             return OperationResponse<PanelCladdingUpdateResult>.Fail(preparedResponse.Message);
@@ -93,16 +104,11 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
         IReadOnlyList<PreparedDependency> prepared = preparedResponse.Data;
         try
         {
-            var ambiguousDependencies = new List<Guid>();
-            IReadOnlyList<PanelCladdingExistingDependency> existing = ReadManagedDependencies(
-                document,
-                sources.Data,
-                selection.ProcessableSources.Select(source => source.ObjectId).ToHashSet(),
-                ambiguousDependencies);
             OperationResponse<PanelCladdingDependencyReconciliationPlan> plan =
                 _reconciliation.CreatePlan(
                     prepared.Select(item => item.Expected).ToArray(),
-                    existing);
+                    existing,
+                    scope);
             if (!plan.Success || plan.Data is null)
             {
                 return OperationResponse<PanelCladdingUpdateResult>.Fail(plan.Message);
@@ -151,46 +157,50 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
         RhinoDoc document,
         string filePath,
         IReadOnlyList<PanelCladdingUpdateSource> sources,
-        LivePanelCladdingSpawnService generator)
+        LivePanelCladdingSpawnService generator,
+        PanelCladdingBakeScope scope,
+        IReadOnlySet<Guid> curvePreservedPanels)
     {
         var prepared = new List<PreparedDependency>();
         foreach (PanelCladdingUpdateSource source in sources)
         {
-            OperationResponse<LivePanelCladdingSpawnService.PreparedPanel> surfaces =
-                generator.PreparePanel(
-                    document,
-                    filePath,
-                    source.ObjectId,
-                    PanelCladdingObjectScope.Surfaces,
-                    allowEmptySurfacePlan: true);
-            if (!surfaces.Success || surfaces.Data is null)
+            if (PanelCladdingDependencyReconciliationService.Includes(scope, PanelCladdingDependencyKind.Surface))
             {
-                DisposePrepared(prepared);
-                return OperationResponse<IReadOnlyList<PreparedDependency>>.Fail(
-                    $"PANEL_CLADDING_UPDATE_SURFACE_PREPARE_FAILED: {source.ObjectId:D}: {surfaces.Message}");
-            }
-
-            OperationResponse<LivePanelCladdingSpawnService.PreparedPanel> curves =
-                generator.PreparePanel(
-                    document,
-                    filePath,
-                    source.ObjectId,
-                    PanelCladdingObjectScope.Curves);
-            if (!curves.Success || curves.Data is null)
-            {
-                foreach (LivePanelCladdingSpawnService.PreparedRegion region in surfaces.Data.Regions)
+                OperationResponse<LivePanelCladdingSpawnService.PreparedPanel> surfaces =
+                    generator.PreparePanel(
+                        document,
+                        filePath,
+                        source.ObjectId,
+                        PanelCladdingObjectScope.Surfaces,
+                        allowEmptySurfacePlan: true);
+                if (!surfaces.Success || surfaces.Data is null)
                 {
-                    region.Geometry.Dispose();
+                    DisposePrepared(prepared);
+                    return OperationResponse<IReadOnlyList<PreparedDependency>>.Fail(
+                        $"PANEL_CLADDING_UPDATE_SURFACE_PREPARE_FAILED: {source.ObjectId:D}: {surfaces.Message}");
                 }
-                DisposePrepared(prepared);
-                return OperationResponse<IReadOnlyList<PreparedDependency>>.Fail(
-                    $"PANEL_CLADDING_UPDATE_CURVE_PREPARE_FAILED: {source.ObjectId:D}: {curves.Message}");
+                prepared.AddRange(surfaces.Data.Regions.Select(region =>
+                    PreparedDependency.FromSurface(source, region)));
             }
 
-            prepared.AddRange(surfaces.Data.Regions.Select(region =>
-                PreparedDependency.FromSurface(source, region)));
-            prepared.AddRange(curves.Data.Curves.Select(curve =>
-                PreparedDependency.FromCurve(source, curve)));
+            if (PanelCladdingDependencyReconciliationService.Includes(scope, PanelCladdingDependencyKind.Curve) &&
+                !curvePreservedPanels.Contains(source.ObjectId))
+            {
+                OperationResponse<LivePanelCladdingSpawnService.PreparedPanel> curves =
+                    generator.PreparePanel(
+                        document,
+                        filePath,
+                        source.ObjectId,
+                        PanelCladdingObjectScope.Curves);
+                if (!curves.Success || curves.Data is null)
+                {
+                    DisposePrepared(prepared);
+                    return OperationResponse<IReadOnlyList<PreparedDependency>>.Fail(
+                        $"PANEL_CLADDING_UPDATE_CURVE_PREPARE_FAILED: {source.ObjectId:D}: {curves.Message}");
+                }
+                prepared.AddRange(curves.Data.Curves.Select(curve =>
+                    PreparedDependency.FromCurve(source, curve)));
+            }
         }
         return OperationResponse<IReadOnlyList<PreparedDependency>>.Ok(prepared);
     }
@@ -261,6 +271,7 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
             result.Add(new PanelCladdingExistingDependency
             {
                 ObjectId = rhinoObject.Id,
+                SourcePanelObjectId = owners[0].ObjectId,
                 PanelId = panelId,
                 Cid = cid,
                 Kind = kind.Value
@@ -272,7 +283,8 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
     private OperationResponse<PanelCladdingUpdateResult> Apply(
         RhinoDoc document,
         string filePath,
-        IReadOnlyList<Guid> sourcePanelIds)
+        IReadOnlyList<Guid> sourcePanelIds,
+        PanelCladdingBakeScope scope)
     {
         var sources = ReadPanelSources(document, sourcePanelIds);
         if (!sources.Success || sources.Data is null) return OperationResponse<PanelCladdingUpdateResult>.Fail(sources.Message);
@@ -289,7 +301,7 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
                 if (!prepared.Success || prepared.Data is null) return OperationResponse<PanelCladdingUpdateResult>.Fail(prepared.Message);
                 pointOrder.Add(source.ObjectId, prepared.Data);
             }
-            return ApplyPrepared(document, filePath, sourcePanelIds, pointOrder);
+            return ApplyPrepared(document, filePath, sourcePanelIds, scope, pointOrder);
         }
         catch (Exception exception)
         {
@@ -305,6 +317,7 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
         RhinoDoc document,
         string filePath,
         IReadOnlyList<Guid> sourcePanelIds,
+        PanelCladdingBakeScope scope,
         IReadOnlyDictionary<Guid, LivePanelCladdingPointOrderService.PreparedGeometry> pointOrder)
     {
         var panelCidChanges = LivePanelCladdingCidService.Prepare(document, sourcePanelIds);
@@ -341,7 +354,7 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
                 }
             }
             outcome = cidCommit.Success
-                ? UpdateDependencies(document, filePath, sourcePanelIds, ref documentMutationOccurred)
+                ? UpdateDependencies(document, filePath, sourcePanelIds, scope, ref documentMutationOccurred)
                 : OperationResponse<PanelCladdingUpdateResult>.Fail(cidCommit.Message);
             if (outcome.Success && outcome.Data is not null)
             {
@@ -453,6 +466,7 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
             SourcePanelIds = selection.ProcessableSources.Select(source => source.ObjectId).ToArray(),
             DuplicateCidGroups = selection.DuplicateCidGroups,
             PreservedAmbiguousDependencyIds = ambiguousDependencies,
+            PreservedCurvePanelIds = plan.PreservedCurvePanelIds,
             CreatedSurfaceIds = createdSurfaces,
             CreatedCurveIds = createdCurves,
             UpdatedSurfaceIds = updatedSurfaces,

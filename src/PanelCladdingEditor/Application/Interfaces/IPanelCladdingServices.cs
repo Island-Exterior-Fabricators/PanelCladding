@@ -16,19 +16,12 @@ public interface ILivePanelCladdingRepository
     OperationResponse<string> SetWorkbookPath(string filePath, string workbookPath);
 }
 
-public interface ILivePanelCladdingSpawnService
-{
-    OperationResponse<PanelCladdingSpawnResult> Spawn(
-        string filePath,
-        IReadOnlyList<Guid> objectIds,
-        PanelCladdingObjectScope scope);
-}
-
 public interface ILivePanelCladdingUpdateService
 {
     OperationResponse<PanelCladdingUpdateResult> Update(
         string filePath,
-        IReadOnlyList<Guid> panelObjectIds);
+        IReadOnlyList<Guid> panelObjectIds,
+        PanelCladdingBakeScope scope);
 }
 
 public interface ILivePanelCladdingMatchService

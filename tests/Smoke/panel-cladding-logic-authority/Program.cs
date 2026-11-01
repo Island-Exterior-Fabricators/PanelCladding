@@ -110,16 +110,16 @@ internal static class Program
         PanelCladdingCreatePanelPlan unconfigured = CreatePlan(planning, userCladding);
         Require(!unconfigured.UserTextWrites.Keys.Any(key => key.StartsWith("CW_4.", StringComparison.OrdinalIgnoreCase) ||
                     key.Equals(Logic, StringComparison.OrdinalIgnoreCase)),
-            "PCCreate writes no CW_4 placeholders and no cladding logic.");
+            "PCcreate writes no CW_4 placeholders and no cladding logic.");
         Require(!unconfigured.UserTextDeletes.Any(key => key.StartsWith("CW_4.", StringComparison.OrdinalIgnoreCase)) &&
                 unconfigured.UserTextDeletes.Contains("CW_2.03_OFFSET_H3") &&
                 unconfigured.UserTextDeletes.Contains(PanelCladdingKeyService.LegacyCladdingLogicKey) &&
                 unconfigured.UserTextDeletes.Contains("CW_2.13_CLADDING_TYPE"),
-            "PCCreate keeps the user's CW_4 keys and still clears offsets and retired keys.");
+            "PCcreate keeps the user's CW_4 keys and still clears offsets and retired keys.");
         Require(unconfigured.UserTextWrites.ContainsKey("CW_2.03_OFFSET_H0") &&
                 unconfigured.UserTextWrites.ContainsKey("CW_2.04_OFFSET_V0") &&
                 unconfigured.UserTextWrites.ContainsKey(PanelCladdingKeyService.FrameConfigBackupKey),
-            "PCCreate still writes the grid and its frame configuration.");
+            "PCcreate still writes the grid and its frame configuration.");
 
         string fitting = "{\"0A\":\"AL-01\",\"0B\":\"0A\",\"1A\":\"\",\"1B\":\"\"}";
         PanelCladdingCreatePanelPlan kept = CreatePlan(planning, new Dictionary<string, string> { [Logic] = fitting });
@@ -137,7 +137,7 @@ internal static class Program
             "Logic that no longer fits the grid is removed (UD_ and CW_9.01); CW_4 stays.");
         PanelCladdingCreatePanelPlan invalid = CreatePlan(planning, new Dictionary<string, string> { [Logic] = "not json" });
         Require(invalid.UserTextDeletes.Contains(Logic), "Unreadable logic is removed as stale.");
-        Console.WriteLine("[OK] PCCreate owns the grid only and removes logic only when it no longer fits");
+        Console.WriteLine("[OK] PCcreate owns the grid only and removes logic only when it no longer fits");
     }
 
     private static void VerifyMatchSource()
@@ -155,8 +155,8 @@ internal static class Program
         IReadOnlyDictionary<string, string> writes = plan.Targets.Single().UserTextWrites;
         Require(writes[Key("0A")] == "AL-01" && writes[Key("1A")] == "GL-02" && writes[Key("0B")] == "0A" &&
                 Required(new PanelCladdingLogicService().DecodeValues(writes[Logic]))["1A"] == "GL-02",
-            "PCMatchSrf transfers the source logic, materials included, and writes CW_4 from it.");
-        Console.WriteLine("[OK] PCMatchSrf needs a configured source and reads it from the logic");
+            "PCmatchSrf transfers the source logic, materials included, and writes CW_4 from it.");
+        Console.WriteLine("[OK] PCmatchSrf needs a configured source and reads it from the logic");
     }
 
     private static void VerifySaveExtrusionsGuard()
