@@ -190,12 +190,13 @@
                 </StackPanel>
                 <ListView x:Name="IssueList" Grid.Row="1" SelectionMode="Extended" BorderBrush="{StaticResource BorderBrush}"
                           Background="{StaticResource SurfaceBrush}" SelectionChanged="OnIssueSelectionChanged"
+                          SizeChanged="OnIssueListSizeChanged"
                           VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="Object" Width="150" DisplayMemberBinding="{Binding Object}" />
-                            <GridViewColumn Header="Layer" Width="380" DisplayMemberBinding="{Binding Layer}" />
-                            <GridViewColumn Header="Detail" Width="520" DisplayMemberBinding="{Binding Detail}" />
+                            <GridViewColumn x:Name="ObjectColumn" Header="Object" Width="150" DisplayMemberBinding="{Binding Object}" />
+                            <GridViewColumn x:Name="LayerColumn" Header="Layer" Width="340" DisplayMemberBinding="{Binding Layer}" />
+                            <GridViewColumn x:Name="DetailColumn" Header="Detail" Width="320" DisplayMemberBinding="{Binding Detail}" />
                         </GridView>
                     </ListView.View>
                 </ListView>

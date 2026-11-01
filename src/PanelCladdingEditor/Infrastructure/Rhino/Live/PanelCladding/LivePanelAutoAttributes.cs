@@ -25,8 +25,8 @@ using UnitSystem = rhinocommon::Rhino.UnitSystem;
 namespace PanelCladdingEditor.Infrastructure.Rhino.Live.PanelCladding;
 
 // Always-on refresh of unit dimension, width, height, area, weight and the panel frame (UD_PLANE,
-// computed from the geometry) on every panel of
-// <PROJECT>-IEF-Wireframe::Surfaces - PNL and its sublayers (replaces the AutoATT script and its
+// computed from the geometry) on every panel of <PROJECT>-IEF-Wireframe::Surfaces - PNL and its
+// sublayers, Not in Scope and By Others ones included (replaces the AutoATT script and its
 // AUTO_panel=1 mark). Events only queue object ids; values are written on idle outside a command,
 // because changing the document inside object events is unsafe. Undo is left alone: it restores
 // the values recorded with the previous geometry.
@@ -162,7 +162,7 @@ internal static class LivePanelAutoAttributes
         int layerIndex = panel.Attributes.LayerIndex;
         string layerPath = layerIndex >= 0 ? document.Layers[layerIndex]?.FullPath ?? string.Empty : string.Empty;
         string project = PanelCladdingProjectService.CodeFromDocumentPath(document.Path);
-        if (!PanelCladdingExtrusionPlanningService.IsPanelLayerPath(layerPath, project)) return false;
+        if (!PanelCladdingExtrusionPlanningService.IsPanelBranchPath(layerPath, project)) return false;
         Brep? brep = panel.Geometry switch
         {
             Brep value => value,

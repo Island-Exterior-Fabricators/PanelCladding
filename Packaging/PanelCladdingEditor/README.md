@@ -180,9 +180,9 @@ The former `01_CW Panels`, `02_CW Extrusions`, `04_STEP Surfaces` and
 
 Since 1.3.0, layers whose name contains `Not in Scope` or `By Others` (any case; spaces, `-` and
 `_` ignored), at any depth under `Surfaces - PNL` or `Curves - PNL`, are not tracked: PCpid does
-not number their panels, auto attributes and the naming sync skip them, `PCbake` does not create
-curves for them or treat curves there as managed, and `PCreport` leaves them out. Values already on
-those objects stay as they are.
+not number their panels, the naming sync skips them, `PCbake` does not create curves for them or
+treat curves there as managed, and `PCreport` leaves them out. The auto attributes (sizes, area,
+weight, `UD_PLANE`) are still kept current on those panels.
 
 Since 1.0.96, `PCmatchCrv` copies extrusion assignments together with the segment, merge and hide
 masks. Select target panel Breps, then the source; horizontal/vertical grid counts

@@ -228,6 +228,11 @@ public sealed class PanelCladdingExtrusionPlanningService
         SplitLayerPath(layerPath).Any(segment => ExcludedLayerKeywords.Any(keyword =>
             LayerWord(segment).Contains(LayerWord(keyword), StringComparison.Ordinal)));
 
+    // The whole panel branch, excluded sublayers included: the auto attributes keep those panels'
+    // sizes and UD_PLANE current although nothing else tracks them.
+    public static bool IsPanelBranchPath(string layerPath, string? projectCode) =>
+        IsProjectBranch(SplitLayerPath(layerPath), PanelSurfaceLayerName, projectCode);
+
     // The branch root itself and every nested sublayer belong to the branch, except excluded ones.
     public static bool IsPanelLayerPath(string layerPath) => IsPanelLayerPath(layerPath, null);
 
