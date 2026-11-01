@@ -6,7 +6,7 @@ it with `Install-PanelCladdingEditor.ps1`.
 
 The Rhino command surface uses the `PC` prefix: `_PCeditor`, `_PCcreate`, `_PCclear`,
 `_PCcrvTemplate`, `_PCmatchSrf`, `_PCmatchCrv`, `_PCbake`, `_PCsyncSrf`, `_PCsyncCrv`, `_PCpid`,
-`_PCreport`, and `_PCtemplatePNL`. Since 1.3.0 every name is `PC`, the first word in lowercase and later words
+`_PCreport`, `_PCtemplatePNL` and `_PCweb`. Since 1.3.0 every name is `PC`, the first word in lowercase and later words
 capitalized (`PNL` stays an acronym). Rhino matches command names case-insensitively, so the former
 spellings (`PCEditor`, `PCSyncCrv`, ...), aliases and toolbar macros still run.
 
@@ -44,6 +44,16 @@ checked, even when they carry a PID.
 
 Select issue rows to select and zoom to their objects in Rhino; Rescan reads the model again and
 Export writes `<model> - PC Report.xlsx` (Summary and Issues sheets).
+
+`PCweb` opens the active saved model in Wireframe Web, the team's read-only web viewer, when it is
+installed (per user, from https://github.com/nuofan-island/wireframe-web/releases). The model must
+be named `<CODE> - ....3dm`. Wireframe Web reads the saved file, so unsaved changes are first saved
+(Yes), left out (No: the last save opens) or the command stops (Cancel); `-PCweb` offers `Save` and
+`LastSave` on the command line. PCweb runs Wireframe Web's launch command
+(`HKEY_CURRENT_USER\Software\IEF\Wireframe Web` `Launcher`, else
+`%LOCALAPPDATA%\Programs\Wireframe Web\wireframe-web.cmd`) and returns at once; the page address,
+or Wireframe Web's message, follows on the command line. The first start can take a minute.
+Wireframe Web keeps running after Rhino closes.
 
 Since 1.1.0, panel attributes follow the project naming convention workbook
 `<PROJECT> - Naming Convention.xlsx` (PNL sheet):
@@ -455,7 +465,7 @@ activate it.
 The installed RHP and its private dependencies live at
 `%LOCALAPPDATA%\PanelCladdingEditor\plugin\<version>`. The installer writes the complete Rhino 8
 current-user registration directly: root product/startup metadata, `PlugIn\FileName`, and the exact
-twelve-command `CommandList`. It does not rely on Rhino consuming a shorthand root `FileName` during
+thirteen-command `CommandList`. It does not rely on Rhino consuming a shorthand root `FileName` during
 first startup. Installer validation rejects shorthand-only, partial, stale-command, or mixed
 registrations. It removes the legacy `PanelCladdingEditor` and `BayHealthPanelCladdingEditor` roots
 from Rhino Package Manager discovery. Do not place the RHP under

@@ -1,0 +1,6 @@
+{
+  "check": "read-only modified model: no question, nothing saved, last save opened",
+  "readOnly": true,
+  "modified": true,
+  "added": "PCweb: PCW - Wireframe LIVE TEST.3dm is read-only; Wireframe Web opens its last save.\nPCweb: opening PCW in Wireframe Web...\nPCweb: PCW is open in Wireframe Web: http://127.0.0.1:8795/?source=api\u0026project=pcw\u0026user=nuofa\n[MCP_Rhino diag] ALC.Load(RhinoCommon) -\u003E share with default context\n"
+}

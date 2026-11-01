@@ -7,8 +7,9 @@
 //   Result = PcLive.Start(doc, Parameters, Log);   // queues one suite and returns at once
 //   Result = PcLive.Read(Parameters);               // returns the suite's results so far (JSON)
 //
-// Parameters: { "suite": "commands|bake|excluded|report|scan|export|editor|otherdocs|probe" (several
-// joined by '+'), "evidenceDir": "<folder>", and "mainModel" for otherdocs, "macro" for probe }.
+// Parameters: { "suite": "commands|bake|excluded|report|scan|export|editor|otherdocs|web|probe" (several
+// joined by '+'), "evidenceDir": "<folder>", and "mainModel" for otherdocs, "assembly" for web, "macro"
+// for probe }.
 // A suite is a list of steps run one per RhinoApp.Idle tick, outside the host's own undo record,
 // the way typed commands run. Commands are sent with RhinoApp.RunScript; objects are picked with
 // a preselection or the transparent '_SelID command. No keyboard or mouse input is generated.
@@ -20,7 +21,7 @@ public static class PcLive
     private static readonly string[] ExpectedCommands =
     {
         "PCeditor", "PCcreate", "PCclear", "PCcrvTemplate", "PCmatchSrf", "PCmatchCrv",
-        "PCbake", "PCsyncSrf", "PCsyncCrv", "PCpid", "PCreport", "PCtemplatePNL"
+        "PCbake", "PCsyncSrf", "PCsyncCrv", "PCpid", "PCreport", "PCtemplatePNL", "PCweb"
     };
     private static readonly string[] RemovedCommands = { "PCupdate", "PCspawnSrf", "PCspawnCrv" };
 
@@ -52,6 +53,7 @@ public static class PcLive
                 case "export": steps.AddRange(ExportSteps()); break;
                 case "editor": steps.AddRange(EditorSteps()); break;
                 case "otherdocs": steps.AddRange(OtherDocumentSteps()); break;
+                case "web": steps.AddRange(WebSteps()); break;
                 case "probe": steps.AddRange(ProbeSteps()); break;
                 default: throw new ArgumentException("Unknown suite: " + name);
             }
@@ -97,8 +99,9 @@ public static class PcLive
             string[] aliases = Rhino.ApplicationSettings.CommandAliasList.GetNames()
                 .Where(name => name.StartsWith("PC", StringComparison.OrdinalIgnoreCase)).ToArray();
             bool exact = new HashSet<string>(pluginNames, StringComparer.Ordinal).SetEquals(ExpectedCommands);
-            ctx.Check("1.1 plug-in registers exactly the 12 commands", exact, pluginNames);
-            ctx.Check("1.1 'PC' completion lists only these 12", all.All(name => ExpectedCommands.Contains(name, StringComparer.OrdinalIgnoreCase)) && all.Length == 12,
+            ctx.Check("1.1 plug-in registers exactly the " + ExpectedCommands.Length + " commands", exact, pluginNames);
+            ctx.Check("1.1 'PC' completion lists only these " + ExpectedCommands.Length,
+                all.All(name => ExpectedCommands.Contains(name, StringComparer.OrdinalIgnoreCase)) && all.Length == ExpectedCommands.Length,
                 new { loadedCommandsStartingWithPC = loaded, registeredCommandsStartingWithPC = all, aliasesStartingWithPC = aliases });
             return true;
         }),
@@ -1092,6 +1095,183 @@ public static class PcLive
     private static Dictionary<string, string> Visibilities(object window, params string[] names) =>
         names.ToDictionary(name => name, name => R.Find(window, name) is object element ? R.Get(element, "Visibility").ToString() : "missing");
 
+    // ---------------------------------------------------------------- PCweb (Wireframe Web)
+
+    // Runs PCweb on the active saved model with the unsaved-changes answer given directly (its dialog
+    // is not driven). Parameters.assembly names a PanelCladdingEditor build to load into its own load
+    // context when that build is not the installed one; otherwise the loaded plug-in is used. Needs
+    // Wireframe Web installed and a model whose project code is not a real project, since PCweb links
+    // that project to the model. Every run that opens the model also opens a browser tab.
+    private const string WebCommandType = "PanelCladdingEditor.UI.PanelCladdingWebCommand";
+    private const string WebLauncherType = "PanelCladdingEditor.Infrastructure.WireframeWeb.WireframeWebLauncher";
+
+    private static List<Step> WebSteps() => new List<Step>
+    {
+        new Step("W.0 setup", ctx =>
+        {
+            Type command = WebCommand(ctx);
+            string launcher = command.Assembly.GetType(WebLauncherType, true)
+                .GetMethod("FindLauncher", Type.EmptyTypes).Invoke(null, null) as string;
+            string version = command.Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
+                .OfType<System.Reflection.AssemblyInformationalVersionAttribute>().FirstOrDefault()?.InformationalVersion ?? string.Empty;
+            RhinoDoc doc = ctx.Doc;
+            ctx.Note("W.0 setup", new { assembly = Text(ctx.Parameters, "assembly"), version, launcher, model = doc.Path, port = WebPort() });
+            ctx.Check("W.0 Wireframe Web is installed", launcher != null && System.IO.File.Exists(launcher), launcher);
+            // Rhino opens a file read-only when it cannot lock it (for example a copy still being
+            // scanned); W.3 would then stop on Rhino's "File Is Read-only" message.
+            ctx.Check("W.0 the test model is saved, writable, unmodified and named <CODE> - ...", !string.IsNullOrEmpty(doc.Path) &&
+                !doc.IsReadOnly && !doc.Modified && WebProject(doc).Length > 0, new { doc.Path, doc.IsReadOnly, doc.Modified });
+            return true;
+        }),
+        new Step("W.1 saved model opens without a question", ctx =>
+        {
+            string result = WebOpen(ctx, "W.1", null, out bool asked);
+            string added = WebHistory(ctx, "W.1");
+            ctx.Check("W.1 PCweb starts the launcher and returns at once", result == "Success" && !asked &&
+                added.Contains("PCweb: opening " + WebProject(ctx.Doc).ToUpperInvariant() + " in Wireframe Web..."), new { result, asked, added });
+            return true;
+        }),
+        WebResultStep("W.1"),
+        new Step("W.2 unsaved changes, LastSave", ctx =>
+        {
+            RhinoDoc doc = ctx.Doc;
+            doc.Modified = true;
+            DateTime before = System.IO.File.GetLastWriteTimeUtc(doc.Path);
+            string result = WebOpen(ctx, "W.2", false, out bool asked);
+            ctx.Check("W.2 PCweb asks, keeps the changes unsaved and opens the last save", result == "Success" && asked && doc.Modified &&
+                System.IO.File.GetLastWriteTimeUtc(doc.Path) == before, new { result, asked, doc.Modified, before, added = WebHistory(ctx, "W.2") });
+            string again = WebOpen(ctx, "W.2b", false, out bool askedAgain);
+            string added = WebHistory(ctx, "W.2b");
+            ctx.Check("W.2 a second run while the first waits starts nothing", again == "Nothing" && !askedAgain &&
+                added.Contains("still opening") && !added.Contains("PCweb: opening"), new { again, askedAgain, added });
+            return true;
+        }),
+        WebResultStep("W.2"),
+        new Step("W.3 unsaved changes, Save", ctx =>
+        {
+            RhinoDoc doc = ctx.Doc;
+            if (doc.IsReadOnly)
+            {
+                ctx.Check("W.3 PCweb asks, saves, then opens", false, "the test model is open read-only");
+                return true;
+            }
+            doc.Modified = true;
+            DateTime before = System.IO.File.GetLastWriteTimeUtc(doc.Path);
+            string result = WebOpen(ctx, "W.3", true, out bool asked);
+            DateTime after = System.IO.File.GetLastWriteTimeUtc(doc.Path);
+            ctx.Check("W.3 PCweb asks, saves, then opens", result == "Success" && asked && !doc.Modified && after > before,
+                new { result, asked, doc.Modified, before, after, added = WebHistory(ctx, "W.3") });
+            return true;
+        }),
+        WebResultStep("W.3"),
+        new Step("W.4 unsaved changes, Cancel", ctx =>
+        {
+            RhinoDoc doc = ctx.Doc;
+            doc.Modified = true;
+            DateTime before = System.IO.File.GetLastWriteTimeUtc(doc.Path);
+            string result = WebOpen(ctx, "W.4", null, out bool asked);
+            string added = WebHistory(ctx, "W.4");
+            ctx.Check("W.4 Cancel saves nothing and starts nothing", result == "Cancel" && asked && doc.Modified &&
+                System.IO.File.GetLastWriteTimeUtc(doc.Path) == before && !added.Contains("PCweb:"), new { result, asked, added });
+            doc.Modified = false;
+            return true;
+        }),
+    };
+
+    // Waits for PCweb's result line, then reads the project's model status from Wireframe Web.
+    private static Step WebResultStep(string id) => new Step(id + " result", ctx =>
+    {
+        string line = WebHistory(ctx, id).Split('\n').Select(item => item.Trim())
+            .LastOrDefault(item => item.StartsWith("PCweb: ") && !item.StartsWith("PCweb: opening ") && !item.Contains("still opening"));
+        if (line == null) return false;
+        ctx.Note(id + " document at result", DocState(ctx.Doc));
+        double seconds = Math.Round(((System.Diagnostics.Stopwatch)ctx.Bag[id + ".watch"]).Elapsed.TotalSeconds, 1);
+        string project = WebProject(ctx.Doc);
+        int at = line.IndexOf("http", StringComparison.Ordinal);
+        string address = line.Contains(" is open in Wireframe Web: ") && at > 0 ? line.Substring(at) : string.Empty;
+        ctx.Check(id + " PCweb reports the page address", address.Contains("source=api&project=" + project + "&user="), new { line, seconds });
+
+        string status = WebGet("/api/projects/" + project + "/model-file");
+        using (JsonDocument json = JsonDocument.Parse(status))
+        {
+            JsonElement root = json.RootElement;
+            string fileName = root.TryGetProperty("fileName", out JsonElement name) ? name.GetString() : string.Empty;
+            string loaded = root.TryGetProperty("loadedSavedAt", out JsonElement value) ? value.GetString() : string.Empty;
+            DateTime saved = System.IO.File.GetLastWriteTimeUtc(ctx.Doc.Path);
+            bool same = DateTime.TryParse(loaded, System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.AdjustToUniversal | System.Globalization.DateTimeStyles.AssumeUniversal, out DateTime loadedAt) &&
+                Math.Abs((loadedAt - saved).TotalSeconds) < 1;
+            ctx.Check(id + " Wireframe Web loaded the saved file", fileName == System.IO.Path.GetFileName(ctx.Doc.Path) && same,
+                new { fileName, loadedSavedAt = loaded, fileSavedAt = saved.ToString("o"), status });
+        }
+        return true;
+    }, maxAttempts: 1200);
+
+    // Calls PCweb's Open(doc, askToSave); returns the Rhino result's name.
+    private static string WebOpen(Ctx ctx, string id, bool? answer, out bool asked)
+    {
+        System.Reflection.MethodInfo open = WebCommand(ctx).GetMethod("Open",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        bool wasAsked = false;
+        var ask = new Func<RhinoDoc, bool?>(document => { wasAsked = true; return answer; });
+        ctx.Bag[id + ".history"] = RhinoApp.CommandHistoryWindowText ?? string.Empty;
+        ctx.Bag[id + ".watch"] = System.Diagnostics.Stopwatch.StartNew();
+        string before = DocState(ctx.Doc);
+        object result = open.Invoke(null, new object[] { ctx.Doc, ask });
+        ctx.Note(id + " document", new { before, after = DocState(ctx.Doc) });
+        asked = wasAsked;
+        return result.ToString();
+    }
+
+    private static string DocState(RhinoDoc doc) =>
+        DateTime.Now.ToString("HH:mm:ss.fff") + " readOnly=" + doc.IsReadOnly + " locked=" + doc.IsLocked + " modified=" + doc.Modified;
+
+    private static string WebHistory(Ctx ctx, string id) =>
+        Ctx.Added((string)ctx.Bag[id + ".history"], RhinoApp.CommandHistoryWindowText ?? string.Empty);
+
+    private static Type WebCommand(Ctx ctx)
+    {
+        if (ctx.Bag.TryGetValue("web.command", out object cached)) return (Type)cached;
+        string path = Text(ctx.Parameters, "assembly");
+        Type type;
+        if (path.Length > 0)
+        {
+            // From bytes, so the build output stays unlocked; its references resolve to the loaded ones.
+            var context = new System.Runtime.Loader.AssemblyLoadContext("PcLive.web." + Guid.NewGuid().ToString("N"), true);
+            type = context.LoadFromStream(new System.IO.MemoryStream(System.IO.File.ReadAllBytes(path))).GetType(WebCommandType, true);
+        }
+        else
+        {
+            type = R.T(WebCommandType) ?? throw new InvalidOperationException("The loaded plug-in has no PCweb.");
+        }
+        ctx.Bag["web.command"] = type;
+        return type;
+    }
+
+    // Wireframe Web's project id: the code before the first " - ", in lower case.
+    private static string WebProject(RhinoDoc doc)
+    {
+        string name = System.IO.Path.GetFileNameWithoutExtension(doc.Path ?? string.Empty);
+        int separator = name.IndexOf(" - ", StringComparison.Ordinal);
+        return separator > 0 ? new string(name.Substring(0, separator).Trim().TakeWhile(char.IsLetterOrDigit).ToArray()).ToLowerInvariant() : string.Empty;
+    }
+
+    private static string WebPort()
+    {
+        using (Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\IEF\Wireframe Web"))
+            return key?.GetValue("Port") as string ?? "8795";
+    }
+
+    private static string WebGet(string path)
+    {
+        using (var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromSeconds(15) })
+        {
+            client.DefaultRequestHeaders.Add("x-wf-user", System.Environment.UserName);
+            string url = "http://127.0.0.1:" + WebPort() + path;
+            return System.Threading.Tasks.Task.Run(() => client.GetStringAsync(url)).Result;
+        }
+    }
+
     // ---------------------------------------------------------------- probe
 
     // Runs Parameters.macro once (to try a macro shape before using it in a suite).
@@ -1371,7 +1551,7 @@ public static class PcLive
 
         // The history window drops its oldest lines when it grows long, so the new text is found after
         // the last stretch of the old text rather than by length.
-        private static string Added(string before, string after)
+        public static string Added(string before, string after)
         {
             if (after.StartsWith(before, StringComparison.Ordinal)) return after.Substring(before.Length);
             string tail = before.Length > 400 ? before.Substring(before.Length - 400) : before;
