@@ -21,6 +21,7 @@ internal static class Program
             ["PanelCladdingSyncSrfCommand"] = "PCsyncSrf",
             ["PanelCladdingBakeCommand"] = "PCbake",
             ["PanelCladdingPidCommand"] = "PCpid",
+            ["PanelCladdingReportCommand"] = "PCreport",
             ["PanelCladdingTemplatePnlCommand"] = "PCtemplatePNL"
         };
 
@@ -34,7 +35,7 @@ internal static class Program
             VerifyPackageMetadata(repositoryRoot);
             VerifyNoFormerSpellings(repositoryRoot);
 
-            Console.WriteLine("[OK] All eleven user-facing PanelCladdingEditor Rhino commands use the PC prefix.");
+            Console.WriteLine("[OK] All twelve user-facing PanelCladdingEditor Rhino commands use the PC prefix.");
             Console.WriteLine("[OK] Command names follow the PC + camel case rule; source and installer use no former spelling.");
             Console.WriteLine("[OK] No legacy PanelCladding-prefixed command alias remains registered.");
             Console.WriteLine("[OK] Command GUIDs remain explicit and unique, and package metadata names PCeditor only.");

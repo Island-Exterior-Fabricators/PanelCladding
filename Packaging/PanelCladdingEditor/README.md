@@ -6,7 +6,7 @@ it with `Install-PanelCladdingEditor.ps1`.
 
 The Rhino command surface uses the `PC` prefix: `_PCeditor`, `_PCcreate`, `_PCclear`,
 `_PCcrvTemplate`, `_PCmatchSrf`, `_PCmatchCrv`, `_PCbake`, `_PCsyncSrf`, `_PCsyncCrv`, `_PCpid`,
-and `_PCtemplatePNL`. Since 1.3.0 every name is `PC`, the first word in lowercase and later words
+`_PCreport`, and `_PCtemplatePNL`. Since 1.3.0 every name is `PC`, the first word in lowercase and later words
 capitalized (`PNL` stays an acronym). Rhino matches command names case-insensitively, so the former
 spellings (`PCEditor`, `PCSyncCrv`, ...), aliases and toolbar macros still run.
 
@@ -25,6 +25,23 @@ skipped and reported while the remaining eligible panels are updated. Selecting 
 panels succeeds without changes. A one-row/one-column case with no applicable
 run remains mask-free. Surface commands operate only on cladding Breps; curve commands operate only
 on extrusion curves.
+
+`PCreport` (1.3.0) checks the active saved model's layer structure and attributes and opens a
+report window; it changes nothing in the model. Issues are Error (a command fails or produces wrong
+output), Warning (non-compliant, tolerated or corrected on the next write) or Info. It checks:
+
+- Layers: project root, retired trees, panels on `Surfaces - PNL` without a type layer, names close
+  to the standard, STEP family against material, curve type layers without a panel type layer, and
+  `Not in Scope` / `By Others` layers (listed, not checked).
+- Panels: keys repeated in another case, duplicate CIDs, unreadable cladding/frame data, PID format,
+  CID and name against PID and role, unit type and role, old payloads in `CW_1.09_FRAME_TYPE`,
+  missing setup keys (Info), legacy keys, role case and `UD_PLANE`.
+- Cladding surfaces and curves: missing or untracked owner panel, duplicate CIDs, `Cladding` against
+  the layer, curves off their panel's curve layer, panels with materials but no surfaces, and
+  objects with a PID outside the managed layers.
+
+Select issue rows to select and zoom to their objects in Rhino; Rescan reads the model again and
+Export writes `<model> - PC Report.xlsx` (Summary and Issues sheets).
 
 Since 1.1.0, panel attributes follow the project naming convention workbook
 `<PROJECT> - Naming Convention.xlsx` (PNL sheet):
@@ -436,7 +453,7 @@ activate it.
 The installed RHP and its private dependencies live at
 `%LOCALAPPDATA%\PanelCladdingEditor\plugin\<version>`. The installer writes the complete Rhino 8
 current-user registration directly: root product/startup metadata, `PlugIn\FileName`, and the exact
-thirteen-command `CommandList`. It does not rely on Rhino consuming a shorthand root `FileName` during
+twelve-command `CommandList`. It does not rely on Rhino consuming a shorthand root `FileName` during
 first startup. Installer validation rejects shorthand-only, partial, stale-command, or mixed
 registrations. It removes the legacy `PanelCladdingEditor` and `LegacyPanelCladdingEditor` roots
 from Rhino Package Manager discovery. Do not place the RHP under
