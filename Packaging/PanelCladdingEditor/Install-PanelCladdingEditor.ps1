@@ -60,6 +60,7 @@ function Get-PanelExpectedCommands {
         'PCmatchCrv',
         'PCmatchSrf',
         'PCpid',
+        'PCreport',
         'PCsyncCrv',
         'PCsyncSrf',
         'PCtemplatePNL'
