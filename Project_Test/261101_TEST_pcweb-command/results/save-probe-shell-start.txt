@@ -1,0 +1,11 @@
+Rhino 56932, C:\01_Projects\Panel Cladding Full\LiveTest-pcweb\PCW - Wireframe LIVE TEST.3dm
+e child cmd 63696 started by the shell (UseShellExecute=true, hidden): 01:14:17.888 readOnly=False locked=True modified=False mtime=01:11:38.298
+e while that child runs queued: 01:14:17.888 readOnly=False locked=True modified=False mtime=01:11:38.298
+e while that child runs before save: 01:14:17.901 readOnly=False locked=True modified=False mtime=01:11:38.298
+e while that child runs save returned True: 01:14:18.284 readOnly=False locked=True modified=False mtime=01:14:18.266
+f child cmd 24348 (ping 40 s) started by the shell (UseShellExecute=true, hidden): 01:14:40.559 readOnly=False locked=True modified=False mtime=01:14:18.266
+g shell-started cmd 68092 alive after 1.5 s=True exit=0 PATH has system32=True: 01:15:13.084 readOnly=False locked=True modified=False mtime=01:14:18.266
+h cmd 68092 alive=True: 01:15:22.134 readOnly=False locked=True modified=False mtime=01:14:18.266
+h save while the shell-started child runs queued: 01:15:22.134 readOnly=False locked=True modified=False mtime=01:14:18.266
+h save while the shell-started child runs before save: 01:15:22.184 readOnly=False locked=True modified=False mtime=01:14:18.266
+h save while the shell-started child runs save returned True: 01:15:22.427 readOnly=False locked=True modified=False mtime=01:15:22.409

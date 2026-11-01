@@ -63,7 +63,8 @@ function Get-PanelExpectedCommands {
         'PCreport',
         'PCsyncCrv',
         'PCsyncSrf',
-        'PCtemplatePNL'
+        'PCtemplatePNL',
+        'PCweb'
     )
 }
 

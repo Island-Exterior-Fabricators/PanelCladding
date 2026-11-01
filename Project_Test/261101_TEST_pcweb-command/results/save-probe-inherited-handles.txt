@@ -1,0 +1,25 @@
+Rhino 53036, C:\01_Projects\Panel Cladding Full\LiveTest-pcweb\PCW - Wireframe LIVE TEST.3dm
+SaveProbe log (RhinoDoc.Save() on an idle tick, state before and after), copied from the probe's output:
+a fresh open queued: 01:10:59.244 readOnly=False locked=True modified=False mtime=01:05:35.486
+a fresh open before save: 01:10:59.257 readOnly=False locked=True modified=False mtime=01:05:35.486
+a fresh open save returned True: 01:10:59.669 readOnly=False locked=True modified=False mtime=01:10:59.648
+b after a PowerShell read queued: 01:11:12.332 readOnly=False locked=True modified=False mtime=01:10:59.648
+b after a PowerShell read before save: 01:11:12.343 readOnly=False locked=True modified=False mtime=01:10:59.648
+b after a PowerShell read save returned True: 01:11:12.573 readOnly=False locked=True modified=False mtime=01:11:12.556
+c after Wireframe Web loaded it queued: 01:11:38.073 readOnly=False locked=True modified=False mtime=01:11:12.556
+c after Wireframe Web loaded it before save: 01:11:38.087 readOnly=False locked=True modified=False mtime=01:11:12.556
+c after Wireframe Web loaded it save returned True: 01:11:38.315 readOnly=False locked=True modified=False mtime=01:11:38.298
+d child cmd 23464 started with inherited handles (UseShellExecute=false): 01:12:20.104 readOnly=False locked=True modified=False mtime=01:11:38.298
+d while that child runs queued: 01:12:20.105 readOnly=False locked=True modified=False mtime=01:11:38.298
+
+(no further line: the save in d did not return.) Visible windows of process 53036 three seconds later:
+File Is Read-only
+PCW - Wireframe LIVE TEST.3dm (26 MB) - Rhino 8 Commercial - [Perspective]
+
+Between b and c, PowerShell ran the Wireframe Web launcher on the model (exit 0) and waited until the
+project's model-file status reported loading=false (loadedSavedAt 2026-11-01T06:11:12.556Z).
+In b, PowerShell read the whole file with FileShare.ReadWrite|Delete, as Node's readFileSync does.
+In d, the child was "cmd.exe /d /c ping -n 20 127.0.0.1 >nul" started from Rhino with
+UseShellExecute=false and redirected output (how the Wireframe Web contract starts the launcher).
+The process was then stopped (the dialog is modal and the test drives no UI).
+Local times are EST (2026-11-01, after the 02:00 EDT -> 01:00 EST change).
