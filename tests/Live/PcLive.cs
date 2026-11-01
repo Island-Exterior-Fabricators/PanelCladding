@@ -1383,9 +1383,12 @@ public static class PcLive
 
     private static string Cid(Rhino.DocObjects.RhinoObject item) => (item.Attributes.GetUserString(CidKey) ?? string.Empty).Trim();
 
+    // The model's own panels on a layer; the PCpid copy an earlier excluded run may have left there
+    // (NewPanelKey, no PID) is not one of them.
     private static List<Rhino.DocObjects.RhinoObject> PanelsOn(RhinoDoc doc, string layerPath) =>
         doc.Objects.GetObjectList(Everything(Rhino.DocObjects.ObjectType.Brep))
-            .Where(item => string.Equals(LayerPath(doc, item), layerPath, StringComparison.OrdinalIgnoreCase))
+            .Where(item => string.Equals(LayerPath(doc, item), layerPath, StringComparison.OrdinalIgnoreCase) &&
+                item.Attributes.GetUserString(NewPanelKey) == null)
             .OrderBy(Pid, StringComparer.Ordinal).ToList();
 
     // Managed dependencies carry the panel's PID and a CID that starts with the panel's CID.

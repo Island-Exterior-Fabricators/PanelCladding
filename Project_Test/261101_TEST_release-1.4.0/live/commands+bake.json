@@ -1,0 +1,413 @@
+{
+  "suite": "commands\u002Bbake",
+  "status": "done",
+  "started": "2026-11-01T01:49:50",
+  "updated": "2026-11-01T01:49:52",
+  "step": "",
+  "passed": 23,
+  "failed": 4,
+  "error": "",
+  "checks": [
+    {
+      "id": "1.0 Rhino runs the installed RHP 1.4.0\u002B8a9421b",
+      "pass": true,
+      "step": "1.0 loaded plug-in",
+      "evidence": {
+        "location": "C:\\Users\\nuofa\\AppData\\Local\\PanelCladdingEditor\\plugin\\1.4.0\\PanelCladdingEditor.rhp",
+        "hash": "F93BE778A9CD15B353E0EBA6B80ED66B84E490ECF06A86E93195D9E4F0D81208",
+        "version": "1.4.0\u002B8a9421bc505eba39d727e95edde40298291d8bce",
+        "expected": "1.4.0\u002B8a9421b"
+      }
+    },
+    {
+      "id": "1.1 plug-in registers exactly the 13 commands",
+      "pass": true,
+      "step": "1.1 command registry",
+      "evidence": [
+        "PCbake",
+        "PCclear",
+        "PCcreate",
+        "PCcrvTemplate",
+        "PCeditor",
+        "PCmatchSrf",
+        "PCmatchCrv",
+        "PCpid",
+        "PCreport",
+        "PCsyncCrv",
+        "PCsyncSrf",
+        "PCtemplatePNL",
+        "PCweb"
+      ]
+    },
+    {
+      "id": "1.1 \u0027PC\u0027 completion lists only these 13",
+      "pass": true,
+      "step": "1.1 command registry",
+      "evidence": {
+        "loadedCommandsStartingWithPC": [
+          "PCbake",
+          "PCclear",
+          "PCcreate",
+          "PCcrvTemplate",
+          "PCeditor",
+          "PCmatchCrv",
+          "PCmatchSrf",
+          "PCpid",
+          "PCreport",
+          "PCsyncCrv",
+          "PCsyncSrf",
+          "PCtemplatePNL",
+          "PCweb"
+        ],
+        "registeredCommandsStartingWithPC": [
+          "PCbake",
+          "PCclear",
+          "PCcreate",
+          "PCcrvTemplate",
+          "PCeditor",
+          "PCmatchCrv",
+          "PCmatchSrf",
+          "PCpid",
+          "PCreport",
+          "PCsyncCrv",
+          "PCsyncSrf",
+          "PCtemplatePNL",
+          "PCweb"
+        ],
+        "aliasesStartingWithPC": []
+      }
+    },
+    {
+      "id": "1.2 PCEditor runs PCeditor",
+      "pass": true,
+      "step": "1.2 old spelling",
+      "evidence": "Command: _PCEditor\nSelect one panel Brep to edit: _Enter\nSelect one panel Brep to edit\nPanel selection cancelled.\n"
+    },
+    {
+      "id": "1.2 PCBAKE runs PCbake",
+      "pass": true,
+      "step": "1.2 old spelling",
+      "evidence": "Command: _PCBAKE\nSelect panel Breps to bake ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake ( Scope=Surfaces )\nPanel bake selection cancelled.\n"
+    },
+    {
+      "id": "1.3 PCupdate is unknown",
+      "pass": true,
+      "step": "1.3 removed commands",
+      "evidence": "Command: _PCupdate\nUnknown command: _PCupdate\n"
+    },
+    {
+      "id": "1.3 PCspawnSrf is unknown",
+      "pass": true,
+      "step": "1.3 removed commands",
+      "evidence": "Command: _PCspawnSrf\nUnknown command: _PCspawnSrf\n"
+    },
+    {
+      "id": "1.3 PCspawnCrv is unknown",
+      "pass": true,
+      "step": "1.3 removed commands",
+      "evidence": "Command: _PCspawnCrv\nUnknown command: _PCspawnCrv\n"
+    },
+    {
+      "id": "1.4 no local alias or loaded toolbar calls a removed command",
+      "pass": true,
+      "step": "1.4 aliases and toolbars",
+      "evidence": {
+        "aliasHits": [],
+        "toolbarHits": [],
+        "toolbarFiles": [
+          {
+            "Name": "default",
+            "path": "Rhino.UI.Resources.rui.default.rui"
+          }
+        ]
+      }
+    },
+    {
+      "id": "2.1 prompt shows Scope=Surfaces",
+      "pass": true,
+      "step": "2.1 preselected panel, default scope",
+      "evidence": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces )\nPANEL_CLADDING_UPDATE_PID_REQUIRED: ef313d2b-361a-4c65-80e1-36e4141c4898\n"
+    },
+    {
+      "id": "2.1 Enter bakes surfaces only",
+      "pass": false,
+      "step": "2.1 preselected panel, default scope",
+      "evidence": {
+        "surfaces": 0
+      }
+    },
+    {
+      "id": "2.1 curves unchanged",
+      "pass": true,
+      "step": "2.1 preselected panel, default scope",
+      "evidence": null
+    },
+    {
+      "id": "2.1 preselected panel stays selected",
+      "pass": true,
+      "step": "2.1 preselected panel, default scope",
+      "evidence": null
+    },
+    {
+      "id": "2.2 selection prompt offers Scope",
+      "pass": true,
+      "step": "2.2 no preselection offers Scope; Curves",
+      "evidence": "Command: _-PCbake\nSelect panel Breps to bake ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake ( Scope=Curves ): \u0027_SelID\nObject ID to select: 77327b6e-e3aa-44d8-b69b-d52bbbd36d46\n1 surface added to selection.\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nPanelCladdingEditor: CW_1.08_FRAME_CONFIG \u0027A\u0027 does not fit the AA frame-config format and is left as it is. Run PCtemplatePNL to record the project\u0027s PNL format.\nStandardized point order on 0 selected surface(s).\nPCbake (Curves) processed 1 panel(s): created 0 surface(s) and 8 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\n"
+    },
+    {
+      "id": "2.2 Scope=Curves processes curves only",
+      "pass": true,
+      "step": "2.2 no preselection offers Scope; Curves",
+      "evidence": {
+        "curves": 8
+      }
+    },
+    {
+      "id": "2.6 curves are coloured by type",
+      "pass": true,
+      "step": "2.2 no preselection offers Scope; Curves",
+      "evidence": {
+        "kinds": {
+          "frame": [
+            "0,0,255"
+          ],
+          "vertical": [
+            "0,100,0"
+          ],
+          "horizontal": [
+            "128,0,128"
+          ]
+        },
+        "codes": [
+          "FRM-0",
+          "FRM-1",
+          "FRM-2",
+          "FRM-3",
+          "INT-0A",
+          "INT-0B",
+          "INT-A0",
+          "INT-A1"
+        ],
+        "sources": [
+          "ColorFromObject"
+        ]
+      }
+    },
+    {
+      "id": "2.2 panel picked at the prompt is not left selected",
+      "pass": true,
+      "step": "2.2 no preselection offers Scope; Curves",
+      "evidence": null
+    },
+    {
+      "id": "2.3 Scope=All processes surfaces and curves",
+      "pass": true,
+      "step": "2.3 Scope=All",
+      "evidence": {
+        "history": "Command: _-PCbake\nSelect panel Breps to bake ( Scope=Surfaces ): _Scope=_All\nSelect panel Breps to bake ( Scope=All ): \u0027_SelID\nObject ID to select: 9923c5e2-a146-4d9d-af4b-b26130c987dd\n1 surface added to selection.\nSelect panel Breps to bake. Press Enter when done ( Scope=All ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=All )\nCreating meshes... Press Esc to cancel\nStandardized point order on 0 selected surface(s).\nPCbake (All) processed 1 panel(s): created 4 surface(s) and 8 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\n",
+        "surfaces": 4,
+        "curves": 8
+      }
+    },
+    {
+      "id": "2.4 the run after Scope=All starts at Scope=Surfaces",
+      "pass": false,
+      "step": "2.4 next run starts at Surfaces",
+      "evidence": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces )\nPANEL_CLADDING_UPDATE_PID_REQUIRED: ef313d2b-361a-4c65-80e1-36e4141c4898\n"
+    },
+    {
+      "id": "2.5 Curves leaves every curve of the panel unchanged",
+      "pass": true,
+      "step": "2.5 panel with curves keeps them",
+      "evidence": {
+        "edited": "46403e0f-27d0-47a6-9c39-270547eca819"
+      }
+    },
+    {
+      "id": "2.5 All leaves every curve of the panel unchanged",
+      "pass": true,
+      "step": "2.5 panel with curves keeps them",
+      "evidence": null
+    },
+    {
+      "id": "2.5 command line reports kept curves",
+      "pass": true,
+      "step": "2.5 panel with curves keeps them",
+      "evidence": {
+        "curvesRun": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nStandardized point order on 0 selected surface(s).\nPCbake (Curves) processed 1 panel(s): created 0 surface(s) and 0 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\nKept the existing curves of 1 panel(s); delete a panel\u0027s curves to bake new ones.\n",
+        "allRun": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_All\nSelect panel Breps to bake. Press Enter when done ( Scope=All ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=All )\nCreating meshes... Press Esc to cancel\nStandardized point order on 0 selected surface(s).\nPCbake (All) processed 1 panel(s): created 4 surface(s) and 0 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\nKept the existing curves of 1 panel(s); delete a panel\u0027s curves to bake new ones.\n"
+      }
+    },
+    {
+      "id": "2.7 Curves creates them again",
+      "pass": true,
+      "step": "2.7 curves are baked again after deleting them",
+      "evidence": {
+        "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nStandardized point order on 0 selected surface(s).\nPCbake (Curves) processed 1 panel(s): created 0 surface(s) and 8 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\n",
+        "curves": 8
+      }
+    },
+    {
+      "id": "2.8 default run rebuilds the surfaces and deletes the extra ones",
+      "pass": false,
+      "step": "2.8 changed cladding rebuilds; one undo",
+      "evidence": {
+        "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces )\nPANEL_CLADDING_UPDATE_PID_REQUIRED: ef313d2b-361a-4c65-80e1-36e4141c4898\n",
+        "surfacesAfter": 0
+      }
+    },
+    {
+      "id": "2.8 one undo restores the whole run",
+      "pass": false,
+      "step": "2.8 changed cladding rebuilds; one undo",
+      "evidence": {
+        "undoRecordsUsedByRun": 1,
+        "undo": ""
+      }
+    },
+    {
+      "id": "2.9 locked and hidden surfaces are updated",
+      "pass": true,
+      "step": "2.9 locked and hidden surfaces",
+      "evidence": {
+        "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces )\nCreating meshes... Press Esc to cancel\nStandardized point order on 0 selected surface(s).\nPCbake (Surfaces) processed 1 panel(s): created 0 surface(s) and 0 curve(s), updated 4 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\n"
+      }
+    },
+    {
+      "id": "2.9 they stay locked and hidden",
+      "pass": true,
+      "step": "2.9 locked and hidden surfaces",
+      "evidence": {
+        "locked": "0b8a4c09-73aa-440e-9465-0659afe3d54c",
+        "hidden": "2c306fca-b21f-4591-bd6f-052079d2e6be"
+      }
+    }
+  ],
+  "notes": {
+    "1.0 loaded plug-in": {
+      "process": 35612,
+      "rhino": "8.36.26293.11001",
+      "location": "C:\\Users\\nuofa\\AppData\\Local\\PanelCladdingEditor\\plugin\\1.4.0\\PanelCladdingEditor.rhp",
+      "sha256": "F93BE778A9CD15B353E0EBA6B80ED66B84E490ECF06A86E93195D9E4F0D81208",
+      "version": "1.4.0\u002B8a9421bc505eba39d727e95edde40298291d8bce"
+    },
+    "panel A": {
+      "id": "ef313d2b-361a-4c65-80e1-36e4141c4898",
+      "pid": "",
+      "cid": "",
+      "removedFromEarlierRun": 0
+    },
+    "panel B": {
+      "id": "77327b6e-e3aa-44d8-b69b-d52bbbd36d46",
+      "pid": "PID-MET-W-01-01",
+      "cid": "CID-MET-W-01-01",
+      "removedFromEarlierRun": 4
+    },
+    "panel C": {
+      "id": "9923c5e2-a146-4d9d-af4b-b26130c987dd",
+      "pid": "PID-MET-W-01-11",
+      "cid": "CID-MET-W-01-11",
+      "removedFromEarlierRun": 12
+    }
+  },
+  "commands": [
+    {
+      "step": "1.2 old spelling",
+      "macro": "_PCEditor _Enter",
+      "result": false,
+      "seconds": 0.022,
+      "history": "Command: _PCEditor\nSelect one panel Brep to edit: _Enter\nSelect one panel Brep to edit\nPanel selection cancelled.\n"
+    },
+    {
+      "step": "1.2 old spelling",
+      "macro": "_PCBAKE _Enter",
+      "result": false,
+      "seconds": 0.021,
+      "history": "Command: _PCBAKE\nSelect panel Breps to bake ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake ( Scope=Surfaces )\nPanel bake selection cancelled.\n"
+    },
+    {
+      "step": "1.3 removed commands",
+      "macro": "_PCupdate",
+      "result": false,
+      "seconds": 0.006,
+      "history": "Command: _PCupdate\nUnknown command: _PCupdate\n"
+    },
+    {
+      "step": "1.3 removed commands",
+      "macro": "_PCspawnSrf",
+      "result": false,
+      "seconds": 0.005,
+      "history": "Command: _PCspawnSrf\nUnknown command: _PCspawnSrf\n"
+    },
+    {
+      "step": "1.3 removed commands",
+      "macro": "_PCspawnCrv",
+      "result": false,
+      "seconds": 0.005,
+      "history": "Command: _PCspawnCrv\nUnknown command: _PCspawnCrv\n"
+    },
+    {
+      "step": "2.1 preselected panel, default scope",
+      "macro": "_-PCbake _Enter",
+      "result": false,
+      "seconds": 0.016,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces )\nPANEL_CLADDING_UPDATE_PID_REQUIRED: ef313d2b-361a-4c65-80e1-36e4141c4898\n"
+    },
+    {
+      "step": "2.2 no preselection offers Scope; Curves",
+      "macro": "_-PCbake _Scope=_Curves \u0027_SelID 77327b6e-e3aa-44d8-b69b-d52bbbd36d46 _Enter",
+      "result": true,
+      "seconds": 0.444,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake ( Scope=Curves ): \u0027_SelID\nObject ID to select: 77327b6e-e3aa-44d8-b69b-d52bbbd36d46\n1 surface added to selection.\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nPanelCladdingEditor: CW_1.08_FRAME_CONFIG \u0027A\u0027 does not fit the AA frame-config format and is left as it is. Run PCtemplatePNL to record the project\u0027s PNL format.\nStandardized point order on 0 selected surface(s).\nPCbake (Curves) processed 1 panel(s): created 0 surface(s) and 8 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\n"
+    },
+    {
+      "step": "2.3 Scope=All",
+      "macro": "_-PCbake _Scope=_All \u0027_SelID 9923c5e2-a146-4d9d-af4b-b26130c987dd _Enter",
+      "result": true,
+      "seconds": 0.363,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake ( Scope=Surfaces ): _Scope=_All\nSelect panel Breps to bake ( Scope=All ): \u0027_SelID\nObject ID to select: 9923c5e2-a146-4d9d-af4b-b26130c987dd\n1 surface added to selection.\nSelect panel Breps to bake. Press Enter when done ( Scope=All ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=All )\nCreating meshes... Press Esc to cancel\nStandardized point order on 0 selected surface(s).\nPCbake (All) processed 1 panel(s): created 4 surface(s) and 8 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\n"
+    },
+    {
+      "step": "2.4 next run starts at Surfaces",
+      "macro": "_-PCbake _Enter",
+      "result": false,
+      "seconds": 0.016,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces )\nPANEL_CLADDING_UPDATE_PID_REQUIRED: ef313d2b-361a-4c65-80e1-36e4141c4898\n"
+    },
+    {
+      "step": "2.5 panel with curves keeps them",
+      "macro": "_-PCbake _Scope=_Curves _Enter",
+      "result": true,
+      "seconds": 0.219,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nStandardized point order on 0 selected surface(s).\nPCbake (Curves) processed 1 panel(s): created 0 surface(s) and 0 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\nKept the existing curves of 1 panel(s); delete a panel\u0027s curves to bake new ones.\n"
+    },
+    {
+      "step": "2.5 panel with curves keeps them",
+      "macro": "_-PCbake _Scope=_All _Enter",
+      "result": true,
+      "seconds": 0.312,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_All\nSelect panel Breps to bake. Press Enter when done ( Scope=All ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=All )\nCreating meshes... Press Esc to cancel\nStandardized point order on 0 selected surface(s).\nPCbake (All) processed 1 panel(s): created 4 surface(s) and 0 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\nKept the existing curves of 1 panel(s); delete a panel\u0027s curves to bake new ones.\n"
+    },
+    {
+      "step": "2.7 curves are baked again after deleting them",
+      "macro": "_-PCbake _Scope=_Curves _Enter",
+      "result": true,
+      "seconds": 0.138,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nStandardized point order on 0 selected surface(s).\nPCbake (Curves) processed 1 panel(s): created 0 surface(s) and 8 curve(s), updated 0 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\n"
+    },
+    {
+      "step": "2.8 changed cladding rebuilds; one undo",
+      "macro": "_-PCbake _Enter",
+      "result": false,
+      "seconds": 0.016,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces )\nPANEL_CLADDING_UPDATE_PID_REQUIRED: ef313d2b-361a-4c65-80e1-36e4141c4898\n"
+    },
+    {
+      "step": "2.9 locked and hidden surfaces",
+      "macro": "_-PCbake _Enter",
+      "result": true,
+      "seconds": 0.223,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces )\nCreating meshes... Press Esc to cancel\nStandardized point order on 0 selected surface(s).\nPCbake (Surfaces) processed 1 panel(s): created 0 surface(s) and 0 curve(s), updated 4 surface(s) and 0 curve(s), deleted 0 obsolete or duplicate object(s).\n"
+    }
+  ]
+}

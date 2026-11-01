@@ -50,5 +50,37 @@ Staged for installation: `C:\01_Projects\Panel Cladding Full\PanelCladdingEditor
 from the verified zip; 33 files, every SHA-256 equal to the verified bundle folder, `Install.cmd` at
 the top, RHP `1.4.0+8a9421b`.
 
-Not run yet: production installation on this host and the live suites against the installed
-1.4.0 (they follow the user's `Install.cmd`).
+## Installation and attestation
+
+The user ran `Install.cmd` from the staged folder with no Rhino running. From the Terminal panel
+(host shell) afterwards ([`install-attestation.txt`](install-attestation.txt)):
+
+- `PlugIn\FileName` = `%LOCALAPPDATA%\PanelCladdingEditor\plugin\1.4.0\PanelCladdingEditor.rhp`,
+  SHA-256 equal to the verified RHP; exact 13-command `CommandList` (`PCweb` included); the
+  installer's `-Mode Validate`: valid (complete registration).
+- After Rhino started on it: only the root and `CommandList` times advanced (06:47:42 -> 06:48:44
+  UTC); `PlugIn` kept its install time. Rhino loaded `plugin\1.4.0` with `1.4.0+8a9421b`
+  (live check 1.0).
+
+## Live acceptance against the installed 1.4.0
+
+Rhino 8.36 started from the Terminal panel; suites from `tests/Live/PcLive.cs` through MCP_Rhino.
+
+| Suite | Model | Result |
+| --- | --- | --- |
+| `commands` ([json](live/commands+bake.json), first part) | MET LIVE TEST | 9/9: RHP `1.4.0+8a9421b` from `plugin\1.4.0`; exactly 13 commands with `PCweb`; old spellings run; removed commands unknown; no alias or toolbar calls them |
+| `bake` ([json](live/bake.json)) | MET LIVE TEST | 18/18 |
+| `excluded` ([json](live/excluded.json)) | MET LIVE TEST | 14/14: Not in Scope / By Others panels get their auto values refreshed on reopen and after each rename (1.4.0), are not numbered by PCpid and get no curves |
+| `report` ([json](live/report.json), [window](live/report-window.png)) | MET LIVE TEST | 10/10; the Detail column reaches the window's right edge; rules: no D07 |
+| `web` ([json](live/web.json)) | PCW copy of MET | 13/13 with the installed command (no `assembly`) |
+| `-PCweb` through `RunScript` ([txt](live/pcweb-registered-command.txt)) | PCW copy of MET | registered command; unmodified model opens; modified model shows `Unsaved changes. Save before opening Wireframe Web <Save> ( Save  LastSave )`, `LastSave` opens the last save and the file is not written |
+| `otherdocs` ([json](live-bkt/otherdocs.json)) | BKT LIVE TEST, MET naming copy, new document | 5/5: no issue for the `Surfaces - GLS` copies and no D07 (1.4.0); PCreport on BKT in 0.8 s (2,062 info, 7,627 fewer than 1.3.0); the other model replaces the window; the naming sheet leaves the excluded type out; an unsaved document is refused |
+
+The first `bake` run (in `commands+bake.json`) failed 4 checks: its panel A was the PCpid test copy
+the 1.3.0 `excluded` run had left on `PNL-EXT-3A.1` (`PCLIVE_NEW_PANEL=1`, no PID), and PCbake
+correctly refused it (`PANEL_CLADDING_UPDATE_PID_REQUIRED`). `PanelsOn` now skips such copies; the
+rerun above passed 18/18.
+
+Not run: `export` and `editor` (they need `Watch-Dialogs.ps1` to answer Win32 dialogs; both are
+unchanged since their 1.3.0 acceptance). Closing the Terminal tab that had started the MET Rhino
+ended that Rhino after its suites had finished; the other two were closed normally.

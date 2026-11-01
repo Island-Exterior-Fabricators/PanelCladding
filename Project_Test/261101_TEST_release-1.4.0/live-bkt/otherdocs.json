@@ -1,0 +1,127 @@
+{
+  "suite": "otherdocs",
+  "status": "done",
+  "started": "2026-11-01T01:55:37",
+  "updated": "2026-11-01T01:55:40",
+  "step": "",
+  "passed": 5,
+  "failed": 0,
+  "error": "",
+  "checks": [
+    {
+      "id": "4.3 objects the plug-in does not manage (Surfaces - GLS copies) are not reported (1.4.0)",
+      "pass": true,
+      "step": "4.14 speed on a large model",
+      "evidence": {}
+    },
+    {
+      "id": "4.14 PCreport on BKT finishes within 30 s",
+      "pass": true,
+      "step": "4.14 speed on a large model",
+      "evidence": {
+        "seconds": 0.79,
+        "objects": 44758,
+        "history": "Command: _PCreport\nPCreport: 67 error(s), 2427 warning(s), 2062 info on 1008 panel(s), 5024 surface(s) and 9568 curve(s).\n"
+      }
+    },
+    {
+      "id": "4.12 the window now shows the other model\u0027s results",
+      "pass": true,
+      "step": "4.12 PCreport in another model replaces the window\u0027s contents",
+      "evidence": {
+        "document": "MET - Wireframe",
+        "path": "C:\\01_Projects\\Panel Cladding Full\\LiveTest-1.3.0\\naming\\MET - Wireframe.3dm",
+        "sameWindowObject": false,
+        "firstStillVisible": false,
+        "open": "Command: _-Open\nName of the file to open ( UpdatePromptUpdateBlocks=Yes  Browse ): \u0022C:\\01_Projects\\Panel Cladding Full\\LiveTest-1.3.0\\naming\\MET - Wireframe.3dm\u0022\nSuccessfully read file \u0022C:\\01_Projects\\Panel Cladding Full\\LiveTest-1.3.0\\naming\\MET - Wireframe.3dm\u0022\nCreating meshes... Press Esc to cancel\n",
+        "history": "Command: _PCreport\nPCreport: 0 error(s), 9903 warning(s), 797 info on 398 panel(s), 0 surface(s) and 9505 curve(s).\n"
+      }
+    },
+    {
+      "id": "3.6 the sheet lists the in-scope wall type and not the excluded one",
+      "pass": true,
+      "step": "3.6 saving the main model leaves excluded panels out of the naming sheet",
+      "evidence": {
+        "sheet": "C:\\01_Projects\\Panel Cladding Full\\LiveTest-1.3.0\\naming\\MET - Naming Convention.xlsx",
+        "saved": true,
+        "readMessage": "",
+        "wallTypes": {
+          "A": "1A.1",
+          "B": "1A.2",
+          "C": "1A.4",
+          "D": "1A.5",
+          "E": "1C.1",
+          "F": "1C.2",
+          "G": "1C.4",
+          "H": "2B.1",
+          "J": "2B.2",
+          "K": "3A.1",
+          "L": "3A.2",
+          "M": "3A.4",
+          "N": "3A.5",
+          "P": "5",
+          "Q": "INS-LIVE"
+        },
+        "history": "MCP_Rhino pipe client connected: \\\\.\\pipe\\mcp_rhino_route_61748_268435458\nPanelCladdingEditor: MET - Naming Convention.xlsx PNL updated (0 frame configs, 15 wall types, 5 frame types).\nFile successfully saved as C:\\01_Projects\\Panel Cladding Full\\LiveTest-1.3.0\\naming\\MET - Wireframe.3dm.\n"
+      }
+    },
+    {
+      "id": "4.13 an unsaved document gets \u0027requires a saved active document\u0027",
+      "pass": true,
+      "step": "4.13 PCreport in an unsaved new document asks to save first",
+      "evidence": {
+        "created": "Command: _-New\nName of the Rhino template file to open ( None  Browse ): _None\n",
+        "history": "Command: _PCreport\nPCreport requires a saved active document.\n"
+      }
+    }
+  ],
+  "notes": {
+    "4.14 BKT rules": {
+      "A02 Error: Duplicate CID": 36,
+      "A03 Error: Cladding or frame data unreadable": 31,
+      "A06 Warning: Name does not match CID": 4,
+      "A10 Info: Setup keys missing": 1008,
+      "A12 Info: Role not lowercase": 1008,
+      "D01 Warning: No owner panel": 2423,
+      "D06 Info: Panel with materials but no surfaces": 45,
+      "L07 Info: Not tracked layer": 1
+    }
+  },
+  "commands": [
+    {
+      "step": "4.14 speed on a large model",
+      "macro": "_PCreport",
+      "result": true,
+      "seconds": 0.789,
+      "history": "Command: _PCreport\nPCreport: 67 error(s), 2427 warning(s), 2062 info on 1008 panel(s), 5024 surface(s) and 9568 curve(s).\n"
+    },
+    {
+      "step": "4.12 PCreport in another model replaces the window\u0027s contents",
+      "macro": "_-Open \u0022C:\\01_Projects\\Panel Cladding Full\\LiveTest-1.3.0\\naming\\MET - Wireframe.3dm\u0022",
+      "result": true,
+      "seconds": 1.001,
+      "history": "Command: _-Open\nName of the file to open ( UpdatePromptUpdateBlocks=Yes  Browse ): \u0022C:\\01_Projects\\Panel Cladding Full\\LiveTest-1.3.0\\naming\\MET - Wireframe.3dm\u0022\nSuccessfully read file \u0022C:\\01_Projects\\Panel Cladding Full\\LiveTest-1.3.0\\naming\\MET - Wireframe.3dm\u0022\nCreating meshes... Press Esc to cancel\n"
+    },
+    {
+      "step": "4.12 PCreport in another model replaces the window\u0027s contents",
+      "macro": "_PCreport",
+      "result": true,
+      "seconds": 0.272,
+      "history": "Command: _PCreport\nPCreport: 0 error(s), 9903 warning(s), 797 info on 398 panel(s), 0 surface(s) and 9505 curve(s).\n"
+    },
+    {
+      "step": "4.13 PCreport in an unsaved new document asks to save first",
+      "macro": "_-New _None",
+      "result": true,
+      "seconds": 0.339,
+      "history": "Command: _-New\nName of the Rhino template file to open ( None  Browse ): _None\n"
+    },
+    {
+      "step": "4.13 PCreport in an unsaved new document asks to save first",
+      "macro": "_PCreport",
+      "result": false,
+      "seconds": 0.005,
+      "history": "Command: _PCreport\nPCreport requires a saved active document.\n"
+    }
+  ]
+}

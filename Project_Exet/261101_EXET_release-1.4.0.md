@@ -26,7 +26,11 @@ Executed 2026-11-01 on branch `codex/release-1.4.0` from `master` (`97bb599`), w
 
 ## Discovered issues
 
-None.
+- The first live `bake` run picked the PCpid test copy that the 1.3.0 `excluded` run had left on
+  `PNL-EXT-3A.1` (no PID) and PCbake refused it, as it should. `tests/Live/PcLive.cs` `PanelsOn`
+  now skips such copies (test code only; not in the package); the rerun passed.
+- Closing the Terminal tab that started a Rhino ends that Rhino; keep it open until the Rhino is
+  done.
 
 ## Commands and results
 
@@ -41,7 +45,12 @@ full regression passed 82/82 in Debug and Release on the same commit; the packag
 - Verify-Release on the committed source, clean tree, full regression: met.
 - RHP version and GUID; installer registers 13 commands: met.
 - Staged bundle equals the verified archive: met.
-- Live acceptance after installation: pending (the user's `Install.cmd`).
+- Live acceptance after installation: met. The user installed the staged bundle; the Terminal-panel
+  attestation found `plugin.4.0`, the verified RHP hash, the exact 13-command `CommandList` and a
+  valid `-Mode Validate`, and after Rhino started only the root and `CommandList` times had
+  advanced. Live suites against the installed plug-in: commands 9/9, bake 18/18, excluded 14/14,
+  report 10/10, web 13/13, the registered `-PCweb` with `LastSave`, otherdocs on BKT 5/5 (see TEST).
+  `export` and `editor` were not rerun (Win32 dialog automation; unchanged since 1.3.0).
 
 ## Rollback
 
@@ -49,10 +58,11 @@ Delete the branch, the generated package and the staged folder; 1.3.0 stays inst
 
 ## Remaining limitations
 
-- Not installed yet; production installation needs the user's `Install.cmd` and the Terminal-panel
-  attestation in `AGENTS.md`.
 - Not tagged, published, merged or built as a Yak package.
+- The PCweb Yes/No/Cancel dialog (interactive runs) was not driven; the scripted prompt and the
+  command's logic were.
 
 ## Conclusion
 
-PanelCladdingEditor 1.4.0 is built and verified on `8a9421b` and staged for installation.
+PanelCladdingEditor 1.4.0 is built and verified on `8a9421b`, installed on NOVAN-HOME with an
+independent registry attestation, and accepted live in Rhino.

@@ -1,0 +1,19 @@
+Rhino 42868 (installed PanelCladdingEditor 1.4.0+8a9421b), C:\01_Projects\Panel Cladding Full\LiveTest-pcweb\PCW - Wireframe LIVE TEST.3dm
+Registered command run through RhinoApp.RunScript (suite probe):
+1. document unmodified, macro "_-PCweb"; 2. doc.Modified = true, macro "_-PCweb _LastSave".
+File write time before probe 2: 2026-11-01T06:53:31.3807061Z; after: 2026-11-01T06:53:31.3807061Z
+Document modified after probe 2: True
+
+Command history (last 700 characters):
+est-pcweb\PCW - Wireframe LIVE TEST.3dm.
+PCweb: opening PCW in Wireframe Web...
+PCweb: PCW is open in Wireframe Web: http://127.0.0.1:8795/?source=api&project=pcw&user=nuofa
+Command: _-PCweb
+PCweb: opening PCW in Wireframe Web...
+PCweb: PCW is open in Wireframe Web: http://127.0.0.1:8795/?source=api&project=pcw&user=nuofa
+[MCP_Rhino diag] ALC.Load(RhinoCommon) -> share with default context
+Command: _-PCweb
+Unsaved changes. Save before opening Wireframe Web <Save> ( Save  LastSave ): _LastSave
+PCweb: opening PCW in Wireframe Web...
+PCweb: PCW is open in Wireframe Web: http://127.0.0.1:8795/?source=api&project=pcw&user=nuofa
+[MCP_Rhino diag] ALC.Load(RhinoCommon) -> share with default context
