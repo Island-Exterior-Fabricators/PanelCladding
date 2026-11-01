@@ -41,4 +41,4 @@ Get-FileHash .\PanelCladdingEditor-<version>-win-x64.zip -Algorithm SHA256
 Compare with the adjacent .zip.sha256 release asset.
 
 See README.md for commands and workflows.
-Releases: https://github.com/novan-xu/PanelCladding/releases
+Releases: https://github.com/nuofan-island/PanelCladding/releases
