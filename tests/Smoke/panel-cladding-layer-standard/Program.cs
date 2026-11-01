@@ -97,13 +97,13 @@ internal static class Program
     private static void VerifyPanelScope(Fixture fixture)
     {
         string[] panelLayers = fixture.Layers.Where(PanelCladdingPidPlanningService.IsPanelLayerPath).ToArray();
-        Require(panelLayers.Length == 9 && panelLayers.All(path =>
+        // Since 1.3.0 "Surfaces - Not in Scope" is excluded (not tracked), leaving eight of nine.
+        Require(panelLayers.Length == 8 && panelLayers.All(path =>
                 path == PanelBranch || path.StartsWith(PanelBranch + "::", StringComparison.Ordinal)),
-            "ABC panel scope must be exactly Surfaces - PNL and its eight sublayers: " + string.Join(", ", panelLayers));
+            "ABC panel scope must be exactly Surfaces - PNL and its seven tracked sublayers: " + string.Join(", ", panelLayers));
         foreach (string path in new[]
                  {
                      PanelBranch + "::Surfaces - WT_08 (SB)",
-                     PanelBranch + "::Surfaces - Not in Scope",
                      "qrs-ief-wireframe::surfaces - pnl::Surfaces - WT_01",
                      "QRS-IEF-Wireframe::Surfaces - PNL::Tower A::Surfaces - WT_09"
                  })
@@ -115,7 +115,8 @@ internal static class Program
                      "", Root, Root + "::Surfaces - PNL-Old::Surfaces - WT_01", CurveBranch + "::Curves - WT_01",
                      Root + "::Surfaces - GLS::GLS-001", Root + "::Other::Surfaces - PNL",
                      "Other::" + PanelBranch, StepRoot + "::Surfaces - GLS::GLS-001",
-                     "01_CW Panels::Surfaces-PNL::WT-01", "-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_01"
+                     "01_CW Panels::Surfaces-PNL::WT-01", "-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_01",
+                     PanelBranch + "::Surfaces - Not in Scope", PanelBranch + "::Surfaces - By Others::WT_01"
                  })
         {
             Require(!PanelCladdingPidPlanningService.IsPanelLayerPath(path), "Exclude panel scope: " + path);
@@ -137,7 +138,6 @@ internal static class Program
         (string Panel, string Curve)[] cases =
         {
             (PanelBranch + "::Surfaces - WT_08 (SB)", CurveBranch + "::Curves - WT_08 (SB)"),
-            (PanelBranch + "::Surfaces - Not in Scope", CurveBranch + "::Curves - Not in Scope"),
             ("QRS-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_02", "QRS-IEF-Wireframe::Curves - PNL::Curves - WT_02"),
             (PanelBranch + "::Surfaces - Tower A::Surfaces - WT_09", CurveBranch + "::Curves - Tower A::Curves - WT_09"),
             (PanelBranch + "::WT-04", CurveBranch + "::WT-04"),
