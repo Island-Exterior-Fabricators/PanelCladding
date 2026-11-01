@@ -7,7 +7,8 @@ Executed 2026-11-01 under [the user-approved PLAN](../Project_Plan/261101_PLAN_p
 ## Related artifacts
 
 [TEST evidence](../Project_Test/261101_TEST_pcweb-command/README.md). Branch `codex/pcweb` from
-`master` (`06a7cbc`), worktree `C:\01_Projects\Panel Cladding Full\PC-pcweb`. The launch contract is
+`master` (`06a7cbc`), worktree `C:\01_Projects\Panel Cladding Full\PC-pcweb`;
+[PR 16](https://github.com/nuofan-island/PanelCladding/pull/16). The launch contract is
 Wireframe Web 1.0.0's `release/windows/README.md` (Wireframe Web repository, `f5ec355`).
 
 ## Implemented scope
