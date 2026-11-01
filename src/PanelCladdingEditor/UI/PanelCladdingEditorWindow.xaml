@@ -770,7 +770,8 @@
                                             <TextBlock x:Name="FrameConfigurationText" Text="No layout changes"
                                                        FontFamily="Consolas" FontSize="16" FontWeight="SemiBold"
                                                        Margin="0,2,0,3" TextWrapping="Wrap" />
-                                            <TextBlock Text="Layout settings and assigned profiles are saved separately."
+                                            <TextBlock x:Name="FrameConfigurationNote"
+                                                       Text="Layout settings and assigned profiles are saved separately."
                                                        Foreground="{StaticResource MutedBrush}" FontSize="11"
                                                        TextWrapping="Wrap" />
                                         </StackPanel>

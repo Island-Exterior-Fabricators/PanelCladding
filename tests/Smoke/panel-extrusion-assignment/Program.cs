@@ -480,6 +480,11 @@ internal static class Program
         string workbookPath,
         string outputDirectory)
     {
+        // Curve assignment is suspended in the editor; keep the dormant UI covered.
+        typeof(PanelCladdingEditorWindow)
+            .GetField("_extrusionAssignmentEnabled",
+                System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)!
+            .SetValue(null, true);
         PanelCladdingLayout layout = BuildLayout(workbookPath: workbookPath);
         var live = new StubLiveRepository(layout);
         var workbook = new OpenXmlPanelCladdingWorkbookRepository();
