@@ -286,9 +286,9 @@ internal static class Program
         Assembly assembly = typeof(PanelCladdingMatchPlanningService).Assembly;
         Type matchCommand = RequireType(assembly, "PanelCladdingEditor.UI.PanelCladdingMatchCommand");
         Type editorCommand = RequireType(assembly, "PanelCladdingEditor.UI.PanelCladdingEditorCommand");
-        Type spawnCommand = RequireType(assembly, "PanelCladdingEditor.UI.PanelCladdingSpawnSrfCommand");
+        Type bakeCommand = RequireType(assembly, "PanelCladdingEditor.UI.PanelCladdingBakeCommand");
         Require(matchCommand.GUID != Guid.Empty, "Match command GUID must be explicit and non-empty.");
-        Require(new[] { matchCommand.GUID, editorCommand.GUID, spawnCommand.GUID }
+        Require(new[] { matchCommand.GUID, editorCommand.GUID, bakeCommand.GUID }
                 .Distinct().Count() == 3,
             "All PanelCladdingEditor Rhino command GUIDs must be unique.");
         Require(assembly.GetType(

@@ -44,6 +44,7 @@ $pluginFileKey = Join-Path $pluginKey 'PlugIn'
 $commandListKey = Join-Path $pluginKey 'CommandList'
 $activeRhp = [IO.Path]::GetFullPath((Join-Path (Join-Path $pluginRoot ([string]$definition.version)) 'PanelCladdingEditor.rhp'))
 $expectedCommands = @(
+    'PCbake',
     'PCclear',
     'PCcreate',
     'PCcrvTemplate',
@@ -51,12 +52,9 @@ $expectedCommands = @(
     'PCmatchCrv',
     'PCmatchSrf',
     'PCpid',
-    'PCspawnCrv',
-    'PCspawnSrf',
     'PCsyncCrv',
     'PCsyncSrf',
-    'PCtemplatePNL',
-    'PCupdate'
+    'PCtemplatePNL'
 )
 
 function Assert-FullRegistration {
