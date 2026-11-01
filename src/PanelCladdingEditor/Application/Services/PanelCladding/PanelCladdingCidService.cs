@@ -145,7 +145,7 @@ public static partial class PanelCladdingCidService
                 return string.Equals(panelCid, prefix + role.Groups[1].Value, StringComparison.OrdinalIgnoreCase);
             }
         }
-        return true; // Existing unsuffixed dependencies can be migrated by PCupdate.
+        return true; // Existing unsuffixed dependencies can be migrated by PCbake.
     }
 
     private static string Get(IReadOnlyDictionary<string, string> userText, string key) =>

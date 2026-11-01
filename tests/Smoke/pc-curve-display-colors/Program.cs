@@ -112,9 +112,7 @@ internal static class Program
     private static void VerifyRhinoAttributeWriteContracts()
     {
         string root = FindRepositoryRoot();
-        string spawn = File.ReadAllText(Path.Combine(
-            root, "src", "PanelCladdingEditor", "Infrastructure", "Rhino", "Live",
-            "PanelCladding", "LivePanelCladdingSpawnService.cs"));
+        // PCbake (1.3.0) is the only generator; the PCspawnCrv write path was removed with the command.
         string update = File.ReadAllText(Path.Combine(
             root, "src", "PanelCladdingEditor", "Infrastructure", "Rhino", "Live",
             "PanelCladding", "LivePanelCladdingUpdateService.cs"));
@@ -125,19 +123,16 @@ internal static class Program
             root, "src", "PanelCladdingEditor", "Application", "Services", "PanelCladding",
             "PanelCladdingSurfaceSyncPlanningService.cs"));
 
-        Require(spawn.Contains("item.CurvePlan.ObjectColor.Red", StringComparison.Ordinal) &&
-                spawn.Contains("ColorSource = ObjectColorSource.ColorFromObject", StringComparison.Ordinal),
-            "PCspawnCrv does not write planned object color.");
         Require(update.Contains("dependency.CurvePlan.ObjectColor.Red", StringComparison.Ordinal) &&
                 update.Contains("ObjectColorSource.ColorFromObject", StringComparison.Ordinal) &&
                 update.Contains("ObjectColorSource.ColorFromLayer", StringComparison.Ordinal),
-            "PCupdate does not branch curve/surface color sources correctly.");
+            "PCbake does not branch curve/surface color sources correctly.");
         Require(sync.Contains("DesiredObjectColor.Red", StringComparison.Ordinal) &&
                 sync.Contains("proposed.ColorSource = ObjectColorSource.ColorFromObject", StringComparison.Ordinal),
             "PCsyncCrv does not commit desired existing-curve color.");
         Require(planning.Contains("curve.ObjectColorChanged", StringComparison.Ordinal),
             "PCsyncCrv planning does not include existing color drift.");
-        Console.WriteLine("[OK] spawn, update, and sync write/repair curve object colors");
+        Console.WriteLine("[OK] bake and sync write/repair curve object colors");
     }
 
     private static T Required<T>(

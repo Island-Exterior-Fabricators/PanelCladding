@@ -422,15 +422,6 @@ public sealed class PanelCladdingSpawnPlan
         Array.Empty<PanelCladdingExtrusionCurvePlan>();
 }
 
-public sealed class PanelCladdingSpawnResult
-{
-    public IReadOnlyList<Guid> SourcePanelIds { get; init; } = Array.Empty<Guid>();
-    public IReadOnlyList<Guid> CreatedObjectIds { get; init; } = Array.Empty<Guid>();
-    public IReadOnlyList<Guid> CreatedSurfaceIds { get; init; } = Array.Empty<Guid>();
-    public IReadOnlyList<Guid> CreatedCurveIds { get; init; } = Array.Empty<Guid>();
-    public IReadOnlyList<string> Cids { get; init; } = Array.Empty<string>();
-}
-
 public sealed class PanelCladdingMatchGeometryDescriptor
 {
     public PanelGeometryClass GeometryClass { get; init; }

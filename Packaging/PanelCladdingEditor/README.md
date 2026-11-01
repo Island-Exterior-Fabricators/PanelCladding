@@ -5,13 +5,20 @@ This plug-in is independent of MCP_Rhino. Its product identity is
 it with `Install-PanelCladdingEditor.ps1`.
 
 The Rhino command surface uses the `PC` prefix: `_PCeditor`, `_PCcreate`, `_PCclear`,
-`_PCcrvTemplate`, `_PCmatchSrf`, `_PCmatchCrv`, `_PCspawnSrf`, `_PCspawnCrv`, `_PCsyncSrf`,
-`_PCsyncCrv`, `_PCupdate`, `_PCpid`, and `_PCtemplatePNL`. Since 1.3.0 every name is `PC`, the
-first word in lowercase and later words capitalized (`PNL` stays an acronym). Rhino matches command
-names case-insensitively, so the former spellings (`PCEditor`, `PCSpawnCrv`, ...), aliases and
-toolbar macros still run. `PCupdate` treats the selected panels' saved attributes as
-authoritative and reconciles all CID-bearing managed surfaces and curves: matching objects are
-rebuilt, missing objects are created, and stale or duplicate objects are deleted. `PCcrvTemplate`
+`_PCcrvTemplate`, `_PCmatchSrf`, `_PCmatchCrv`, `_PCbake`, `_PCsyncSrf`, `_PCsyncCrv`, `_PCpid`,
+and `_PCtemplatePNL`. Since 1.3.0 every name is `PC`, the first word in lowercase and later words
+capitalized (`PNL` stays an acronym). Rhino matches command names case-insensitively, so the former
+spellings (`PCEditor`, `PCSyncCrv`, ...), aliases and toolbar macros still run.
+
+`PCbake` (1.3.0) replaces `PCupdate`, `PCspawnSrf` and `PCspawnCrv`; aliases and macros that call
+them must use `PCbake`. It treats the selected panels' saved attributes as authoritative and bakes
+them into managed geometry. Its `Scope` option is `Surfaces` (the default on every run), `Curves` or
+`All`; objects of a kind outside the scope are left as they are. Cladding surfaces are reconciled:
+matching surfaces are rebuilt, missing ones are created, and stale or duplicate ones are deleted.
+Extrusion curves are never overwritten, since they may carry hand-assigned components: a panel that
+already has managed curves keeps all of them and is reported, and a panel without curves gets them.
+Delete a panel's curves to bake new ones. `PCsyncSrf` and `PCsyncCrv` go the other way, reading
+edited geometry back into the panel. `PCcrvTemplate`
 assigns a full-run horizontal or vertical merge mask only to selected
 panel Breps that do not already have a merge code. Configured panels in a mixed selection are
 skipped and reported while the remaining eligible panels are updated. Selecting only configured
@@ -39,8 +46,8 @@ blank placeholder only for a setup key that does not exist yet.
 
 Since 1.2.2 the user-defined `CW_9.xx` series is `UD_XXX`. Panels that still carry
 `CW_9.01`/`CW_9.02` are read as before, and the keys are renamed to `UD_` the next time a
-cladding command writes the panel (`PCeditor` save, `PCcreate`, `PCMatch*`, `PCsyncSrf`,
-`PCcrvTemplate`, `PCSpawn*`/`PCupdate`), in the same Undo step.
+cladding command writes the panel (`PCeditor` save, `PCcreate`, `PCmatchSrf`, `PCmatchCrv`,
+`PCsyncSrf`, `PCcrvTemplate`, `PCbake`), in the same Undo step.
 
 `UD_FRAME_CONFIG` is authoritative and lets the plug-in read a coded panel even when the workbook
 is unavailable. `2H 1V` is the number of horizontal and vertical intermediates; horizontal
@@ -160,8 +167,8 @@ must match. Profiles, quantities, formulas, parent links and length modifiers ar
 replaced by the source assignments, while target dimensions, offsets and cladding
 remain intact. Configuration is stored in `CW_1.08_FRAME_CONFIG`, and profile
 assignments in `UD_FRAME_ASSIGNMENTS` (`CW_1.09_FRAME_TYPE` before 1.2.5). An unassigned source
-clears target assignments. Run `PCupdate` to rebuild existing managed curves from
-the matched panel settings, or `PCspawnCrv` to generate curves.
+clears target assignments. Run `PCbake` with `Scope=Curves` to generate curves for panels that have none;
+existing curves are kept, so delete them first to bake curves from the matched settings.
 
 Since 1.0.95, Extrusion Setup includes Clear all beside Cancel. After a Yes/No
 confirmation it clears configured and unconfigured profiles, editor values and
@@ -202,13 +209,13 @@ each panel's tight bounds in its own facade plane, in model units with five deci
 places. Unit dimension is `widthxheight`. These three dimensions are refreshed
 alongside the IDs on every run. Conflicting case variants fail before any writes.
 
-Since 1.0.92, both PCpid and PCupdate also standardize selected source surfaces
+Since 1.0.92, both PCpid and PCbake also standardize selected source surfaces
 using the MCP standard four-point skill's convention: lower-left anchor viewed
 from the oriented front, clockwise corners in a gravity-aligned local frame,
 four-point rebuild, front/back flip, then SwapUV. The original front direction,
 footprint, object ID and metadata are retained. Already-standardized surfaces are
 not replaced again. Geometry changes share the owning command's Undo record.
-PCupdate generates dependencies after this preparation and continues to exclude
+PCbake generates dependencies after this preparation and continues to exclude
 duplicate-CID sources. PCpid's unselected context surfaces are never reordered.
 
 Point ordering supports planar, straight, convex four-corner surfaces without
@@ -271,10 +278,10 @@ reconstruct the selected panels' H/V grid and curve topology. Both read existing
 geometry back into panel attributes and refresh dependency metadata and panel
 dimensions; select the source panel Breps in a saved document.
 
-`PCupdate` participates in Rhino's command-owned Undo record when invoked from the command line and
+`PCbake` participates in Rhino's command-owned Undo record when invoked from the command line and
 opens its own record only when called without an active command record. A successful batch therefore
 appears as one normal Rhino Undo entry without attempting an unsupported nested record.
-Since version 1.0.83, PCupdate normalizes parent/child CIDs before checking selected
+Since version 1.0.83, PCbake normalizes parent/child CIDs before checking selected
 panel identities. Parent and child panels sharing a PID can update together.
 Every panel in a duplicate-CID group is skipped; unique-CID panels still update,
 and skipped panels remain selected with their duplicate CIDs reported. An
@@ -286,8 +293,8 @@ layers: update and stale/duplicate deletion bypass those mutation modes without 
 the objects or changing layer state, and retained object-level mode is preserved.
 Managed extrusion curves use object colors by planned type: main-frame curves are Blue
 (`RGB 0,0,255`), horizontal intermediate curves are Purple (`RGB 128,0,128`), and vertical
-intermediate curves are DarkGreen (`RGB 0,100,0`). `PCspawnCrv` applies the colors to new curves,
-while `PCupdate` and `PCsyncCrv` correct existing curves within the selected-panel scope.
+intermediate curves are DarkGreen (`RGB 0,100,0`). `PCbake` applies the colors to the curves it creates,
+and `PCsyncCrv` corrects existing curves within the selected-panel scope.
 
 Panel cladding saves persist cell ownership and materials under
 `UD_CLADDING_LOGIC` (`CW_9.01_CLADDING_LOGIC` in 1.1.0–1.2.1, `CW_2.13_CLADDING_LOGIC` before).
@@ -329,9 +336,10 @@ CID: `CID-BKT-S1-06-14` becomes `S1-06-14`, and
 `CID-<project>-` of any project is removed (`CID-MET-S-04-36` becomes `S-04-36`), without
 changing the full CID user text; a `CID-` identifier without a second `-` loses only `CID-`,
 and custom identifiers are preserved. Prefix matching ignores case.
-Create, save, match, spawn, sync, and update normalize source-panel names from the
-current CID. Spawn/update/sync apply the same rule to surfaces and extrusion curves.
-Run PCupdate on existing configured panels to refresh their dependency names.
+Create, save, match, bake, and sync normalize source-panel names from the
+current CID. Bake and sync apply the same rule to surfaces and extrusion curves.
+Run PCbake on existing configured panels to refresh their surface names; existing curves keep
+theirs until `PCsyncCrv` runs.
 Both sync commands detect name-only changes; missing CID leaves the panel name alone.
 
 Since version 1.0.87, PCeditor displays total width and height on separate lines
@@ -343,9 +351,9 @@ Version 1.0.88 fits assigned profiles into two columns within the same floating
 panel width, with each profile code above its length modifier and remove button.
 
 Baked cladding surfaces and extrusion curves inherit the panel's `CW_1.05_LOT`
-value, including leading zeros. `PCupdate`, `PCsyncSrf`, and `PCsyncCrv` use this
+value, including leading zeros. `PCbake`, `PCsyncSrf`, and `PCsyncCrv` use this
 canonical lot key for inherited metadata. An absent panel lot leaves synced
-dependencies without that key; surface spawning requires a populated lot.
+dependencies without that key; baking surfaces requires a populated lot.
 Version 1.0.79 replaces `CW_1.05_RELEASE` with `CW_1.05_LOT` without an old-key
 fallback. Existing Rhino data must already use the new name.
 
