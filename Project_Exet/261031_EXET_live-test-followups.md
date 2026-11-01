@@ -8,7 +8,8 @@ Executed 2026-10-31 under [the user-authorized PLAN](../Project_Plan/261031_PLAN
 
 [TEST evidence](../Project_Test/261031_TEST_live-test-followups/README.md). Branch
 `codex/live-test-followups` from `master` (`150f546`), worktree
-`C:\01_Projects\Panel Cladding Full\PC-followups`. The live acceptance run that found both points
+`C:\01_Projects\Panel Cladding Full\PC-followups`;
+[PR 15](https://github.com/nuofan-island/PanelCladding/pull/15). The live acceptance run that found both points
 is on `codex/live-acceptance-tests` (finding 3 and 4 of its TEST record).
 
 ## Implemented scope
