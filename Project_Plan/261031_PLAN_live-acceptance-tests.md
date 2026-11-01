@@ -6,19 +6,22 @@ On 2026-10-31, after installing 1.3.0, the user asked the agent to run the 1.3.0
 (`PanelCladdingEditor-1.3.0 Manual Tests.md`) itself, including the items that looked manual-only,
 and to keep the scripts in the repository. The user must keep working on the same computer, so the
 tests may not use keyboard or mouse input. The user approved programmatic UI Automation (patterns
-only, no input), changes to copied test models, and a separate test Rhino. This authorizes the
+only, no input) and any change to the test model. This authorizes the
 test code and its PLAN/EXET/TEST records; it changes no plug-in behaviour.
 
 ## Goals
 
-- Rerunnable live checks for each item of the 1.3.0 list, run against an installed plug-in in a
-  dedicated Rhino process, with evidence (command history, model state, screenshots, workbooks).
-- No synthetic keyboard or mouse input; the user's own Rhino and windows are not touched.
+- Rerunnable live checks for each item of the 1.3.0 list, run against an installed plug-in on the
+  test model, with evidence (command history, model state, screenshots, workbooks).
+- No synthetic keyboard or mouse input; nothing outside the test model and Rhino is touched.
 
 ## Design
 
-- Test models: copies under `C:\01_Projects\Panel Cladding Full\LiveTest-<version>\` named as main
-  models (`MET - Wireframe.3dm`, `BKT - Wireframe.3dm`), opened by a separate Rhino process.
+- Test model: the user's test model
+  `C:\01_Projects\MCP_Rhino\.claude\worktrees\release-1.3.9\Project_Test\261031_TEST_release-1.3.9\MET - Wireframe LIVE TEST.3dm`,
+  open in Rhino (the user allows any change to it; reopen this file if Rhino has to restart). A BKT
+  copy for the speed check is at `C:\01_Projects\Panel Cladding Full\LiveTest-1.3.0\BKT\BKT - Wireframe.3dm`.
+  The file name is not a main-model name, so the naming-convention sync does not run on save.
 - In-process checks run as C# through MCP_Rhino's live scripting on the test document:
   `RhinoApp.RunScript` command macros (`_-PCbake _Scope=_All _Enter`, ...), command-history reads,
   model state (objects, user text, colours, selection, Undo, modified flag, viewport camera), the
@@ -40,8 +43,8 @@ New `tests/Live/` (README, C# live scripts, PowerShell UI Automation and Excel h
 ## Acceptance
 
 - Each item of the 1.3.0 manual list has a script or a recorded reason it cannot be automated.
-- A full run on the copied MET (and BKT for speed) records pass/fail per item with evidence.
-- No keyboard or mouse input is generated; the user's Rhino is untouched.
+- A full run on the MET test model (and the BKT copy for speed) records pass/fail per item with evidence.
+- No keyboard or mouse input is generated.
 
 ## Rollback
 
