@@ -389,7 +389,7 @@ public sealed partial class LivePanelCladdingRepository : ILivePanelCladdingRepo
 
     // The editor layout's width and height (render-mesh extents in the panel frame) and the frame
     // itself, computed from the geometry for the auto attribute refresh, so CW_2.00-2.02 match what
-    // PCEditor and PCSyncSrf write and UD_PLANE follows the panel.
+    // PCeditor and PCsyncSrf write and UD_PLANE follows the panel.
     internal static OperationResponse<(double Width, double Height, PanelPlaneFrame Plane)> MeasurePanel(Brep brep, double tolerance)
     {
         OperationResponse<LocalMesh> local;

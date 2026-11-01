@@ -17,10 +17,10 @@ internal static class Program
         Console.WriteLine("[OK] Merge_Mark is canonical and conflicting legacy values fail closed");
 
         VerifySpawnWritesOnlyMergeMark();
-        Console.WriteLine("[OK] PCSpawnSrf planning writes Merge_Mark and never the legacy key");
+        Console.WriteLine("[OK] PCbake planning writes Merge_Mark and never the legacy key");
 
         VerifySyncSchedulesLegacyCleanup();
-        Console.WriteLine("[OK] PCSyncSrf planning schedules legacy-key cleanup");
+        Console.WriteLine("[OK] PCsyncSrf planning schedules legacy-key cleanup");
 
         VerifyLiveRepositoryMigrationContract();
         Console.WriteLine("[OK] live sync resolves and deletes the legacy key before writing Merge_Mark");
@@ -71,7 +71,7 @@ internal static class Program
         Require(writes.TryGetValue("Merge_Mark", out string? value) && value == "0A;1A",
             "Merged spawn geometry must carry Merge_Mark=0A;1A.");
         Require(!writes.ContainsKey(PanelCladdingSurfaceCoverageService.LegacyUserTextKey),
-            "PCSpawnSrf must not write the former CW_1.03 key.");
+            "PCbake must not write the former CW_1.03 key.");
     }
 
     private static void VerifySyncSchedulesLegacyCleanup()

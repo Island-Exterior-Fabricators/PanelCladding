@@ -20,7 +20,7 @@ internal static class Program
         Console.WriteLine("[OK] missing, merge, and hide states persist independently.");
         Console.WriteLine("[OK] hide-only save migrates separate masks into combined frame configuration.");
         Console.WriteLine("[OK] absent topology masks parse, match, and spawn as defaults.");
-        Console.WriteLine("[OK] PCCrvTemplate skips configured merge codes and no-ops when no merge is possible.");
+        Console.WriteLine("[OK] PCcrvTemplate skips configured merge codes and no-ops when no merge is possible.");
         Console.WriteLine("[OK] surface sync uses combined configuration while signatures retain canonical mask contents.");
         return 0;
     }
@@ -236,7 +236,7 @@ internal static class Program
         Require(configured.Success && configured.Data is not null &&
                 configured.Data.Panels.Count == 0 && configured.Data.SkippedPanelIds.SequenceEqual(
                     [Guid.Parse("A8200000-0000-0000-0000-000000000203")]),
-            "PCCrvTemplate did not skip an existing nonblank merge code.");
+            "PCcrvTemplate did not skip an existing nonblank merge code.");
 
         Require(!PanelCladdingKeyService.HasNonblankMergeMask(new Dictionary<string, string>()) &&
                 !PanelCladdingKeyService.HasNonblankMergeMask(new Dictionary<string, string>

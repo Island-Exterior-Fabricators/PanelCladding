@@ -558,13 +558,13 @@ internal static class Program
             assembly,
             "PanelCladdingEditor.UI.PanelCladdingSyncSrfCommand");
         Type editorCommand = RequireType(assembly, "PanelCladdingEditor.UI.PanelCladdingEditorCommand");
-        Type spawnCommand = RequireType(assembly, "PanelCladdingEditor.UI.PanelCladdingSpawnSrfCommand");
+        Type bakeCommand = RequireType(assembly, "PanelCladdingEditor.UI.PanelCladdingBakeCommand");
         Type matchCommand = RequireType(assembly, "PanelCladdingEditor.UI.PanelCladdingMatchCommand");
         Type clearCommand = RequireType(assembly, "PanelCladdingEditor.UI.PanelCladdingClearCommand");
         Require(syncCommand.GUID != Guid.Empty, "Sync command GUID must be explicit and non-empty.");
         Require(new[]
             {
-                syncCommand.GUID, editorCommand.GUID, spawnCommand.GUID,
+                syncCommand.GUID, editorCommand.GUID, bakeCommand.GUID,
                 matchCommand.GUID, clearCommand.GUID
             }.Distinct().Count() == 5,
             "All PanelCladdingEditor Rhino command GUIDs must be unique.");

@@ -4,11 +4,21 @@ This plug-in is independent of MCP_Rhino. Its product identity is
 `PanelCladdingEditor`; build it with `Build-PanelCladdingEditorPackage.ps1`, then install or validate
 it with `Install-PanelCladdingEditor.ps1`.
 
-The Rhino command surface uses the `PC` prefix: `_PCEditor`, `_PCCreate`, `_PCClear`,
-`_PCCrvTemplate`, `_PCMatchSrf`, `_PCMatchCrv`, `_PCSpawnSrf`, `_PCSpawnCrv`, `_PCSyncSrf`,
-`_PCSyncCrv`, `_PCUpdate`, `_PCpid`, and `_PCtemplatePNL`. `PCUpdate` treats the selected panels' saved attributes as
-authoritative and reconciles all CID-bearing managed surfaces and curves: matching objects are
-rebuilt, missing objects are created, and stale or duplicate objects are deleted. `PCCrvTemplate`
+The Rhino command surface uses the `PC` prefix: `_PCeditor`, `_PCcreate`, `_PCclear`,
+`_PCcrvTemplate`, `_PCmatchSrf`, `_PCmatchCrv`, `_PCbake`, `_PCsyncSrf`, `_PCsyncCrv`, `_PCpid`,
+and `_PCtemplatePNL`. Since 1.3.0 every name is `PC`, the first word in lowercase and later words
+capitalized (`PNL` stays an acronym). Rhino matches command names case-insensitively, so the former
+spellings (`PCEditor`, `PCSyncCrv`, ...), aliases and toolbar macros still run.
+
+`PCbake` (1.3.0) replaces `PCupdate`, `PCspawnSrf` and `PCspawnCrv`; aliases and macros that call
+them must use `PCbake`. It treats the selected panels' saved attributes as authoritative and bakes
+them into managed geometry. Its `Scope` option is `Surfaces` (the default on every run), `Curves` or
+`All`; objects of a kind outside the scope are left as they are. Cladding surfaces are reconciled:
+matching surfaces are rebuilt, missing ones are created, and stale or duplicate ones are deleted.
+Extrusion curves are never overwritten, since they may carry hand-assigned components: a panel that
+already has managed curves keeps all of them and is reported, and a panel without curves gets them.
+Delete a panel's curves to bake new ones. `PCsyncSrf` and `PCsyncCrv` go the other way, reading
+edited geometry back into the panel. `PCcrvTemplate`
 assigns a full-run horizontal or vertical merge mask only to selected
 panel Breps that do not already have a merge code. Configured panels in a mixed selection are
 skipped and reported while the remaining eligible panels are updated. Selecting only configured
@@ -36,8 +46,8 @@ blank placeholder only for a setup key that does not exist yet.
 
 Since 1.2.2 the user-defined `CW_9.xx` series is `UD_XXX`. Panels that still carry
 `CW_9.01`/`CW_9.02` are read as before, and the keys are renamed to `UD_` the next time a
-cladding command writes the panel (`PCEditor` save, `PCCreate`, `PCMatch*`, `PCSyncSrf`,
-`PCCrvTemplate`, `PCSpawn*`/`PCUpdate`), in the same Undo step.
+cladding command writes the panel (`PCeditor` save, `PCcreate`, `PCmatchSrf`, `PCmatchCrv`,
+`PCsyncSrf`, `PCcrvTemplate`, `PCbake`), in the same Undo step.
 
 `UD_FRAME_CONFIG` is authoritative and lets the plug-in read a coded panel even when the workbook
 is unavailable. `2H 1V` is the number of horizontal and vertical intermediates; horizontal
@@ -68,7 +78,7 @@ normal), Y is up and X is right seen from outside; the origin is the panel's low
 Curved panels use their best-fit plane. A stored value that describes the same frame (origin
 within the document tolerance, same axes) is kept as written.
 
-Width and height are the same measurement `PCEditor` and `PCSyncSrf` use. Values refresh after a
+Width and height are the same measurement `PCeditor` and `PCsyncSrf` use. Values refresh after a
 panel is added, copied, edited or moved onto the branch, after `CW_6.01` changes, and for all
 panels when a model opens (which marks the model modified if any value changed). The refresh runs
 when no command is active and is not a separate Undo step; Undo restores the previous values.
@@ -151,14 +161,14 @@ as managed dependencies; copies elsewhere (for example the wireframe
 The former `01_CW Panels`, `02_CW Extrusions`, `04_STEP Surfaces` and
 `03_Material Surfaces (STEP)` trees are no longer recognized; re-layer older documents first.
 
-Since 1.0.96, `PCMatchCrv` copies extrusion assignments together with the segment, merge and hide
+Since 1.0.96, `PCmatchCrv` copies extrusion assignments together with the segment, merge and hide
 masks. Select target panel Breps, then the source; horizontal/vertical grid counts
 must match. Profiles, quantities, formulas, parent links and length modifiers are
 replaced by the source assignments, while target dimensions, offsets and cladding
 remain intact. Configuration is stored in `CW_1.08_FRAME_CONFIG`, and profile
 assignments in `UD_FRAME_ASSIGNMENTS` (`CW_1.09_FRAME_TYPE` before 1.2.5). An unassigned source
-clears target assignments. Run `PCUpdate` to rebuild existing managed curves from
-the matched panel settings, or `PCSpawnCrv` to generate curves.
+clears target assignments. Run `PCbake` with `Scope=Curves` to generate curves for panels that have none;
+existing curves are kept, so delete them first to bake curves from the matched settings.
 
 Since 1.0.95, Extrusion Setup includes Clear all beside Cancel. After a Yes/No
 confirmation it clears configured and unconfigured profiles, editor values and
@@ -174,7 +184,7 @@ Since 1.0.93, PCpid measures the outer boundary on Rhino's verified face plane.
 It no longer treats bounding-box thickness as nonplanarity; actual nonplanar
 surfaces are still rejected at the document tolerance.
 
-`PCpid` (1.0.89) is the first setup step, before PCCreate. In a saved document it
+`PCpid` (1.0.89) is the first setup step, before PCcreate. In a saved document it
 prompts for a three-letter project code, the panels to update,
 a north-facade panel, and a first-floor panel. It writes
 `CW_1.03_ELEVATION`, `CW_1.04_LEVEL`, `CW_1.01_PID` and `CW_1.02_CID`, for example
@@ -199,13 +209,13 @@ each panel's tight bounds in its own facade plane, in model units with five deci
 places. Unit dimension is `widthxheight`. These three dimensions are refreshed
 alongside the IDs on every run. Conflicting case variants fail before any writes.
 
-Since 1.0.92, both PCpid and PCUpdate also standardize selected source surfaces
+Since 1.0.92, both PCpid and PCbake also standardize selected source surfaces
 using the MCP standard four-point skill's convention: lower-left anchor viewed
 from the oriented front, clockwise corners in a gravity-aligned local frame,
 four-point rebuild, front/back flip, then SwapUV. The original front direction,
 footprint, object ID and metadata are retained. Already-standardized surfaces are
 not replaced again. Geometry changes share the owning command's Undo record.
-PCUpdate generates dependencies after this preparation and continues to exclude
+PCbake generates dependencies after this preparation and continues to exclude
 duplicate-CID sources. PCpid's unselected context surfaces are never reordered.
 
 Point ordering supports planar, straight, convex four-corner surfaces without
@@ -238,18 +248,18 @@ dependencies are cleared. An identical rerun makes no changes. Attribute changes
 share one Rhino Undo entry; unrelated metadata and geometry are preserved. Escape
 at any of the four prompts exits before attributes are written.
 
-`PCCreate` initializes the selected panels' grid from selected guide curves. Since
+`PCcreate` initializes the selected panels' grid from selected guide curves. Since
 version 1.0.80 it also writes `CW_2.00_UNIT_DIMENSION`, `CW_2.01_UNIT_WIDTH`, and
 `CW_2.02_UNIT_HEIGHT` from each panel's local extents, using invariant five-decimal
 values (`widthxheight` for the combined dimension). Existing dimension values are
-refreshed. Rerunning PCCreate resets the generated grid; since 1.2.4 it no longer writes or deletes cell
+refreshed. Rerunning PCcreate resets the generated grid; since 1.2.4 it no longer writes or deletes cell
 assignments (see *Cladding configuration* below).
 Since version 1.0.81, its intermediate tracks start segmented even when a guide
 spans multiple cells. Guide coverage still determines missing segments; guide
-continuity does not create a merge mask. Merge explicitly in PCEditor or apply
-PCCrvTemplate when desired. Perimeter frame behavior is unchanged.
+continuity does not create a merge mask. Merge explicitly in PCeditor or apply
+PCcrvTemplate when desired. Perimeter frame behavior is unchanged.
 
-Since version 1.0.82, changing H/V values or row/column dimensions in PCEditor
+Since version 1.0.82, changing H/V values or row/column dimensions in PCeditor
 preserves the current delete, hide, and merge masks by track/segment index.
 Cladding materials, parent-cell links, and extrusion profile assignments retain
 their layout while coordinates move. Save/reload persists the same masks; adding
@@ -261,17 +271,17 @@ spanning/nonrectangular logical cells. Cell label numbering and material code
 equality do not determine line style: separate owners stay solid even with the
 same material, and deleted logical-cell interiors remain absent.
 
-Use `PCSyncSrf` after editing associated cladding surfaces or their material layers
+Use `PCsyncSrf` after editing associated cladding surfaces or their material layers
 to reconstruct the selected panels' cladding layout, material assignments, and
-cell ownership. Use `PCSyncCrv` after editing associated extrusion curves to
+cell ownership. Use `PCsyncCrv` after editing associated extrusion curves to
 reconstruct the selected panels' H/V grid and curve topology. Both read existing
 geometry back into panel attributes and refresh dependency metadata and panel
 dimensions; select the source panel Breps in a saved document.
 
-`PCUpdate` participates in Rhino's command-owned Undo record when invoked from the command line and
+`PCbake` participates in Rhino's command-owned Undo record when invoked from the command line and
 opens its own record only when called without an active command record. A successful batch therefore
 appears as one normal Rhino Undo entry without attempting an unsupported nested record.
-Since version 1.0.83, PCUpdate normalizes parent/child CIDs before checking selected
+Since version 1.0.83, PCbake normalizes parent/child CIDs before checking selected
 panel identities. Parent and child panels sharing a PID can update together.
 Every panel in a duplicate-CID group is skipped; unique-CID panels still update,
 and skipped panels remain selected with their duplicate CIDs reported. An
@@ -283,8 +293,8 @@ layers: update and stale/duplicate deletion bypass those mutation modes without 
 the objects or changing layer state, and retained object-level mode is preserved.
 Managed extrusion curves use object colors by planned type: main-frame curves are Blue
 (`RGB 0,0,255`), horizontal intermediate curves are Purple (`RGB 128,0,128`), and vertical
-intermediate curves are DarkGreen (`RGB 0,100,0`). `PCSpawnCrv` applies the colors to new curves,
-while `PCUpdate` and `PCSyncCrv` correct existing curves within the selected-panel scope.
+intermediate curves are DarkGreen (`RGB 0,100,0`). `PCbake` applies the colors to the curves it creates,
+and `PCsyncCrv` corrects existing curves within the selected-panel scope.
 
 Panel cladding saves persist cell ownership and materials under
 `UD_CLADDING_LOGIC` (`CW_9.01_CLADDING_LOGIC` in 1.1.0–1.2.1, `CW_2.13_CLADDING_LOGIC` before).
@@ -298,16 +308,16 @@ are still written on every cladding save, as output for schedules and scripts, b
 their number or content cannot stop a panel from loading.
 
 - Unconfigured panel (no `UD_CLADDING_LOGIC`): it loads from the `CW_2.03`/`CW_2.04` offsets
-  alone, with blank cells. `PCCreate` writes no `CW_4` placeholders or logic and leaves any
-  `CW_4` keys already on the panel untouched; `PCSyncCrv` leaves its cladding keys alone;
-  `PCMatchSrf` refuses it as a source.
+  alone, with blank cells. `PCcreate` writes no `CW_4` placeholders or logic and leaves any
+  `CW_4` keys already on the panel untouched; `PCsyncCrv` leaves its cladding keys alone;
+  `PCmatchSrf` refuses it as a source.
 - Configured panel: the logic must name exactly the cells of the H/V grid
   (`PANEL_CLADDING_LOGIC_GRID_MISMATCH` otherwise), and `UD_FRAME_CONFIG` must fit H/V as before.
-  Rerunning `PCCreate` keeps the logic when the grid size is unchanged and deletes it when the
-  grid size changed. In `PCEditor`, a grid-size change on a configured panel must be saved with
+  Rerunning `PCcreate` keeps the logic when the grid size is unchanged and deletes it when the
+  grid size changed. In `PCeditor`, a grid-size change on a configured panel must be saved with
   Save Both.
 - Logic saved before 1.2.4 holds ownership only; such a panel takes its owner materials from its
-  `CW_4` keys once, and the next cladding write stores them in the logic. `PCSyncSrf` combines that saved owner graph with current Rhino surface
+  `CW_4` keys once, and the next cladding write stores them in the logic. `PCsyncSrf` combines that saved owner graph with current Rhino surface
 coverage and material layers, while edited splits and merges remain geometry-authoritative.
 
 Since version 1.0.85, panel roles come from `CW_1.06_UNIT_TYPE` (since 1.1.0 together
@@ -326,12 +336,13 @@ CID: `CID-ABC-S1-06-14` becomes `S1-06-14`, and
 `CID-<project>-` of any project is removed (`CID-XYZ-S-04-36` becomes `S-04-36`), without
 changing the full CID user text; a `CID-` identifier without a second `-` loses only `CID-`,
 and custom identifiers are preserved. Prefix matching ignores case.
-Create, save, match, spawn, sync, and update normalize source-panel names from the
-current CID. Spawn/update/sync apply the same rule to surfaces and extrusion curves.
-Run PCUpdate on existing configured panels to refresh their dependency names.
+Create, save, match, bake, and sync normalize source-panel names from the
+current CID. Bake and sync apply the same rule to surfaces and extrusion curves.
+Run PCbake on existing configured panels to refresh their surface names; existing curves keep
+theirs until `PCsyncCrv` runs.
 Both sync commands detect name-only changes; missing CID leaves the panel name alone.
 
-Since version 1.0.87, PCEditor displays total width and height on separate lines
+Since version 1.0.87, PCeditor displays total width and height on separate lines
 with five decimal places and shows the shortened panel CID in Current Panel.
 In Extrusion view, selecting frame or intermediate curves opens the floating
 profile-assignment panel on the canvas. Drag profiles from the sidebar into it;
@@ -346,17 +357,17 @@ are kept, follow layout edits and are saved back; PCMatchCrv, PCSpawnCrv, PCSync
 still use them. The assignment UI remains dormant for a later decision.
 
 Baked cladding surfaces and extrusion curves inherit the panel's `CW_1.05_LOT`
-value, including leading zeros. `PCUpdate`, `PCSyncSrf`, and `PCSyncCrv` use this
+value, including leading zeros. `PCbake`, `PCsyncSrf`, and `PCsyncCrv` use this
 canonical lot key for inherited metadata. An absent panel lot leaves synced
-dependencies without that key; surface spawning requires a populated lot.
+dependencies without that key; baking surfaces requires a populated lot.
 Version 1.0.79 replaces `CW_1.05_RELEASE` with `CW_1.05_LOT` without an old-key
 fallback. Existing Rhino data must already use the new name.
 
 Every baked cladding Brep persists its complete logical coverage under
 `Merge_Mark`, including the owner: a single-cell surface stores `0A`, while a merged
-surface stores values such as `0A;1A`. A complete baked coverage partition lets `PCSyncSrf`
+surface stores values such as `0A;1A`. A complete baked coverage partition lets `PCsyncSrf`
 distinguish a hidden mullion inside one merged surface from an obsolete boundary between separate
-surfaces. Unmarked surface sets do not preserve geometry-missing offsets from the PCEditor parent
+surfaces. Unmarked surface sets do not preserve geometry-missing offsets from the PCeditor parent
 graph; unmatched stored values are cleared and the geometry-derived canonical coverage is then
 written. Mixed or invalid coverage fails before mutation rather than guessing. The former
 `CW_1.03_CLADDING_CELLS` name is accepted only for migration: sync removes it and writes
@@ -371,7 +382,7 @@ Combined cladding types are suspended. Editor saves and surface/curve sync no lo
 calculate or persist `CW_2.14_CLADDING_TYPE`, and the editor no longer shows a cladding
 type preview. Every save scope and changed-panel sync removes that attribute and its
 previous names (`CW_2.13_CLADDING_TYPE`, `CW_1.10_CLADDING_TYPE`, `CW_4.00_CLADDING_TYPE`).
-PCClear also recognizes these retired keys. Material, owner-graph, and topology
+PCclear also recognizes these retired keys. Material, owner-graph, and topology
 validation remain active. The former frame-typology identifier is also retired.
 The old identity/workbook utilities remain dormant for a future design decision.
 
@@ -396,7 +407,7 @@ Existing `CW_2.12_DELETE_MASK`, `CW_2.10_MERGE_MASK`, `CW_2.11_HIDE_MASK` and
 take precedence; blank PCpid placeholders allow legacy fallback. Malformed new
 payloads fail validation. Saving extrusions/both or matching curve settings writes
 the new keys and removes the old masks, assignment key and `CW_1.5D_FRAME TYPOLOGY`.
-PCCreate resets frame settings under the new keys; changed template/sync operations
+PCcreate resets frame settings under the new keys; changed template/sync operations
 also use the new format. Cladding-only saves preserve frame settings.
 
 Version 1.0.78 renames the former `CW_2.05_SEGMENT_MASK`, `CW_2.06_MERGE_MASK`, `CW_2.07_HIDE_MASK`,
@@ -478,10 +489,10 @@ the new version loads after a Rhino restart. Rhino installs packages under
 ## Downloadable release installation
 
 Download the `PanelCladdingEditor-<version>-win-x64.zip` asset from
-[GitHub Releases](https://github.com/novan-xu/PanelCladding/releases/latest), extract
+[GitHub Releases](https://github.com/nuofan-island/PanelCladding/releases/latest), extract
 all files, close Rhino, and run `Install.cmd` normally. The launcher installs for
 the current Windows user and runs `-Mode Validate` before reporting success.
-Restart Rhino and run `PCEditor`. Use `Uninstall.cmd` with Rhino closed to remove it.
+Restart Rhino and run `PCeditor`. Use `Uninstall.cmd` with Rhino closed to remove it.
 See `QUICKSTART.txt` for command-line repair, validation and checksum verification.
 
 Installation uses LocalAppData and HKCU only. It requires no administrator rights,

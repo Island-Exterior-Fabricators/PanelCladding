@@ -38,7 +38,7 @@ internal static class Program
         var keys = new PanelCladdingKeyService();
         Require(!keys.IsClearableCladdingAssignmentKey(FrameType) && !keys.IsClearableCladdingAssignmentKey("cw_1.09_frame_type") &&
                 keys.IsClearableCladdingAssignmentKey("UD_FRAME_ASSIGNMENTS"),
-            "PCClear removes UD_FRAME_ASSIGNMENTS and leaves CW_1.09_FRAME_TYPE.");
+            "PCclear removes UD_FRAME_ASSIGNMENTS and leaves CW_1.09_FRAME_TYPE.");
         Console.WriteLine("[OK] key names and clear scope");
     }
 

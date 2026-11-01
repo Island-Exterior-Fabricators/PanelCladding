@@ -52,10 +52,10 @@ internal static class Program
         PanelCladdingMatchTargetPlan targetPlan = plan.Targets.Single();
         Require(!targetPlan.UserTextWrites.ContainsKey(PanelCladdingKeyService.SegmentMaskKey) &&
                 !targetPlan.UserTextWrites.ContainsKey(PanelCladdingKeyService.MergeMaskKey),
-            "PCMatchSrf must not copy source topology masks.");
+            "PCmatchSrf must not copy source topology masks.");
         Require(!targetPlan.UserTextDeletes.Contains(PanelCladdingKeyService.SegmentMaskKey, StringComparer.OrdinalIgnoreCase) &&
                 !targetPlan.UserTextDeletes.Contains(PanelCladdingKeyService.MergeMaskKey, StringComparer.OrdinalIgnoreCase),
-            "PCMatchSrf must not delete target topology masks.");
+            "PCmatchSrf must not delete target topology masks.");
         Require(!targetPlan.UserTextDeletes.Any(IsOffsetKey) &&
                 !targetPlan.UserTextWrites.Keys.Any(IsOffsetKey),
             "PCMatch must preserve target H/V offsets.");
@@ -70,8 +70,8 @@ internal static class Program
             keys.DecodeTopology(applied, 1, 2),
             "Decode preserved target masks");
         Require(decoded.MissingSegments.Count == 0 && decoded.MergeRuns.Count == 0,
-            "PCMatchSrf changed the target extrusion topology.");
-        Console.WriteLine("[OK] PCMatchSrf ignores source masks and preserves target masks and H/V offsets.");
+            "PCmatchSrf changed the target extrusion topology.");
+        Console.WriteLine("[OK] PCmatchSrf ignores source masks and preserves target masks and H/V offsets.");
 
         var legacySourceText = new Dictionary<string, string>(SourceUserText(sourceMasks), StringComparer.OrdinalIgnoreCase);
         legacySourceText.Remove(PanelCladdingKeyService.SegmentMaskKey);

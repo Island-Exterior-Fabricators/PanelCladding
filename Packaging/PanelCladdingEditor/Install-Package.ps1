@@ -8,4 +8,4 @@ if (@(Get-Process -Name Rhino -ErrorAction SilentlyContinue).Count -gt 0) {
 }
 & $installer -Mode Install
 & $installer -Mode Validate
-Write-Output 'Installation and validation passed. Start Rhino 8 and run PCEditor.'
+Write-Output 'Installation and validation passed. Start Rhino 8 and run PCeditor.'

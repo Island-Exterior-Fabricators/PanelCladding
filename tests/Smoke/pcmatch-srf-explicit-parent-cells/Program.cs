@@ -73,7 +73,7 @@ internal static class Program
                 applied[PanelCladdingKeyService.TypeCodeKey] == "TARGET-TYPE" &&
                 !applied.ContainsKey(PanelCladdingKeyService.SignatureKey) &&
                 applied["CustomNote"] == "preserve",
-            "PCMatchSrf changed target-owned non-cell attributes or retained Signature.");
+            "PCmatchSrf changed target-owned non-cell attributes or retained Signature.");
     }
 
     private static void VerifyExplicitParentSurvivesTopologyCollapse()

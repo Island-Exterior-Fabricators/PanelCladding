@@ -28,7 +28,7 @@ internal static class Program
 
         Console.WriteLine("[OK] H/V curve-template masks preserve topology and round-trip canonically.");
         Console.WriteLine("[OK] Mixed/all-configured batches skip existing masks; duplicates, no-runs, and invalid inputs are handled.");
-        Console.WriteLine("[OK] PCCrvTemplate command, one-record Undo, and rollback contracts passed.");
+        Console.WriteLine("[OK] PCcrvTemplate command, one-record Undo, and rollback contracts passed.");
         if (args.Contains("--curve-template-only", StringComparer.Ordinal))
         {
             return;
@@ -116,7 +116,7 @@ internal static class Program
         Require(alreadyConfigured.Success && alreadyConfigured.Data is not null &&
                 alreadyConfigured.Data.Panels.Count == 0 &&
                 alreadyConfigured.Data.SkippedPanelIds.SequenceEqual([panelId]),
-            "PCCrvTemplate did not skip a panel with an existing merge code.");
+            "PCcrvTemplate did not skip a panel with an existing merge code.");
 
         PanelCladdingCurveTemplatePanelPlan vertical = RequirePlan(
             planner.CreatePlan([snapshot], PanelCladdingCurveTemplatePriority.Vertical));
@@ -285,28 +285,28 @@ internal static class Program
     {
         Assembly assembly = typeof(PanelCladdingKeyService).Assembly;
         Type command = assembly.GetType("PanelCladdingEditor.UI.PanelCladdingCurveTemplateCommand") ??
-            throw new InvalidOperationException("PCCrvTemplate command type is missing.");
+            throw new InvalidOperationException("PCcrvTemplate command type is missing.");
         Require(typeof(Command).IsAssignableFrom(command) && command.GUID != Guid.Empty,
-            "PCCrvTemplate is not a Rhino Command with an explicit non-empty GUID.");
+            "PCcrvTemplate is not a Rhino Command with an explicit non-empty GUID.");
         Type[] commands = assembly.GetTypes()
             .Where(type => !type.IsAbstract && typeof(Command).IsAssignableFrom(type))
             .ToArray();
         Require(commands.Select(type => type.GUID).Distinct().Count() == commands.Length,
-            "PCCrvTemplate introduced a duplicate command GUID.");
+            "PCcrvTemplate introduced a duplicate command GUID.");
 
         string repositoryRoot = FindRepositoryRoot();
         string commandSource = File.ReadAllText(Path.Combine(
             repositoryRoot, "src", "PanelCladdingEditor", "UI", "PanelCladdingCurveTemplateCommand.cs"));
         Require(Regex.IsMatch(commandSource,
-                "EnglishName\\s*=>\\s*\\\"PCCrvTemplate\\\"",
+                "EnglishName\\s*=>\\s*\\\"PCcrvTemplate\\\"",
                 RegexOptions.CultureInvariant),
-            "The command does not register the exact PCCrvTemplate name.");
+            "The command does not register the exact PCcrvTemplate name.");
         Require(commandSource.IndexOf("SelectPanels()", StringComparison.Ordinal) <
                 commandSource.IndexOf("SelectPriority()", StringComparison.Ordinal),
-            "PCCrvTemplate does not prompt for panels before priority.");
+            "PCcrvTemplate does not prompt for panels before priority.");
         Require(commandSource.Contains("HPriority", StringComparison.Ordinal) &&
                 commandSource.Contains("VPriority", StringComparison.Ordinal),
-            "PCCrvTemplate does not expose both required priority options.");
+            "PCcrvTemplate does not expose both required priority options.");
 
         string liveSource = File.ReadAllText(Path.Combine(
             repositoryRoot, "src", "PanelCladdingEditor", "Infrastructure", "Rhino", "Live",

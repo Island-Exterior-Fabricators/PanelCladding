@@ -139,7 +139,7 @@ internal static class Program
             "Create configured-color spawn plan");
         Require(plan.Regions.Count == 1 &&
                 plan.Regions[0].LayerColor == new PanelColorRgb(0x12, 0x34, 0x56),
-            "PCSpawnSrf planning did not use the Material Setup color for XX.");
+            "PCbake planning did not use the Material Setup color for XX.");
 
         PanelColorRgb fallback = PanelCladdingSpawnPlanningService.ResolveMaterialLayerColor("XX");
         PanelCladdingSpawnPlan fallbackPlan = RequireData(
@@ -156,7 +156,7 @@ internal static class Program
             "A material missing from Material Setup must retain the deterministic fallback color.");
         Require(!colorService.ParseHex("#12ZZ56").Success,
             "Invalid Material Setup color text must fail before spawn mutation.");
-        Console.WriteLine("[OK] PCSpawnSrf layer colors use exact Material Setup RGB with deterministic fallback");
+        Console.WriteLine("[OK] PCbake layer colors use exact Material Setup RGB with deterministic fallback");
     }
 
     private static void VerifySingleFaceNativeGeometryWhenAvailable()
@@ -214,7 +214,7 @@ internal static class Program
                 "Resolve 0A/1A coverage")).ToArray();
             Require(coverage.SequenceEqual(["0A", "1A"]),
                 $"Boundary-trimmed surface coverage was {string.Join(", ", coverage)}.");
-            Console.WriteLine("[OK] Rhino-native PCSpawnSrf probe returns one exact-coverage face for 0A/1A");
+            Console.WriteLine("[OK] Rhino-native PCbake probe returns one exact-coverage face for 0A/1A");
         }
         catch (DllNotFoundException)
         {

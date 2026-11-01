@@ -422,15 +422,6 @@ public sealed class PanelCladdingSpawnPlan
         Array.Empty<PanelCladdingExtrusionCurvePlan>();
 }
 
-public sealed class PanelCladdingSpawnResult
-{
-    public IReadOnlyList<Guid> SourcePanelIds { get; init; } = Array.Empty<Guid>();
-    public IReadOnlyList<Guid> CreatedObjectIds { get; init; } = Array.Empty<Guid>();
-    public IReadOnlyList<Guid> CreatedSurfaceIds { get; init; } = Array.Empty<Guid>();
-    public IReadOnlyList<Guid> CreatedCurveIds { get; init; } = Array.Empty<Guid>();
-    public IReadOnlyList<string> Cids { get; init; } = Array.Empty<string>();
-}
-
 public sealed class PanelCladdingMatchGeometryDescriptor
 {
     public PanelGeometryClass GeometryClass { get; init; }
@@ -695,7 +686,7 @@ public sealed class PanelCladdingSurfaceSyncPanelPlan
     public IReadOnlyDictionary<string, string> CellValues { get; init; } =
         new Dictionary<string, string>();
     public string CladdingLogic { get; init; } = string.Empty;
-    // False for PCSyncCrv on an unconfigured panel: its CW_4.xx keys and logic are left as they are.
+    // False for PCsyncCrv on an unconfigured panel: its CW_4.xx keys and logic are left as they are.
     public bool WritesCladding { get; init; } = true;
     public bool CladdingChanged { get; init; }
     public bool NameChanged { get; init; }

@@ -32,7 +32,7 @@ internal static class Program
                 !targetPlan.UserTextWrites.ContainsKey(PanelCladdingKeyService.MergeMaskKey) &&
                 !targetPlan.UserTextDeletes.Contains(PanelCladdingKeyService.SegmentMaskKey, StringComparer.OrdinalIgnoreCase) &&
                 !targetPlan.UserTextDeletes.Contains(PanelCladdingKeyService.MergeMaskKey, StringComparer.OrdinalIgnoreCase),
-            "PCMatchSrf must preserve target topology masks.");
+            "PCmatchSrf must preserve target topology masks.");
         Console.WriteLine("[OK] planned writes preserve 0A/0B parent references instead of flattening them.");
 
         Dictionary<string, string> applied = ApplyPlan(targetText, targetPlan);

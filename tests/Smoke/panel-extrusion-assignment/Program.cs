@@ -622,7 +622,7 @@ internal static class Program
         Require(plannerSource.Contains("AssignedExtrusionsUserTextKey = \"Extrusions\"", StringComparison.Ordinal),
             "Baked curves do not expose the extrusion take-off user-text key.");
         Require(syncSource.Contains("curveWrite.DesiredAssignedExtrusions", StringComparison.Ordinal),
-            "PCSyncCrv does not propagate updated extrusion take-off codes.");
+            "PCsyncCrv does not propagate updated extrusion take-off codes.");
     }
 
     private static PanelCladdingLayout BuildLayout(

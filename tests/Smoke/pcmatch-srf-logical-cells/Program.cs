@@ -24,10 +24,10 @@ internal static class Program
             "PanelCladdingEditor",
             "UI",
             "PanelCladdingMatchCommand.cs"));
-        Require(commandSource.Contains("EnglishName => \"PCMatchSrf\"", StringComparison.Ordinal) &&
+        Require(commandSource.Contains("EnglishName => \"PCmatchSrf\"", StringComparison.Ordinal) &&
                 !commandSource.Contains("EnglishName => \"PCMatch\"", StringComparison.Ordinal),
-            "The public Rhino command was not renamed exclusively to PCMatchSrf.");
-        Console.WriteLine("[OK] PCMatchSrf is the registered public command name.");
+            "The public Rhino command was not renamed exclusively to PCmatchSrf.");
+        Console.WriteLine("[OK] PCmatchSrf is the registered public command name.");
         return 0;
     }
 
@@ -74,12 +74,12 @@ internal static class Program
                 PanelCladdingKeyService.CladdingLogicKey,
                 StringComparison.OrdinalIgnoreCase)) &&
                 plan.UserTextWrites.ContainsKey(PanelCladdingKeyService.CladdingLogicKey),
-            "PCMatchSrf planned a write outside cell assignments and their derived logic.");
+            "PCmatchSrf planned a write outside cell assignments and their derived logic.");
         Require(plan.UserTextDeletes.All(key => keys.IsCladdingCellKey(key) ||
                 string.Equals(key, PanelCladdingKeyService.CladdingLogicKey, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(key, PanelCladdingKeyService.SignatureKey, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(key, PanelCladdingKeyService.LegacySignatureKey, StringComparison.OrdinalIgnoreCase)),
-            "PCMatchSrf planned a non-cell deletion other than retired Signature keys.");
+            "PCmatchSrf planned a non-cell deletion other than retired Signature keys.");
 
         IReadOnlyDictionary<string, string> applied =
             PanelCladdingMatchPlanningService.ApplyUserTextPlan(targetText, plan);
@@ -90,7 +90,7 @@ internal static class Program
                 applied[PanelCladdingKeyService.TypeCodeKey] == "TARGET-TYPE-PRESERVE" &&
                 !applied.ContainsKey(PanelCladdingKeyService.SignatureKey) &&
                 applied["CustomNote"] == "preserve",
-            "PCMatchSrf changed target-owned layout, topology, type metadata, unrelated text, or retained Signature.");
+            "PCmatchSrf changed target-owned layout, topology, type metadata, unrelated text, or retained Signature.");
         Console.WriteLine("[OK] a blank source region expands across every compatible target physical cell.");
     }
 
@@ -113,7 +113,7 @@ internal static class Program
                 plan.UserTextWrites[PanelCladdingKeyService.GetCellKey(0, "B")] == "MPL-001" &&
                 plan.UserTextWrites[PanelCladdingKeyService.GetCellKey(1, "A")] == "0A" &&
                 plan.UserTextWrites[PanelCladdingKeyService.GetCellKey(1, "B")] == "0B",
-            "PCMatchSrf changed the source material/parent graph.");
+            "PCmatchSrf changed the source material/parent graph.");
         Console.WriteLine("[OK] assigned materials and parent-cell conditions transfer exactly by cell code.");
     }
 

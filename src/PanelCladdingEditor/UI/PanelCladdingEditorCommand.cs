@@ -25,13 +25,13 @@ public sealed class PanelCladdingEditorCommand : RhinoCommand
 {
     private static PanelCladdingEditorWindow? _window;
 
-    public override string EnglishName => "PCEditor";
+    public override string EnglishName => "PCeditor";
 
     protected override Result RunCommand(RhinoDoc doc, RunMode mode)
     {
         if (doc is null || string.IsNullOrWhiteSpace(doc.Path))
         {
-            RhinoApp.WriteLine("PCEditor requires a saved active document.");
+            RhinoApp.WriteLine("PCeditor requires a saved active document.");
             return Result.Failure;
         }
 

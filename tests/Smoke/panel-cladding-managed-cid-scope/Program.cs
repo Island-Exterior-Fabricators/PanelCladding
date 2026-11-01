@@ -7,7 +7,7 @@ internal static class Program
     private static void Main()
     {
         VerifyManagedLayerPredicates();
-        VerifyLiveSpawnConflictFilterContract();
+        VerifyLiveBakeDiscoveryContract();
         VerifyLiveSyncDiscoveryContract();
     }
 
@@ -55,7 +55,9 @@ internal static class Program
         Console.WriteLine("[OK] managed layer predicates accept only canonical roots and descendants");
     }
 
-    private static void VerifyLiveSpawnConflictFilterContract()
+    // The spawn commands and their CID-conflict check were removed in 1.3.0; PCbake discovers
+    // existing dependencies with the same geometry-class and managed-root limits.
+    private static void VerifyLiveBakeDiscoveryContract()
     {
         string source = File.ReadAllText(Path.Combine(
             FindRepositoryRoot(),
@@ -65,20 +67,14 @@ internal static class Program
             "Rhino",
             "Live",
             "PanelCladding",
-            "LivePanelCladdingSpawnService.cs"));
+            "LivePanelCladdingUpdateService.cs"));
         Require(
-            source.Contains("existing.Any(item =>", StringComparison.Ordinal) &&
-            source.Contains("IsManagedCidConflict(document, item, scope)", StringComparison.Ordinal),
-            "CID lookup results are not filtered through the managed conflict policy.");
+            source.Contains("Brep when PanelCladdingSpawnPlanningService.IsManagedSurfaceLayerPath(layerPath)", StringComparison.Ordinal),
+            "Existing surface dependencies are not limited by geometry class and managed STEP layer.");
         Require(
-            source.Contains("PanelCladdingObjectScope.Surfaces => rhinoObject.Geometry is Brep", StringComparison.Ordinal) &&
-            source.Contains("IsManagedSurfaceLayerPath(layerPath)", StringComparison.Ordinal),
-            "Surface CID conflicts are not limited by geometry class and managed STEP layer.");
-        Require(
-            source.Contains("PanelCladdingObjectScope.Curves => rhinoObject.Geometry is Curve", StringComparison.Ordinal) &&
-            source.Contains("IsManagedExtrusionLayerPath(layerPath,", StringComparison.Ordinal),
-            "Curve CID conflicts are not limited by geometry class and managed extrusion layer.");
-        Console.WriteLine("[OK] spawn CID conflicts are filtered by scope, geometry class, and managed root");
+            source.Contains("Curve when PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath(layerPath,", StringComparison.Ordinal),
+            "Existing curve dependencies are not limited by geometry class and managed extrusion layer.");
+        Console.WriteLine("[OK] bake dependency discovery is filtered by geometry class and managed root");
     }
 
     private static void VerifyLiveSyncDiscoveryContract()

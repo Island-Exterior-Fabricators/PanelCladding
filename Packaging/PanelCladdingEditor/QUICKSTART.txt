@@ -10,7 +10,7 @@ INSTALL
 2. Extract ALL files to a folder you can write to. Do not run inside the ZIP.
 3. Close every Rhino window.
 4. Double-click Install.cmd normally (do not choose Run as administrator).
-5. After installation and validation pass, start Rhino 8 and run PCEditor.
+5. After installation and validation pass, start Rhino 8 and run PCeditor.
 
 Install.cmd uses Windows PowerShell supplied with Windows. Its execution-policy
 override applies only to that process; it does not change your saved policy.
@@ -41,4 +41,4 @@ Get-FileHash .\PanelCladdingEditor-<version>-win-x64.zip -Algorithm SHA256
 Compare with the adjacent .zip.sha256 release asset.
 
 See README.md for commands and workflows.
-Releases: https://github.com/novan-xu/PanelCladding/releases
+Releases: https://github.com/nuofan-island/PanelCladding/releases
