@@ -82,3 +82,18 @@ document, workbook, package, registry entry or installed RHP was changed.
 
 Curve extrusion assignment is suspended in PCEditor and its Extrusion view edits the layout
 only. Builds and the full regression pass. The work stays active until live acceptance in Rhino.
+
+## Merge follow-up (2026-10-31)
+
+At the user's request, `master` (PR 8 repository links, PR 10 command casing, PR 11 `PCbake`) was
+merged into this branch before PR 9 was merged, and the package README paragraph above now names
+`PCeditor`, `PCmatchCrv`, `PCsyncCrv` and `PCbake` (1.3.0 removed `PCspawnCrv` and renamed
+`PCupdate`).
+
+The new smoke closed the editor while it still had unsaved edits, so each run raised the real
+"Discard unsaved panel cladding edits?" message box and waited for someone to answer it (Release
+103.5 s in this TEST's evidence, 50.4 s in the combined run). It now clears the dirty state
+before both `Close()` calls, as `pc-editor-canvas-assignment` does: 2.3 s Debug, 2.2 s Release.
+
+`tests/Run-Regression.ps1` on the combined tree before that fix: Debug 79/79, Release 79/79, exit 0.
+After it, `extrusion-assignment-suspension` passes in both configurations without a prompt.

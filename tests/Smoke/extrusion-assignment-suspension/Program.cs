@@ -87,6 +87,9 @@ internal static class Program
         Require(Named<Border>(window, "MaterialLegendSection").Visibility == Visibility.Visible &&
                 Named<Border>(window, "CladdingAssignmentSection").Visibility == Visibility.Visible,
             "Cladding view changed.");
+        // Closing a dirty editor shows a real "Discard unsaved edits?" message box that blocks the
+        // run until someone answers it; the edits under test are already verified.
+        Invoke(window, "SetDirty", false);
         window.Close();
 
         enabled.SetValue(null, true);
@@ -102,6 +105,7 @@ internal static class Program
             Require(CanvasAssignments(Named<PanelCladdingGridCanvas>(restored, "PanelGridCanvas"))
                     .TryGetValue("FRM-0", out IReadOnlyList<string>? codes) && codes.Contains(FrameProfile),
                 "Restored canvas labels do not show assigned profiles.");
+            Invoke(restored, "SetDirty", false);
             restored.Close();
         }
         finally

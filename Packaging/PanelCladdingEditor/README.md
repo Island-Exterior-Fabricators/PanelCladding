@@ -350,11 +350,11 @@ clear the selection or press Escape to hide it.
 Version 1.0.88 fits assigned profiles into two columns within the same floating
 panel width, with each profile code above its length modifier and remove button.
 
-Curve profile assignment is suspended. PCEditor's Extrusion view edits the layout only
+Curve profile assignment is suspended. PCeditor's Extrusion view edits the layout only
 (merge, explode, hide, add, delete and offsets); it no longer shows the profile catalogue, the
 floating assignment panel or assigned codes on curve labels. Existing `UD_FRAME_ASSIGNMENTS`
-are kept, follow layout edits and are saved back; PCMatchCrv, PCSpawnCrv, PCSyncCrv and PCUpdate
-still use them. The assignment UI remains dormant for a later decision.
+are kept, follow layout edits and are saved back; PCmatchCrv, PCsyncCrv and PCbake (for curves it
+creates) still use them. The assignment UI remains dormant for a later decision.
 
 Baked cladding surfaces and extrusion curves inherit the panel's `CW_1.05_LOT`
 value, including leading zeros. `PCbake`, `PCsyncSrf`, and `PCsyncCrv` use this
