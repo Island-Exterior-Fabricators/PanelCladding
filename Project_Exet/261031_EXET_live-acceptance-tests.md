@@ -7,8 +7,10 @@ Executed 2026-10-31 under [the user-authorized PLAN](../Project_Plan/261031_PLAN
 ## Related artifacts
 
 [TEST evidence](../Project_Test/261031_TEST_live-acceptance-tests/README.md); code in
-[`tests/Live`](../tests/Live/README.md). Branch `codex/live-acceptance-tests` (local), worktree
-`C:\01_Projects\Panel Cladding Full\PC-casing`.
+[`tests/Live`](../tests/Live/README.md). Branch `codex/live-acceptance-tests`, worktree
+`C:\01_Projects\Panel Cladding Full\PC-casing`;
+[PR 14](https://github.com/nuofan-island/PanelCladding/pull/14). The plug-in changes for its findings
+are in [PR 15](https://github.com/nuofan-island/PanelCladding/pull/15).
 
 ## Implemented scope
 
