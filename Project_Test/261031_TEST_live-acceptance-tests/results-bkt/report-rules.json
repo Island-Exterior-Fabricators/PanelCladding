@@ -1,0 +1,397 @@
+{
+  "panels": 1008,
+  "surfaces": 5024,
+  "curves": 9568,
+  "rules": [
+    {
+      "id": "A02",
+      "title": "Duplicate CID",
+      "severity": "Error",
+      "category": "Attributes",
+      "count": 36,
+      "objectIssues": 36,
+      "byLayer": {
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04": 36
+      },
+      "samples": [
+        {
+          "objectId": "fb4b8211-48c1-485b-ab32-e80da50741aa",
+          "name": "E1-01-02",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04",
+          "detail": "CID-BKT-E1-01-02 is shared by 2 panels"
+        },
+        {
+          "objectId": "8c69fb37-2bc2-4152-bead-3af2e1064f26",
+          "name": "E1-01-02",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04",
+          "detail": "CID-BKT-E1-01-02 is shared by 2 panels"
+        },
+        {
+          "objectId": "aa0bc2c3-71be-438f-bb32-fbcdf0bde619",
+          "name": "E1-01-04",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04",
+          "detail": "CID-BKT-E1-01-04 is shared by 2 panels"
+        },
+        {
+          "objectId": "ed6cc002-37a5-4d09-9961-47461b48a2c7",
+          "name": "E1-01-04",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04",
+          "detail": "CID-BKT-E1-01-04 is shared by 2 panels"
+        },
+        {
+          "objectId": "7e53092b-b9e2-4fb8-90e4-54fc7171ac94",
+          "name": "E1-01-06",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04",
+          "detail": "CID-BKT-E1-01-06 is shared by 2 panels"
+        }
+      ]
+    },
+    {
+      "id": "A03",
+      "title": "Cladding or frame data unreadable",
+      "severity": "Error",
+      "category": "Attributes",
+      "count": 31,
+      "objectIssues": 31,
+      "byLayer": {
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04": 28,
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_07": 3
+      },
+      "samples": [
+        {
+          "objectId": "fb4b8211-48c1-485b-ab32-e80da50741aa",
+          "name": "E1-01-02",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04",
+          "detail": "PANEL_CLADDING_H_OUTSIDE_EXTENT: H2=204.625 is outside the panel interior."
+        },
+        {
+          "objectId": "8c69fb37-2bc2-4152-bead-3af2e1064f26",
+          "name": "E1-01-02",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04",
+          "detail": "PANEL_CLADDING_H_OUTSIDE_EXTENT: H0=152.20455 is outside the panel interior."
+        },
+        {
+          "objectId": "aa0bc2c3-71be-438f-bb32-fbcdf0bde619",
+          "name": "E1-01-04",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04",
+          "detail": "PANEL_CLADDING_H_OUTSIDE_EXTENT: H2=204.625 is outside the panel interior."
+        },
+        {
+          "objectId": "ed6cc002-37a5-4d09-9961-47461b48a2c7",
+          "name": "E1-01-04",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04",
+          "detail": "PANEL_CLADDING_H_OUTSIDE_EXTENT: H0=152.20455 is outside the panel interior."
+        },
+        {
+          "objectId": "7e53092b-b9e2-4fb8-90e4-54fc7171ac94",
+          "name": "E1-01-06",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04",
+          "detail": "PANEL_CLADDING_H_OUTSIDE_EXTENT: H2=204.625 is outside the panel interior."
+        }
+      ]
+    },
+    {
+      "id": "A06",
+      "title": "Name does not match CID",
+      "severity": "Warning",
+      "category": "Attributes",
+      "count": 4,
+      "objectIssues": 4,
+      "byLayer": {
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_07": 3,
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04": 1
+      },
+      "samples": [
+        {
+          "objectId": "f75a147d-60ea-4872-afa1-c393e9b6cccc",
+          "name": "E1-PF-07_C",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04",
+          "detail": "\u0027E1-PF-07_C\u0027; expected \u0027N1-PF-02\u0027"
+        },
+        {
+          "objectId": "c59b9216-8591-4553-97cc-e41f2f7f361f",
+          "name": "",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_07",
+          "detail": "\u0027\u0027; expected \u0027W2-05-02\u0027"
+        },
+        {
+          "objectId": "2bd35056-2da7-4e47-a70f-ac04cfd4b5f5",
+          "name": "",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_07",
+          "detail": "\u0027\u0027; expected \u0027W2-03-02\u0027"
+        },
+        {
+          "objectId": "13b38ef3-826b-4b74-889f-e145c505b461",
+          "name": "",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_07",
+          "detail": "\u0027\u0027; expected \u0027W2-02-02\u0027"
+        }
+      ]
+    },
+    {
+      "id": "A10",
+      "title": "Setup keys missing",
+      "severity": "Info",
+      "category": "Attributes",
+      "count": 1008,
+      "objectIssues": 1008,
+      "byLayer": {
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_01": 390,
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04": 172,
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_03": 163,
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_02": 140,
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_08 (SB)": 79,
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_07": 49,
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_11": 15
+      },
+      "samples": [
+        {
+          "objectId": "102906e4-dc28-4735-b4cc-b223f691d85d",
+          "name": "E1-06-10",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_01",
+          "detail": "CW_1.09_FRAME_TYPE, CW_2.05_ANCHOR_DL_LEFT, CW_2.05_ANCHOR_DL_RIGHT, CW_2.05_ANCHOR_WL_LEFT, CW_2.05_ANCHOR_WL_RIGHT, CW_2.06_PENETRATION_DIMENSION, CW_5.00_DEFINITION_B, CW_5.00_DEFINITION_C, CW_5.00_DEFINITION_D, CW_6.00_WL_NEGATIVE, CW_6.00_WL_POSITIVE, CW_7.00_BLIND_SINGLE, CW_7.00_BLIND_DOUBLE"
+        },
+        {
+          "objectId": "f2c23371-5460-456a-b4b9-5214ae1da9e2",
+          "name": "E1-06-11",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_01",
+          "detail": "CW_1.09_FRAME_TYPE, CW_2.05_ANCHOR_DL_LEFT, CW_2.05_ANCHOR_DL_RIGHT, CW_2.05_ANCHOR_WL_LEFT, CW_2.05_ANCHOR_WL_RIGHT, CW_2.06_PENETRATION_DIMENSION, CW_5.00_DEFINITION_B, CW_5.00_DEFINITION_C, CW_5.00_DEFINITION_D, CW_6.00_WL_NEGATIVE, CW_6.00_WL_POSITIVE, CW_7.00_BLIND_SINGLE, CW_7.00_BLIND_DOUBLE"
+        },
+        {
+          "objectId": "75f17575-5bd8-4043-8fc1-9b4d85051c3a",
+          "name": "E1-06-12",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_01",
+          "detail": "CW_1.09_FRAME_TYPE, CW_2.05_ANCHOR_DL_LEFT, CW_2.05_ANCHOR_DL_RIGHT, CW_2.05_ANCHOR_WL_LEFT, CW_2.05_ANCHOR_WL_RIGHT, CW_2.06_PENETRATION_DIMENSION, CW_5.00_DEFINITION_B, CW_5.00_DEFINITION_C, CW_5.00_DEFINITION_D, CW_6.00_WL_NEGATIVE, CW_6.00_WL_POSITIVE, CW_7.00_BLIND_SINGLE, CW_7.00_BLIND_DOUBLE"
+        },
+        {
+          "objectId": "2c50824c-49fe-4871-a67c-cd266456d41d",
+          "name": "E1-06-13",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_01",
+          "detail": "CW_1.09_FRAME_TYPE, CW_2.05_ANCHOR_DL_LEFT, CW_2.05_ANCHOR_DL_RIGHT, CW_2.05_ANCHOR_WL_LEFT, CW_2.05_ANCHOR_WL_RIGHT, CW_2.06_PENETRATION_DIMENSION, CW_5.00_DEFINITION_B, CW_5.00_DEFINITION_C, CW_5.00_DEFINITION_D, CW_6.00_WL_NEGATIVE, CW_6.00_WL_POSITIVE, CW_7.00_BLIND_SINGLE, CW_7.00_BLIND_DOUBLE"
+        },
+        {
+          "objectId": "dc9951b1-3b94-491f-8c1a-e95d94339041",
+          "name": "E1-06-14",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_01",
+          "detail": "CW_1.09_FRAME_TYPE, CW_2.05_ANCHOR_DL_LEFT, CW_2.05_ANCHOR_DL_RIGHT, CW_2.05_ANCHOR_WL_LEFT, CW_2.05_ANCHOR_WL_RIGHT, CW_2.06_PENETRATION_DIMENSION, CW_5.00_DEFINITION_B, CW_5.00_DEFINITION_C, CW_5.00_DEFINITION_D, CW_6.00_WL_NEGATIVE, CW_6.00_WL_POSITIVE, CW_7.00_BLIND_SINGLE, CW_7.00_BLIND_DOUBLE"
+        }
+      ]
+    },
+    {
+      "id": "A12",
+      "title": "Role not lowercase",
+      "severity": "Info",
+      "category": "Attributes",
+      "count": 1008,
+      "objectIssues": 1008,
+      "byLayer": {
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_01": 390,
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04": 172,
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_03": 163,
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_02": 140,
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_08 (SB)": 79,
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_07": 49,
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_11": 15
+      },
+      "samples": [
+        {
+          "objectId": "102906e4-dc28-4735-b4cc-b223f691d85d",
+          "name": "E1-06-10",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_01",
+          "detail": "Definition A \u0027Parent\u0027"
+        },
+        {
+          "objectId": "f2c23371-5460-456a-b4b9-5214ae1da9e2",
+          "name": "E1-06-11",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_01",
+          "detail": "Definition A \u0027Parent\u0027"
+        },
+        {
+          "objectId": "75f17575-5bd8-4043-8fc1-9b4d85051c3a",
+          "name": "E1-06-12",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_01",
+          "detail": "Definition A \u0027Parent\u0027"
+        },
+        {
+          "objectId": "2c50824c-49fe-4871-a67c-cd266456d41d",
+          "name": "E1-06-13",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_01",
+          "detail": "Definition A \u0027Parent\u0027"
+        },
+        {
+          "objectId": "dc9951b1-3b94-491f-8c1a-e95d94339041",
+          "name": "E1-06-14",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_01",
+          "detail": "Definition A \u0027Parent\u0027"
+        }
+      ]
+    },
+    {
+      "id": "D01",
+      "title": "No owner panel",
+      "severity": "Warning",
+      "category": "Dependencies",
+      "count": 2423,
+      "objectIssues": 2423,
+      "byLayer": {
+        "BKT-IEF-Wireframe::Curves - PNL::Curves - Mullion Wrap::do not include": 1204,
+        "BKT-IEF-Wireframe::Curves - PNL::Curves - Mullion Wrap::Opaque vertical mullion": 798,
+        "BKT-IEF-Wireframe::Curves - PNL::Curves - Mullion Wrap::Opaque vertical mullion optional": 356,
+        "BKT-IEF-Wireframe::Curves - PNL::Curves - Snow Guards::MTL-05.1": 31,
+        "BKT-IEF-Wireframe::Curves - PNL::Curves - Snow Guards::MTL-06.1": 18,
+        "BKT-IEF-Wireframe::Curves - PNL::Curves - Snow Guards::MTL-01.1": 7,
+        "BKT-IEF-Wireframe::Curves - PNL::Curves - Snow Guards::MTL-02.1": 3,
+        "BKT-IEF-Wireframe::Curves - PNL::Curves - Snow Guards::MTL-07.1": 3,
+        "BKT-IEF-Wireframe::Curves - PNL::Curves - Snow Guards::MTL-08.1": 3
+      },
+      "samples": [
+        {
+          "objectId": "9bf23645-b61d-48fd-a80b-0627d6c8d5c4",
+          "name": "",
+          "layer": "BKT-IEF-Wireframe::Curves - PNL::Curves - Mullion Wrap::do not include",
+          "detail": "No PID"
+        },
+        {
+          "objectId": "519eb53e-0afb-4af4-87f1-eb61afa4a8e2",
+          "name": "",
+          "layer": "BKT-IEF-Wireframe::Curves - PNL::Curves - Mullion Wrap::do not include",
+          "detail": "No PID"
+        },
+        {
+          "objectId": "addb85e6-9788-4303-b941-5ead206e7e7b",
+          "name": "",
+          "layer": "BKT-IEF-Wireframe::Curves - PNL::Curves - Mullion Wrap::do not include",
+          "detail": "No PID"
+        },
+        {
+          "objectId": "f8b04c26-847d-46d5-8bae-810beceedf2c",
+          "name": "",
+          "layer": "BKT-IEF-Wireframe::Curves - PNL::Curves - Mullion Wrap::do not include",
+          "detail": "No PID"
+        },
+        {
+          "objectId": "1c976979-b6b7-4c51-8aee-9888e84cbbbd",
+          "name": "",
+          "layer": "BKT-IEF-Wireframe::Curves - PNL::Curves - Mullion Wrap::do not include",
+          "detail": "No PID"
+        }
+      ]
+    },
+    {
+      "id": "D06",
+      "title": "Panel with materials but no surfaces",
+      "severity": "Info",
+      "category": "Dependencies",
+      "count": 45,
+      "objectIssues": 45,
+      "byLayer": {
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04": 45
+      },
+      "samples": [
+        {
+          "objectId": "fb4b8211-48c1-485b-ab32-e80da50741aa",
+          "name": "E1-01-02",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04",
+          "detail": "CID-BKT-E1-01-02"
+        },
+        {
+          "objectId": "8c69fb37-2bc2-4152-bead-3af2e1064f26",
+          "name": "E1-01-02",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04",
+          "detail": "CID-BKT-E1-01-02"
+        },
+        {
+          "objectId": "aa0bc2c3-71be-438f-bb32-fbcdf0bde619",
+          "name": "E1-01-04",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04",
+          "detail": "CID-BKT-E1-01-04"
+        },
+        {
+          "objectId": "ed6cc002-37a5-4d09-9961-47461b48a2c7",
+          "name": "E1-01-04",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04",
+          "detail": "CID-BKT-E1-01-04"
+        },
+        {
+          "objectId": "7e53092b-b9e2-4fb8-90e4-54fc7171ac94",
+          "name": "E1-01-06",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - WT_04",
+          "detail": "CID-BKT-E1-01-06"
+        }
+      ]
+    },
+    {
+      "id": "D07",
+      "title": "PID outside the managed layers",
+      "severity": "Info",
+      "category": "Dependencies",
+      "count": 7627,
+      "objectIssues": 7627,
+      "byLayer": {
+        "BKT-IEF-Wireframe::Surfaces - TER::TER-001": 5175,
+        "BKT-IEF-Wireframe::Surfaces - GLS::GLS-003.0": 759,
+        "BKT-IEF-Wireframe::Surfaces - GLS::GLS-005.2": 466,
+        "BKT-IEF-Wireframe::Surfaces - GLS::GLS-005.0": 357,
+        "BKT-IEF-Wireframe::Surfaces - MP::MPL-001": 339,
+        "BKT-IEF-Wireframe::Surfaces - STN::STN-001": 263,
+        "BKT-IEF-Wireframe::Surfaces - GLS::GLS-004": 121,
+        "BKT-IEF-Wireframe::Surfaces - GLS::GLS-002": 44,
+        "BKT-IEF-Wireframe::Surfaces - GLS::GLS-003.1": 32,
+        "BKT-IEF-Wireframe::Surfaces - GLS::GLS-001": 30,
+        "BKT-IEF-Wireframe::Surfaces - GLS::GLS-007.0": 16,
+        "BKT-IEF-Wireframe::Surfaces - GLS::GLS-005.3": 9
+      },
+      "samples": [
+        {
+          "objectId": "86ed00af-6eae-4d50-9cc9-2ab15aebf8d7",
+          "name": "",
+          "layer": "BKT-IEF-Wireframe::Surfaces - GLS::GLS-001",
+          "detail": "PID-BKT-W1-02-16"
+        },
+        {
+          "objectId": "0f2ddd8f-b9e4-4d6e-9504-ed84356ce4d2",
+          "name": "",
+          "layer": "BKT-IEF-Wireframe::Surfaces - GLS::GLS-001",
+          "detail": "PID-BKT-W1-02-16"
+        },
+        {
+          "objectId": "3ed5db69-6f36-4a53-8766-754b2ddfbfca",
+          "name": "",
+          "layer": "BKT-IEF-Wireframe::Surfaces - GLS::GLS-001",
+          "detail": "PID-BKT-W1-02-14"
+        },
+        {
+          "objectId": "cadb7681-5fc9-43b0-bc95-d88e0d07f845",
+          "name": "",
+          "layer": "BKT-IEF-Wireframe::Surfaces - GLS::GLS-001",
+          "detail": "PID-BKT-W1-02-14"
+        },
+        {
+          "objectId": "e61a45b3-6fda-4d31-8c08-b7fb5f340a96",
+          "name": "",
+          "layer": "BKT-IEF-Wireframe::Surfaces - GLS::GLS-001",
+          "detail": "PID-BKT-W1-02-08"
+        }
+      ]
+    },
+    {
+      "id": "L07",
+      "title": "Not tracked layer",
+      "severity": "Info",
+      "category": "Layers",
+      "count": 1,
+      "objectIssues": 0,
+      "byLayer": {
+        "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - Not in Scope": 1
+      },
+      "samples": [
+        {
+          "objectId": "00000000-0000-0000-0000-000000000000",
+          "name": "",
+          "layer": "BKT-IEF-Wireframe::Surfaces - PNL::Surfaces - Not in Scope",
+          "detail": "158 object(s) not tracked"
+        }
+      ]
+    }
+  ]
+}

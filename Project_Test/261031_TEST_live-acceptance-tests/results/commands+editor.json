@@ -1,0 +1,297 @@
+{
+  "suite": "commands\u002Beditor",
+  "status": "done",
+  "started": "2026-10-31T22:39:45",
+  "updated": "2026-10-31T22:39:46",
+  "step": "",
+  "passed": 18,
+  "failed": 0,
+  "error": "",
+  "checks": [
+    {
+      "id": "1.0 Rhino runs the installed 1.3.0 RHP",
+      "pass": true,
+      "step": "1.0 loaded plug-in",
+      "evidence": {
+        "location": "C:\\Users\\nuofa\\AppData\\Local\\PanelCladdingEditor\\plugin\\1.3.0\\PanelCladdingEditor.rhp",
+        "hash": "BDA62FFD1726D7BD6609A794081FDD1EF143BC2FB4C619447D6C3C96F14E8E39",
+        "version": "1.3.0\u002B150f546680545b6f8178d71613747643622ca8a8"
+      }
+    },
+    {
+      "id": "1.1 plug-in registers exactly the 12 commands",
+      "pass": true,
+      "step": "1.1 command registry",
+      "evidence": [
+        "PCbake",
+        "PCclear",
+        "PCcreate",
+        "PCcrvTemplate",
+        "PCeditor",
+        "PCmatchSrf",
+        "PCmatchCrv",
+        "PCpid",
+        "PCreport",
+        "PCsyncCrv",
+        "PCsyncSrf",
+        "PCtemplatePNL"
+      ]
+    },
+    {
+      "id": "1.1 \u0027PC\u0027 completion lists only these 12",
+      "pass": true,
+      "step": "1.1 command registry",
+      "evidence": {
+        "loadedCommandsStartingWithPC": [
+          "PCbake",
+          "PCclear",
+          "PCcreate",
+          "PCcrvTemplate",
+          "PCeditor",
+          "PCmatchCrv",
+          "PCmatchSrf",
+          "PCpid",
+          "PCreport",
+          "PCsyncCrv",
+          "PCsyncSrf",
+          "PCtemplatePNL"
+        ],
+        "registeredCommandsStartingWithPC": [
+          "PCbake",
+          "PCclear",
+          "PCcreate",
+          "PCcrvTemplate",
+          "PCeditor",
+          "PCmatchCrv",
+          "PCmatchSrf",
+          "PCpid",
+          "PCreport",
+          "PCsyncCrv",
+          "PCsyncSrf",
+          "PCtemplatePNL"
+        ],
+        "aliasesStartingWithPC": []
+      }
+    },
+    {
+      "id": "1.2 PCEditor runs PCeditor",
+      "pass": true,
+      "step": "1.2 old spelling",
+      "evidence": "Command: _PCEditor\nSelect one panel Brep to edit: _Enter\nSelect one panel Brep to edit\nPanel selection cancelled.\n"
+    },
+    {
+      "id": "1.2 PCBAKE runs PCbake",
+      "pass": true,
+      "step": "1.2 old spelling",
+      "evidence": "Command: _PCBAKE\nSelect panel Breps to bake ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake ( Scope=Surfaces )\nPanel bake selection cancelled.\n"
+    },
+    {
+      "id": "1.3 PCupdate is unknown",
+      "pass": true,
+      "step": "1.3 removed commands",
+      "evidence": "Command: _PCupdate\nUnknown command: _PCupdate\n"
+    },
+    {
+      "id": "1.3 PCspawnSrf is unknown",
+      "pass": true,
+      "step": "1.3 removed commands",
+      "evidence": "Command: _PCspawnSrf\nUnknown command: _PCspawnSrf\n"
+    },
+    {
+      "id": "1.3 PCspawnCrv is unknown",
+      "pass": true,
+      "step": "1.3 removed commands",
+      "evidence": "Command: _PCspawnCrv\nUnknown command: _PCspawnCrv\n"
+    },
+    {
+      "id": "1.4 no local alias or loaded toolbar calls a removed command",
+      "pass": true,
+      "step": "1.4 aliases and toolbars",
+      "evidence": {
+        "aliasHits": [],
+        "toolbarHits": [],
+        "toolbarFiles": [
+          {
+            "Name": "default",
+            "path": "Rhino.UI.Resources.rui.default.rui"
+          }
+        ]
+      }
+    },
+    {
+      "id": "5.0 PCeditor opens on the panel",
+      "pass": true,
+      "step": "5.0 setup and open PCeditor",
+      "evidence": {
+        "panel": "16b4c18d-3d4b-4832-981c-069bc7ea492d",
+        "pid": "PID-MET-E-04-12",
+        "history": "Command: _PCeditor\n",
+        "status": "Grid metadata loaded",
+        "badge": "Saved"
+      }
+    },
+    {
+      "id": "5.4 Cladding view shows the material legend and cell assignment",
+      "pass": true,
+      "step": "5.4 Cladding view",
+      "evidence": {
+        "MaterialLegendSection": "Visible",
+        "CladdingAssignmentSection": "Visible",
+        "ClearCellsButton": "Visible",
+        "ExtrusionActions": "Collapsed",
+        "FrameConfigurationSection": "Collapsed",
+        "ExtrusionLegendSection": "Collapsed",
+        "ExtrusionAssignmentSection": "Collapsed"
+      }
+    },
+    {
+      "id": "5.1 Extrusion view offers merge, explode, hide, add, delete and dimensions",
+      "pass": true,
+      "step": "5.1 Extrusion view",
+      "evidence": {
+        "ExtrusionActions": "Visible",
+        "MergeExtrusionsButton": "Visible",
+        "ExplodeExtrusionsButton": "Visible",
+        "HideExtrusionsButton": "Visible",
+        "AddHorizontalMullionButton": "Visible",
+        "AddVerticalMullionButton": "Visible",
+        "DeleteExtrusionsButton": "Visible",
+        "DividerOffsetList": "Visible",
+        "ExtrusionLegendSection": "Collapsed",
+        "ExtrusionAssignmentSection": "Collapsed",
+        "FrameConfigurationNote": "Collapsed",
+        "FrameConfigurationSection": "Visible",
+        "MaterialLegendSection": "Collapsed"
+      }
+    },
+    {
+      "id": "5.2 no profile catalogue, floating assignment panel or profile codes on curve labels",
+      "pass": true,
+      "step": "5.1 Extrusion view",
+      "evidence": {
+        "after": {
+          "ExtrusionLegendSection": "Collapsed",
+          "ExtrusionAssignmentSection": "Collapsed",
+          "FrameConfigurationNote": "Collapsed"
+        },
+        "labelCodes": 0,
+        "selected": [
+          "FRM-0",
+          "H:94:0"
+        ],
+        "tooltip": null
+      }
+    },
+    {
+      "id": "5.3 Save Extrusions after Hide keeps the profile assignment",
+      "pass": true,
+      "step": "5.3 layout edit and Save Extrusions keep UD_FRAME_ASSIGNMENTS",
+      "evidence": {
+        "hidden": "V:25.625:0",
+        "dirtyAfterHide": "Unsaved",
+        "before": "{\u0022v\u0022:1,\u0022f\u0022:{\u0022FRM-0\u0022:[\u00221D-T000\u0022]},\u0022s\u0022:[]}",
+        "after": "{\u0022v\u0022:2,\u0022f\u0022:{\u0022FRM-0\u0022:[\u00221D-T000\u0022]},\u0022s\u0022:[],\u0022d\u0022:{\u00221D-T000\u0022:{\u0022b\u0022:\u0022T000\u0022,\u0022s\u0022:\u0022T000\u0022,\u0022g\u0022:\u0022\u0022,\u0022m\u0022:\u0022L\u0022,\u0022n\u0022:1}},\u0022x\u0022:{}}",
+        "frameConfig": "1H 1V | hide 0A",
+        "status": "Saved extrusion data to the panel. Cladding changes are still not saved.",
+        "badge": "Unsaved"
+      }
+    },
+    {
+      "id": "5.4 switching back restores the Cladding view",
+      "pass": true,
+      "step": "5.4 back to Cladding view",
+      "evidence": {
+        "MaterialLegendSection": "Visible",
+        "CladdingAssignmentSection": "Visible",
+        "ClearCellsButton": "Visible",
+        "ExtrusionActions": "Collapsed"
+      }
+    },
+    {
+      "id": "5.5 a saved editor closes without the discard prompt",
+      "pass": true,
+      "step": "5.5 closing without edits asks nothing",
+      "evidence": {
+        "badgeBeforeSave": "Unsaved",
+        "badgeAfterSave": "Saved",
+        "status": "Saved extrusion and cladding data to the panel.",
+        "seconds": 0.0343557,
+        "note": "Watch-Dialogs.ps1 must log no prompt for this close (its first answer, No, would keep the editor open)."
+      }
+    },
+    {
+      "id": "5.5 No keeps the editor open with its edits",
+      "pass": true,
+      "step": "5.5 closing with unsaved edits asks; No keeps the editor",
+      "evidence": {
+        "badgeBefore": "Unsaved"
+      }
+    },
+    {
+      "id": "5.5 Yes closes the editor",
+      "pass": true,
+      "step": "5.5 Yes discards and closes",
+      "evidence": null
+    }
+  ],
+  "notes": {
+    "1.0 loaded plug-in": {
+      "process": 51216,
+      "rhino": "8.36.26293.11001",
+      "location": "C:\\Users\\nuofa\\AppData\\Local\\PanelCladdingEditor\\plugin\\1.3.0\\PanelCladdingEditor.rhp",
+      "sha256": "BDA62FFD1726D7BD6609A794081FDD1EF143BC2FB4C619447D6C3C96F14E8E39",
+      "version": "1.3.0\u002B150f546680545b6f8178d71613747643622ca8a8"
+    }
+  },
+  "commands": [
+    {
+      "step": "1.2 old spelling",
+      "macro": "_PCEditor _Enter",
+      "result": false,
+      "seconds": 0.035,
+      "history": "Command: _PCEditor\nSelect one panel Brep to edit: _Enter\nSelect one panel Brep to edit\nPanel selection cancelled.\n"
+    },
+    {
+      "step": "1.2 old spelling",
+      "macro": "_PCBAKE _Enter",
+      "result": false,
+      "seconds": 0.02,
+      "history": "Command: _PCBAKE\nSelect panel Breps to bake ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake ( Scope=Surfaces )\nPanel bake selection cancelled.\n"
+    },
+    {
+      "step": "1.3 removed commands",
+      "macro": "_PCupdate",
+      "result": false,
+      "seconds": 0.006,
+      "history": "Command: _PCupdate\nUnknown command: _PCupdate\n"
+    },
+    {
+      "step": "1.3 removed commands",
+      "macro": "_PCspawnSrf",
+      "result": false,
+      "seconds": 0.006,
+      "history": "Command: _PCspawnSrf\nUnknown command: _PCspawnSrf\n"
+    },
+    {
+      "step": "1.3 removed commands",
+      "macro": "_PCspawnCrv",
+      "result": false,
+      "seconds": 0.006,
+      "history": "Command: _PCspawnCrv\nUnknown command: _PCspawnCrv\n"
+    },
+    {
+      "step": "5.0 setup and open PCeditor",
+      "macro": "_PCeditor",
+      "result": true,
+      "seconds": 0.101,
+      "history": "Command: _PCeditor\n"
+    },
+    {
+      "step": "5.5 closing without edits asks nothing",
+      "macro": "_PCeditor",
+      "result": true,
+      "seconds": 0.133,
+      "history": "Command: _PCeditor\n"
+    }
+  ]
+}

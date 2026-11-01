@@ -1,0 +1,24 @@
+﻿[
+    {
+        "time":  "2026-10-31T22:39:46",
+        "title":  "Panel Cladding Editor",
+        "answer":  "No",
+        "waitedSeconds":  0.1,
+        "texts":  [
+                      "Discard unsaved panel cladding edits?"
+                  ],
+        "clicked":  "No",
+        "pressedWith":  "WM_COMMAND 7"
+    },
+    {
+        "time":  "2026-10-31T22:39:46",
+        "title":  "Panel Cladding Editor",
+        "answer":  "Yes",
+        "waitedSeconds":  0,
+        "texts":  [
+                      "Discard unsaved panel cladding edits?"
+                  ],
+        "clicked":  "Yes",
+        "pressedWith":  "WM_COMMAND 6"
+    }
+]

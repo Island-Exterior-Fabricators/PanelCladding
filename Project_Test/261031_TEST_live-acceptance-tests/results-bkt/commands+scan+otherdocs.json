@@ -1,0 +1,349 @@
+{
+  "suite": "commands\u002Bscan\u002Botherdocs",
+  "status": "done",
+  "started": "2026-10-31T22:39:05",
+  "updated": "2026-10-31T22:39:10",
+  "step": "",
+  "passed": 15,
+  "failed": 0,
+  "error": "",
+  "checks": [
+    {
+      "id": "1.0 Rhino runs the installed 1.3.0 RHP",
+      "pass": true,
+      "step": "1.0 loaded plug-in",
+      "evidence": {
+        "location": "C:\\Users\\nuofa\\AppData\\Local\\PanelCladdingEditor\\plugin\\1.3.0\\PanelCladdingEditor.rhp",
+        "hash": "BDA62FFD1726D7BD6609A794081FDD1EF143BC2FB4C619447D6C3C96F14E8E39",
+        "version": "1.3.0\u002B150f546680545b6f8178d71613747643622ca8a8"
+      }
+    },
+    {
+      "id": "1.1 plug-in registers exactly the 12 commands",
+      "pass": true,
+      "step": "1.1 command registry",
+      "evidence": [
+        "PCbake",
+        "PCclear",
+        "PCcreate",
+        "PCcrvTemplate",
+        "PCeditor",
+        "PCmatchSrf",
+        "PCmatchCrv",
+        "PCpid",
+        "PCreport",
+        "PCsyncCrv",
+        "PCsyncSrf",
+        "PCtemplatePNL"
+      ]
+    },
+    {
+      "id": "1.1 \u0027PC\u0027 completion lists only these 12",
+      "pass": true,
+      "step": "1.1 command registry",
+      "evidence": {
+        "loadedCommandsStartingWithPC": [
+          "PCbake",
+          "PCclear",
+          "PCcreate",
+          "PCcrvTemplate",
+          "PCeditor",
+          "PCmatchCrv",
+          "PCmatchSrf",
+          "PCpid",
+          "PCreport",
+          "PCsyncCrv",
+          "PCsyncSrf",
+          "PCtemplatePNL"
+        ],
+        "registeredCommandsStartingWithPC": [
+          "PCbake",
+          "PCclear",
+          "PCcreate",
+          "PCcrvTemplate",
+          "PCeditor",
+          "PCmatchCrv",
+          "PCmatchSrf",
+          "PCpid",
+          "PCreport",
+          "PCsyncCrv",
+          "PCsyncSrf",
+          "PCtemplatePNL"
+        ],
+        "aliasesStartingWithPC": []
+      }
+    },
+    {
+      "id": "1.2 PCEditor runs PCeditor",
+      "pass": true,
+      "step": "1.2 old spelling",
+      "evidence": "Command: _PCEditor\nSelect one panel Brep to edit: _Enter\nSelect one panel Brep to edit\nPanel selection cancelled.\n"
+    },
+    {
+      "id": "1.2 PCBAKE runs PCbake",
+      "pass": true,
+      "step": "1.2 old spelling",
+      "evidence": "Command: _PCBAKE\nSelect panel Breps to bake ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake ( Scope=Surfaces )\nPanel bake selection cancelled.\n"
+    },
+    {
+      "id": "1.3 PCupdate is unknown",
+      "pass": true,
+      "step": "1.3 removed commands",
+      "evidence": "Command: _PCupdate\nUnknown command: _PCupdate\n"
+    },
+    {
+      "id": "1.3 PCspawnSrf is unknown",
+      "pass": true,
+      "step": "1.3 removed commands",
+      "evidence": "Command: _PCspawnSrf\nUnknown command: _PCspawnSrf\n"
+    },
+    {
+      "id": "1.3 PCspawnCrv is unknown",
+      "pass": true,
+      "step": "1.3 removed commands",
+      "evidence": "Command: _PCspawnCrv\nUnknown command: _PCspawnCrv\n"
+    },
+    {
+      "id": "1.4 no local alias or loaded toolbar calls a removed command",
+      "pass": true,
+      "step": "1.4 aliases and toolbars",
+      "evidence": {
+        "aliasHits": [],
+        "toolbarHits": [],
+        "toolbarFiles": [
+          {
+            "Name": "default",
+            "path": "Rhino.UI.Resources.rui.default.rui"
+          }
+        ]
+      }
+    },
+    {
+      "id": "4.1 window opens with error, warning and info counts",
+      "pass": true,
+      "step": "4.1 window opens read-only",
+      "evidence": {
+        "counts": {
+          "errors": "67 errors",
+          "warnings": "2,427 warnings",
+          "info": "9,689 info",
+          "document": "BKT - Wireframe LIVE TEST"
+        },
+        "history": "Command: _PCreport\nPCreport: 67 error(s), 2427 warning(s), 9689 info on 1008 panel(s), 5024 surface(s) and 9568 curve(s).\n",
+        "seconds": 1.1620563
+      }
+    },
+    {
+      "id": "4.2 model not modified, nothing added to Undo",
+      "pass": true,
+      "step": "4.1 window opens read-only",
+      "evidence": {
+        "modified": false,
+        "undoRun": "Command: _Undo\nUndoing Point\n",
+        "note": "Rhino reserves an undo serial for every command, read-only ones included",
+        "serialAcrossPCreport": [
+          5,
+          6
+        ],
+        "serialAcrossSelNone": [
+          7,
+          8
+        ]
+      }
+    },
+    {
+      "id": "4.14 PCreport on BKT finishes within 30 s",
+      "pass": true,
+      "step": "4.14 speed on a large model",
+      "evidence": {
+        "seconds": 0.61,
+        "objects": 44759,
+        "history": "Command: _PCreport\nPCreport: 67 error(s), 2427 warning(s), 9689 info on 1008 panel(s), 5024 surface(s) and 9568 curve(s).\n"
+      }
+    },
+    {
+      "id": "4.12 the window now shows the other model\u0027s results",
+      "pass": true,
+      "step": "4.12 PCreport in another model replaces the window\u0027s contents",
+      "evidence": {
+        "document": "MET - Wireframe",
+        "path": "C:\\01_Projects\\Panel Cladding Full\\LiveTest-1.3.0\\naming\\MET - Wireframe.3dm",
+        "sameWindowObject": false,
+        "firstStillVisible": false,
+        "open": "Command: _-Open\nName of the file to open ( UpdatePromptUpdateBlocks=Yes  Browse ): \u0022C:\\01_Projects\\Panel Cladding Full\\LiveTest-1.3.0\\naming\\MET - Wireframe.3dm\u0022\nSuccessfully read file \u0022C:\\01_Projects\\Panel Cladding Full\\LiveTest-1.3.0\\naming\\MET - Wireframe.3dm\u0022\nCreating meshes... Press Esc to cancel\n",
+        "history": "Command: _PCreport\nPCreport: 0 error(s), 9904 warning(s), 1205 info on 399 panel(s), 0 surface(s) and 9505 curve(s).\n"
+      }
+    },
+    {
+      "id": "3.6 the sheet lists the in-scope wall type and not the excluded one",
+      "pass": true,
+      "step": "3.6 saving the main model leaves excluded panels out of the naming sheet",
+      "evidence": {
+        "sheet": "C:\\01_Projects\\Panel Cladding Full\\LiveTest-1.3.0\\naming\\MET - Naming Convention.xlsx",
+        "saved": true,
+        "readMessage": "",
+        "wallTypes": {
+          "A": "1A.1",
+          "B": "1A.2",
+          "C": "1A.4",
+          "D": "1A.5",
+          "E": "1C.1",
+          "F": "1C.2",
+          "G": "1C.4",
+          "H": "2B.1",
+          "J": "2B.2",
+          "K": "3A.1",
+          "L": "3A.2",
+          "M": "3A.4",
+          "N": "3A.5",
+          "P": "5",
+          "Q": "INS-LIVE"
+        },
+        "history": "File successfully saved as C:\\01_Projects\\Panel Cladding Full\\LiveTest-1.3.0\\naming\\MET - Wireframe.3dm.\n"
+      }
+    },
+    {
+      "id": "4.13 an unsaved document gets \u0027requires a saved active document\u0027",
+      "pass": true,
+      "step": "4.13 PCreport in an unsaved new document asks to save first",
+      "evidence": {
+        "created": "Command: _-New\nName of the Rhino template file to open ( None  Browse ): _None\n",
+        "history": "Command: _PCreport\nPCreport requires a saved active document.\n"
+      }
+    }
+  ],
+  "notes": {
+    "1.0 loaded plug-in": {
+      "process": 68372,
+      "rhino": "8.36.26293.11001",
+      "location": "C:\\Users\\nuofa\\AppData\\Local\\PanelCladdingEditor\\plugin\\1.3.0\\PanelCladdingEditor.rhp",
+      "sha256": "BDA62FFD1726D7BD6609A794081FDD1EF143BC2FB4C619447D6C3C96F14E8E39",
+      "version": "1.3.0\u002B150f546680545b6f8178d71613747643622ca8a8"
+    },
+    "4.3 rules": [
+      "A02 Error x36: Duplicate CID",
+      "A03 Error x31: Cladding or frame data unreadable",
+      "A06 Warning x4: Name does not match CID",
+      "A10 Info x1008: Setup keys missing",
+      "A12 Info x1008: Role not lowercase",
+      "D01 Warning x2423: No owner panel",
+      "D06 Info x45: Panel with materials but no surfaces",
+      "D07 Info x7627: PID outside the managed layers",
+      "L07 Info x1: Not tracked layer"
+    ],
+    "4.14 BKT rules": {
+      "A02 Error: Duplicate CID": 36,
+      "A03 Error: Cladding or frame data unreadable": 31,
+      "A06 Warning: Name does not match CID": 4,
+      "A10 Info: Setup keys missing": 1008,
+      "A12 Info: Role not lowercase": 1008,
+      "D01 Warning: No owner panel": 2423,
+      "D06 Info: Panel with materials but no surfaces": 45,
+      "D07 Info: PID outside the managed layers": 7627,
+      "L07 Info: Not tracked layer": 1
+    },
+    "4.3 BKT Surfaces - GLS info": {
+      "D07 PID outside the managed layers": 1848
+    }
+  },
+  "commands": [
+    {
+      "step": "1.2 old spelling",
+      "macro": "_PCEditor _Enter",
+      "result": false,
+      "seconds": 0.065,
+      "history": "Command: _PCEditor\nSelect one panel Brep to edit: _Enter\nSelect one panel Brep to edit\nPanel selection cancelled.\n"
+    },
+    {
+      "step": "1.2 old spelling",
+      "macro": "_PCBAKE _Enter",
+      "result": false,
+      "seconds": 0.038,
+      "history": "Command: _PCBAKE\nSelect panel Breps to bake ( Scope=Surfaces ): _Enter\nSelect panel Breps to bake ( Scope=Surfaces )\nPanel bake selection cancelled.\n"
+    },
+    {
+      "step": "1.3 removed commands",
+      "macro": "_PCupdate",
+      "result": false,
+      "seconds": 0.012,
+      "history": "Command: _PCupdate\nUnknown command: _PCupdate\n"
+    },
+    {
+      "step": "1.3 removed commands",
+      "macro": "_PCspawnSrf",
+      "result": false,
+      "seconds": 0.011,
+      "history": "Command: _PCspawnSrf\nUnknown command: _PCspawnSrf\n"
+    },
+    {
+      "step": "1.3 removed commands",
+      "macro": "_PCspawnCrv",
+      "result": false,
+      "seconds": 0.015,
+      "history": "Command: _PCspawnCrv\nUnknown command: _PCspawnCrv\n"
+    },
+    {
+      "step": "4.1 window opens read-only",
+      "macro": "_Point 0,0,-10000",
+      "result": true,
+      "seconds": 0.078,
+      "history": "Command: _Point\nLocation of point object: 0,0,-10000\n"
+    },
+    {
+      "step": "4.1 window opens read-only",
+      "macro": "_PCreport",
+      "result": true,
+      "seconds": 1.162,
+      "history": "Command: _PCreport\nPCreport: 67 error(s), 2427 warning(s), 9689 info on 1008 panel(s), 5024 surface(s) and 9568 curve(s).\n"
+    },
+    {
+      "step": "4.1 window opens read-only",
+      "macro": "_Undo",
+      "result": true,
+      "seconds": 0.147,
+      "history": "Command: _Undo\nUndoing Point\n"
+    },
+    {
+      "step": "4.1 window opens read-only",
+      "macro": "_SelNone",
+      "result": true,
+      "seconds": 0.025,
+      "history": "Command: _SelNone\n"
+    },
+    {
+      "step": "4.14 speed on a large model",
+      "macro": "_PCreport",
+      "result": true,
+      "seconds": 0.606,
+      "history": "Command: _PCreport\nPCreport: 67 error(s), 2427 warning(s), 9689 info on 1008 panel(s), 5024 surface(s) and 9568 curve(s).\n"
+    },
+    {
+      "step": "4.12 PCreport in another model replaces the window\u0027s contents",
+      "macro": "_-Open \u0022C:\\01_Projects\\Panel Cladding Full\\LiveTest-1.3.0\\naming\\MET - Wireframe.3dm\u0022",
+      "result": true,
+      "seconds": 1.447,
+      "history": "Command: _-Open\nName of the file to open ( UpdatePromptUpdateBlocks=Yes  Browse ): \u0022C:\\01_Projects\\Panel Cladding Full\\LiveTest-1.3.0\\naming\\MET - Wireframe.3dm\u0022\nSuccessfully read file \u0022C:\\01_Projects\\Panel Cladding Full\\LiveTest-1.3.0\\naming\\MET - Wireframe.3dm\u0022\nCreating meshes... Press Esc to cancel\n"
+    },
+    {
+      "step": "4.12 PCreport in another model replaces the window\u0027s contents",
+      "macro": "_PCreport",
+      "result": true,
+      "seconds": 0.222,
+      "history": "Command: _PCreport\nPCreport: 0 error(s), 9904 warning(s), 1205 info on 399 panel(s), 0 surface(s) and 9505 curve(s).\n"
+    },
+    {
+      "step": "4.13 PCreport in an unsaved new document asks to save first",
+      "macro": "_-New _None",
+      "result": true,
+      "seconds": 0.6,
+      "history": "Command: _-New\nName of the Rhino template file to open ( None  Browse ): _None\n"
+    },
+    {
+      "step": "4.13 PCreport in an unsaved new document asks to save first",
+      "macro": "_PCreport",
+      "result": false,
+      "seconds": 0.004,
+      "history": "Command: _PCreport\nPCreport requires a saved active document.\n"
+    }
+  ]
+}

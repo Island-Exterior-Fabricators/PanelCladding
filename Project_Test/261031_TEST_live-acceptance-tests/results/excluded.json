@@ -1,0 +1,257 @@
+{
+  "suite": "excluded",
+  "status": "done",
+  "started": "2026-10-31T22:18:09",
+  "updated": "2026-10-31T22:18:22",
+  "step": "",
+  "passed": 14,
+  "failed": 0,
+  "error": "",
+  "checks": [
+    {
+      "id": "3.1 model saved and reopened",
+      "pass": true,
+      "step": "3.1 save and reopen",
+      "evidence": {
+        "saved": true,
+        "history": "Command: _-Open\nName of the file to open ( UpdatePromptUpdateBlocks=Yes  Browse ): \u0022C:\\01_Projects\\MCP_Rhino\\.claude\\worktrees\\release-1.3.9\\Project_Test\\261031_TEST_release-1.3.9\\MET - Wireframe LIVE TEST.3dm\u0022\nSuccessfully read file \u0022C:\\01_Projects\\MCP_Rhino\\.claude\\worktrees\\release-1.3.9\\Project_Test\\261031_TEST_release-1.3.9\\MET - Wireframe LIVE TEST.3dm\u0022\nCreating meshes... Press Esc to cancel\n"
+      }
+    },
+    {
+      "id": "3.1 control panel E was refreshed on open",
+      "pass": true,
+      "step": "3.1 auto values after reopen",
+      "evidence": {
+        "width": "13.75000",
+        "history": "Command: _-Open\nName of the file to open ( UpdatePromptUpdateBlocks=Yes  Browse ): \u0022C:\\01_Projects\\MCP_Rhino\\.claude\\worktrees\\release-1.3.9\\Project_Test\\261031_TEST_release-1.3.9\\MET - Wireframe LIVE TEST.3dm\u0022\nSuccessfully read file \u0022C:\\01_Projects\\MCP_Rhino\\.claude\\worktrees\\release-1.3.9\\Project_Test\\261031_TEST_release-1.3.9\\MET - Wireframe LIVE TEST.3dm\u0022\nCreating meshes... Press Esc to cancel\n"
+      }
+    },
+    {
+      "id": "3.1 Not in Scope panel keeps its auto values after reopening",
+      "pass": true,
+      "step": "3.1 auto values after reopen",
+      "evidence": {
+        "layer": "MET-IEF-Wireframe::Surfaces - PNL::Surfaces - Not in Scope",
+        "values": {
+          "CW_2.00_UNIT_DIMENSION": "1.00000x1.00000",
+          "CW_2.01_UNIT_WIDTH": "1.00000",
+          "CW_2.02_UNIT_HEIGHT": "1.00000",
+          "CW_2.07_UNIT_AREA": "0.007 sqf",
+          "CW_6.02_UNIT_WEIGHT": "0.574",
+          "UD_PLANE": "{0, 0, 0};{1,0,0};{0,0,1}"
+        }
+      }
+    },
+    {
+      "id": "3.2 PCpid does not number the Not in Scope panel",
+      "pass": true,
+      "step": "3.2 PCpid does not number the Not in Scope panel",
+      "evidence": {
+        "inScopePanels": 401,
+        "pidBefore": "PID-MET-W-01-26",
+        "pidAfter": "PID-MET-W-01-26",
+        "newPanelPid": "PID-MET-W6-33-03",
+        "duplicatePidsSuffixed": [],
+        "history": "Command: _PCpid\nEnter the three-letter project code \u003CMET\u003E: _Enter\nPCpid uses all 401 panels in the panel-layer subtree for numbering; only selected panels will be changed.\nSelect a panel in the panel-layer subtree on the north facade: \u0027_SelID\nObject ID to select: 47ea888e-51b1-4adc-a65c-8175ac62ead2\n1 surface added to selection.\nSelect a panel in the panel-layer subtree on the first floor (level 01): \u0027_SelID\nObject ID to select: 42ea0995-2381-4e17-bdee-bd1da6adf229\n1 surface added to selection.\nMCP_Rhino pipe client connected: \\\\.\\pipe\\mcp_rhino_route_51216_268435461\nPCpid analyzed 401 panels; assigned 1 selected panel IDs; 1 panel(s) changed.\nStandardized point order on 0 selected surface(s).\nW6: 1 panels, 1 levels, 1 bays.\n"
+      }
+    },
+    {
+      "id": "3.3 PCbake Curves fails on the Not in Scope panel",
+      "pass": true,
+      "step": "3.3 PCbake Curves fails on the Not in Scope panel",
+      "evidence": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nPANEL_CLADDING_UPDATE_CURVE_PREPARE_FAILED: 66a2d4f4-ba76-4c43-8cad-4379d0ad654b: PANEL_CLADDING_PANEL_LAYER_EXCLUDED: MET-IEF-Wireframe::Surfaces - PNL::Surfaces - Not in Scope; layers named Not in Scope or By Others are not tracked.\n"
+    },
+    {
+      "id": "3.4 Surfaces - By Others: auto values are not refreshed",
+      "pass": true,
+      "step": "3.4 Surfaces - By Others auto values",
+      "evidence": {
+        "layer": "MET-IEF-Wireframe::Surfaces - PNL::Surfaces - By Others",
+        "values": {
+          "CW_2.00_UNIT_DIMENSION": "1.00000x1.00000",
+          "CW_2.01_UNIT_WIDTH": "1.00000",
+          "CW_2.02_UNIT_HEIGHT": "1.00000",
+          "CW_2.07_UNIT_AREA": "0.007 sqf",
+          "CW_6.02_UNIT_WEIGHT": "0.574",
+          "UD_PLANE": "{0, 0, 0};{1,0,0};{0,0,1}"
+        }
+      }
+    },
+    {
+      "id": "3.4 Surfaces - By Others: PCpid does not number it",
+      "pass": true,
+      "step": "3.4 Surfaces - By Others: PCpid does not number it",
+      "evidence": {
+        "inScopePanels": 401,
+        "pidBefore": "PID-MET-W-01-26",
+        "pidAfter": "PID-MET-W-01-26",
+        "newPanelPid": "PID-MET-W6-33-03",
+        "duplicatePidsSuffixed": [],
+        "history": "Command: _PCpid\nEnter the three-letter project code \u003CMET\u003E: _Enter\nPCpid uses all 401 panels in the panel-layer subtree for numbering; only selected panels will be changed.\nSelect a panel in the panel-layer subtree on the north facade: \u0027_SelID\nObject ID to select: 47ea888e-51b1-4adc-a65c-8175ac62ead2\n1 surface added to selection.\nSelect a panel in the panel-layer subtree on the first floor (level 01): \u0027_SelID\nObject ID to select: 42ea0995-2381-4e17-bdee-bd1da6adf229\n1 surface added to selection.\nPCpid analyzed 401 panels; assigned 1 selected panel IDs; 0 panel(s) changed.\nStandardized point order on 0 selected surface(s).\nW6: 1 panels, 1 levels, 1 bays.\n"
+      }
+    },
+    {
+      "id": "3.4 Surfaces - By Others: PCbake Curves fails",
+      "pass": true,
+      "step": "3.4 Surfaces - By Others: PCbake Curves fails",
+      "evidence": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nPANEL_CLADDING_UPDATE_CURVE_PREPARE_FAILED: 66a2d4f4-ba76-4c43-8cad-4379d0ad654b: PANEL_CLADDING_PANEL_LAYER_EXCLUDED: MET-IEF-Wireframe::Surfaces - PNL::Surfaces - By Others; layers named Not in Scope or By Others are not tracked.\n"
+    },
+    {
+      "id": "3.4 NOT_IN_SCOPE: auto values are not refreshed",
+      "pass": true,
+      "step": "3.4 NOT_IN_SCOPE auto values",
+      "evidence": {
+        "layer": "MET-IEF-Wireframe::Surfaces - PNL::NOT_IN_SCOPE",
+        "values": {
+          "CW_2.00_UNIT_DIMENSION": "1.00000x1.00000",
+          "CW_2.01_UNIT_WIDTH": "1.00000",
+          "CW_2.02_UNIT_HEIGHT": "1.00000",
+          "CW_2.07_UNIT_AREA": "0.007 sqf",
+          "CW_6.02_UNIT_WEIGHT": "0.574",
+          "UD_PLANE": "{0, 0, 0};{1,0,0};{0,0,1}"
+        }
+      }
+    },
+    {
+      "id": "3.4 NOT_IN_SCOPE: PCpid does not number it",
+      "pass": true,
+      "step": "3.4 NOT_IN_SCOPE: PCpid does not number it",
+      "evidence": {
+        "inScopePanels": 401,
+        "pidBefore": "PID-MET-W-01-26",
+        "pidAfter": "PID-MET-W-01-26",
+        "newPanelPid": "PID-MET-W6-33-03",
+        "duplicatePidsSuffixed": [],
+        "history": "Command: _PCpid\nEnter the three-letter project code \u003CMET\u003E: _Enter\nPCpid uses all 401 panels in the panel-layer subtree for numbering; only selected panels will be changed.\nSelect a panel in the panel-layer subtree on the north facade: \u0027_SelID\nObject ID to select: 47ea888e-51b1-4adc-a65c-8175ac62ead2\n1 surface added to selection.\nSelect a panel in the panel-layer subtree on the first floor (level 01): \u0027_SelID\nObject ID to select: 42ea0995-2381-4e17-bdee-bd1da6adf229\n1 surface added to selection.\nPCpid analyzed 401 panels; assigned 1 selected panel IDs; 0 panel(s) changed.\nStandardized point order on 0 selected surface(s).\nW6: 1 panels, 1 levels, 1 bays.\n"
+      }
+    },
+    {
+      "id": "3.4 NOT_IN_SCOPE: PCbake Curves fails",
+      "pass": true,
+      "step": "3.4 NOT_IN_SCOPE: PCbake Curves fails",
+      "evidence": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nPANEL_CLADDING_UPDATE_CURVE_PREPARE_FAILED: 66a2d4f4-ba76-4c43-8cad-4379d0ad654b: PANEL_CLADDING_PANEL_LAYER_EXCLUDED: MET-IEF-Wireframe::Surfaces - PNL::NOT_IN_SCOPE; layers named Not in Scope or By Others are not tracked.\n"
+    },
+    {
+      "id": "3.4 By-Others: auto values are not refreshed",
+      "pass": true,
+      "step": "3.4 By-Others auto values",
+      "evidence": {
+        "layer": "MET-IEF-Wireframe::Surfaces - PNL::By-Others",
+        "values": {
+          "CW_2.00_UNIT_DIMENSION": "1.00000x1.00000",
+          "CW_2.01_UNIT_WIDTH": "1.00000",
+          "CW_2.02_UNIT_HEIGHT": "1.00000",
+          "CW_2.07_UNIT_AREA": "0.007 sqf",
+          "CW_6.02_UNIT_WEIGHT": "0.574",
+          "UD_PLANE": "{0, 0, 0};{1,0,0};{0,0,1}"
+        }
+      }
+    },
+    {
+      "id": "3.4 By-Others: PCpid does not number it",
+      "pass": true,
+      "step": "3.4 By-Others: PCpid does not number it",
+      "evidence": {
+        "inScopePanels": 401,
+        "pidBefore": "PID-MET-W-01-26",
+        "pidAfter": "PID-MET-W-01-26",
+        "newPanelPid": "PID-MET-W6-33-03",
+        "duplicatePidsSuffixed": [],
+        "history": "Command: _PCpid\nEnter the three-letter project code \u003CMET\u003E: _Enter\nPCpid uses all 401 panels in the panel-layer subtree for numbering; only selected panels will be changed.\nSelect a panel in the panel-layer subtree on the north facade: \u0027_SelID\nObject ID to select: 47ea888e-51b1-4adc-a65c-8175ac62ead2\n1 surface added to selection.\nSelect a panel in the panel-layer subtree on the first floor (level 01): \u0027_SelID\nObject ID to select: 42ea0995-2381-4e17-bdee-bd1da6adf229\n1 surface added to selection.\nPCpid analyzed 401 panels; assigned 1 selected panel IDs; 0 panel(s) changed.\nStandardized point order on 0 selected surface(s).\nW6: 1 panels, 1 levels, 1 bays.\n"
+      }
+    },
+    {
+      "id": "3.4 By-Others: PCbake Curves fails",
+      "pass": true,
+      "step": "3.4 By-Others: PCbake Curves fails",
+      "evidence": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nPANEL_CLADDING_UPDATE_CURVE_PREPARE_FAILED: 66a2d4f4-ba76-4c43-8cad-4379d0ad654b: PANEL_CLADDING_PANEL_LAYER_EXCLUDED: MET-IEF-Wireframe::Surfaces - PNL::By-Others; layers named Not in Scope or By Others are not tracked.\n"
+    }
+  ],
+  "notes": {
+    "panel D (excluded)": {
+      "id": "66a2d4f4-ba76-4c43-8cad-4379d0ad654b",
+      "pid": "PID-MET-W-01-26",
+      "layer": "MET-IEF-Wireframe::Surfaces - PNL::Surfaces - Not in Scope"
+    },
+    "panel E (control)": {
+      "id": "0196e29f-0b3a-43d2-bc96-e913bf845f38",
+      "pid": "PID-MET-W-01-26"
+    },
+    "3.0 new panel for PCpid": "ef313d2b-361a-4c65-80e1-36e4141c4898",
+    "panel E width before reopen": "13.75000",
+    "3.3 stale auto values": "MCP_Rhino pipe client connected: \\\\.\\pipe\\mcp_rhino_route_51216_268435461\nCommand: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nPanelCladdingEditor: CW_1.08_FRAME_CONFIG \u0027A\u0027 does not fit the AA frame-config format and is left as it is. Run PCtemplatePNL to record the project\u0027s PNL format.\nMCP_Rhino pipe client connected: \\\\.\\pipe\\mcp_rhino_route_51216_268435461\nPANEL_CLADDING_UPDATE_CURVE_PREPARE_FAILED: 66a2d4f4-ba76-4c43-8cad-4379d0ad654b: PANEL_CLADDING_PANEL_EXTENT_INVALID\n",
+    "3.5 naming convention": "Not testable here: the sync writes only for a main model (\u003Ccode\u003E - Wireframe.3dm) with \u003Ccode\u003E - Naming Convention.xlsx beside it; no MET sheet exists."
+  },
+  "commands": [
+    {
+      "step": "3.1 save and reopen",
+      "macro": "_-Open \u0022C:\\01_Projects\\MCP_Rhino\\.claude\\worktrees\\release-1.3.9\\Project_Test\\261031_TEST_release-1.3.9\\MET - Wireframe LIVE TEST.3dm\u0022",
+      "result": true,
+      "seconds": 1.491,
+      "history": "Command: _-Open\nName of the file to open ( UpdatePromptUpdateBlocks=Yes  Browse ): \u0022C:\\01_Projects\\MCP_Rhino\\.claude\\worktrees\\release-1.3.9\\Project_Test\\261031_TEST_release-1.3.9\\MET - Wireframe LIVE TEST.3dm\u0022\nSuccessfully read file \u0022C:\\01_Projects\\MCP_Rhino\\.claude\\worktrees\\release-1.3.9\\Project_Test\\261031_TEST_release-1.3.9\\MET - Wireframe LIVE TEST.3dm\u0022\nCreating meshes... Press Esc to cancel\n"
+    },
+    {
+      "step": "3.2 PCpid does not number the Not in Scope panel",
+      "macro": "_PCpid _Enter \u0027_SelID 47ea888e-51b1-4adc-a65c-8175ac62ead2 \u0027_SelID 42ea0995-2381-4e17-bdee-bd1da6adf229",
+      "result": true,
+      "seconds": 0.268,
+      "history": "Command: _PCpid\nEnter the three-letter project code \u003CMET\u003E: _Enter\nPCpid uses all 401 panels in the panel-layer subtree for numbering; only selected panels will be changed.\nSelect a panel in the panel-layer subtree on the north facade: \u0027_SelID\nObject ID to select: 47ea888e-51b1-4adc-a65c-8175ac62ead2\n1 surface added to selection.\nSelect a panel in the panel-layer subtree on the first floor (level 01): \u0027_SelID\nObject ID to select: 42ea0995-2381-4e17-bdee-bd1da6adf229\n1 surface added to selection.\nMCP_Rhino pipe client connected: \\\\.\\pipe\\mcp_rhino_route_51216_268435461\nPCpid analyzed 401 panels; assigned 1 selected panel IDs; 1 panel(s) changed.\nStandardized point order on 0 selected surface(s).\nW6: 1 panels, 1 levels, 1 bays.\n"
+    },
+    {
+      "step": "3.3 PCbake Curves fails on the Not in Scope panel",
+      "macro": "_-PCbake _Scope=_Curves _Enter",
+      "result": false,
+      "seconds": 0.206,
+      "history": "MCP_Rhino pipe client connected: \\\\.\\pipe\\mcp_rhino_route_51216_268435461\nCommand: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nPanelCladdingEditor: CW_1.08_FRAME_CONFIG \u0027A\u0027 does not fit the AA frame-config format and is left as it is. Run PCtemplatePNL to record the project\u0027s PNL format.\nMCP_Rhino pipe client connected: \\\\.\\pipe\\mcp_rhino_route_51216_268435461\nPANEL_CLADDING_UPDATE_CURVE_PREPARE_FAILED: 66a2d4f4-ba76-4c43-8cad-4379d0ad654b: PANEL_CLADDING_PANEL_EXTENT_INVALID\n"
+    },
+    {
+      "step": "3.3 PCbake Curves fails on the Not in Scope panel",
+      "macro": "_-PCbake _Scope=_Curves _Enter",
+      "result": false,
+      "seconds": 0.116,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nPANEL_CLADDING_UPDATE_CURVE_PREPARE_FAILED: 66a2d4f4-ba76-4c43-8cad-4379d0ad654b: PANEL_CLADDING_PANEL_LAYER_EXCLUDED: MET-IEF-Wireframe::Surfaces - PNL::Surfaces - Not in Scope; layers named Not in Scope or By Others are not tracked.\n"
+    },
+    {
+      "step": "3.4 Surfaces - By Others: PCpid does not number it",
+      "macro": "_PCpid _Enter \u0027_SelID 47ea888e-51b1-4adc-a65c-8175ac62ead2 \u0027_SelID 42ea0995-2381-4e17-bdee-bd1da6adf229",
+      "result": true,
+      "seconds": 0.245,
+      "history": "Command: _PCpid\nEnter the three-letter project code \u003CMET\u003E: _Enter\nPCpid uses all 401 panels in the panel-layer subtree for numbering; only selected panels will be changed.\nSelect a panel in the panel-layer subtree on the north facade: \u0027_SelID\nObject ID to select: 47ea888e-51b1-4adc-a65c-8175ac62ead2\n1 surface added to selection.\nSelect a panel in the panel-layer subtree on the first floor (level 01): \u0027_SelID\nObject ID to select: 42ea0995-2381-4e17-bdee-bd1da6adf229\n1 surface added to selection.\nPCpid analyzed 401 panels; assigned 1 selected panel IDs; 0 panel(s) changed.\nStandardized point order on 0 selected surface(s).\nW6: 1 panels, 1 levels, 1 bays.\n"
+    },
+    {
+      "step": "3.4 Surfaces - By Others: PCbake Curves fails",
+      "macro": "_-PCbake _Scope=_Curves _Enter",
+      "result": false,
+      "seconds": 0.12,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nPANEL_CLADDING_UPDATE_CURVE_PREPARE_FAILED: 66a2d4f4-ba76-4c43-8cad-4379d0ad654b: PANEL_CLADDING_PANEL_LAYER_EXCLUDED: MET-IEF-Wireframe::Surfaces - PNL::Surfaces - By Others; layers named Not in Scope or By Others are not tracked.\n"
+    },
+    {
+      "step": "3.4 NOT_IN_SCOPE: PCpid does not number it",
+      "macro": "_PCpid _Enter \u0027_SelID 47ea888e-51b1-4adc-a65c-8175ac62ead2 \u0027_SelID 42ea0995-2381-4e17-bdee-bd1da6adf229",
+      "result": true,
+      "seconds": 0.243,
+      "history": "Command: _PCpid\nEnter the three-letter project code \u003CMET\u003E: _Enter\nPCpid uses all 401 panels in the panel-layer subtree for numbering; only selected panels will be changed.\nSelect a panel in the panel-layer subtree on the north facade: \u0027_SelID\nObject ID to select: 47ea888e-51b1-4adc-a65c-8175ac62ead2\n1 surface added to selection.\nSelect a panel in the panel-layer subtree on the first floor (level 01): \u0027_SelID\nObject ID to select: 42ea0995-2381-4e17-bdee-bd1da6adf229\n1 surface added to selection.\nPCpid analyzed 401 panels; assigned 1 selected panel IDs; 0 panel(s) changed.\nStandardized point order on 0 selected surface(s).\nW6: 1 panels, 1 levels, 1 bays.\n"
+    },
+    {
+      "step": "3.4 NOT_IN_SCOPE: PCbake Curves fails",
+      "macro": "_-PCbake _Scope=_Curves _Enter",
+      "result": false,
+      "seconds": 0.119,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nPANEL_CLADDING_UPDATE_CURVE_PREPARE_FAILED: 66a2d4f4-ba76-4c43-8cad-4379d0ad654b: PANEL_CLADDING_PANEL_LAYER_EXCLUDED: MET-IEF-Wireframe::Surfaces - PNL::NOT_IN_SCOPE; layers named Not in Scope or By Others are not tracked.\n"
+    },
+    {
+      "step": "3.4 By-Others: PCpid does not number it",
+      "macro": "_PCpid _Enter \u0027_SelID 47ea888e-51b1-4adc-a65c-8175ac62ead2 \u0027_SelID 42ea0995-2381-4e17-bdee-bd1da6adf229",
+      "result": true,
+      "seconds": 0.3,
+      "history": "Command: _PCpid\nEnter the three-letter project code \u003CMET\u003E: _Enter\nPCpid uses all 401 panels in the panel-layer subtree for numbering; only selected panels will be changed.\nSelect a panel in the panel-layer subtree on the north facade: \u0027_SelID\nObject ID to select: 47ea888e-51b1-4adc-a65c-8175ac62ead2\n1 surface added to selection.\nSelect a panel in the panel-layer subtree on the first floor (level 01): \u0027_SelID\nObject ID to select: 42ea0995-2381-4e17-bdee-bd1da6adf229\n1 surface added to selection.\nPCpid analyzed 401 panels; assigned 1 selected panel IDs; 0 panel(s) changed.\nStandardized point order on 0 selected surface(s).\nW6: 1 panels, 1 levels, 1 bays.\n"
+    },
+    {
+      "step": "3.4 By-Others: PCbake Curves fails",
+      "macro": "_-PCbake _Scope=_Curves _Enter",
+      "result": false,
+      "seconds": 0.119,
+      "history": "Command: _-PCbake\nSelect panel Breps to bake. Press Enter when done ( Scope=Surfaces ): _Scope=_Curves\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves ): _Enter\nSelect panel Breps to bake. Press Enter when done ( Scope=Curves )\nPANEL_CLADDING_UPDATE_CURVE_PREPARE_FAILED: 66a2d4f4-ba76-4c43-8cad-4379d0ad654b: PANEL_CLADDING_PANEL_LAYER_EXCLUDED: MET-IEF-Wireframe::Surfaces - PNL::By-Others; layers named Not in Scope or By Others are not tracked.\n"
+    }
+  ]
+}
