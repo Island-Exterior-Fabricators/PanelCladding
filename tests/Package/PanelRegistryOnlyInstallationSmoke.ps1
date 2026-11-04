@@ -49,8 +49,8 @@ try {
     $child = Get-ItemProperty -LiteralPath (Join-Path $pluginKey 'PlugIn')
     Require ([int]$root.LoadMode -eq 1) 'Registry-only plug-in loads at Rhino startup.'
     Require ([int]$root.DirectoryInstall -eq 0) 'Registration is not marked as a Package Manager directory install.'
-    Require ([IO.Path]::GetFullPath([string]$root.FileName).Equals([IO.Path]::GetFullPath($activeRhp), [StringComparison]::OrdinalIgnoreCase)) `
-        'Top-level bootstrap registration points at the registry-only RHP.'
+    Require ([string]::IsNullOrWhiteSpace([string]$root.FileName)) `
+        'The root key has no shorthand FileName; Rhino owns the root and the installer writes PlugIn\FileName.'
     Require ([IO.Path]::GetFullPath([string]$child.FileName).Equals([IO.Path]::GetFullPath($activeRhp), [StringComparison]::OrdinalIgnoreCase)) `
         'Detailed registration points at the registry-only RHP.'
 
