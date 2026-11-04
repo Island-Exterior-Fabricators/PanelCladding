@@ -46,7 +46,7 @@ Select issue rows to select and zoom to their objects in Rhino; Rescan reads the
 Export writes `<model> - PC Report.xlsx` (Summary and Issues sheets).
 
 `PCweb` opens the active saved model in Wireframe Web, the team's read-only web viewer, when it is
-installed (per user, from https://github.com/nuofan-island/wireframe-web/releases). The model must
+installed (per user, from https://github.com/Island-Exterior-Fabricators/wireframe-web/releases). The model must
 be named `<CODE> - ....3dm`. Wireframe Web reads the saved file, so unsaved changes are first saved
 (Yes), left out (No: the last save opens) or the command stops (Cancel); `-PCweb` offers `Save` and
 `LastSave` on the command line. PCweb runs Wireframe Web's launch command
@@ -524,7 +524,7 @@ the new version loads after a Rhino restart. Rhino installs packages under
 ## Downloadable release installation
 
 Download the `PanelCladdingEditor-<version>-win-x64.zip` asset from
-[GitHub Releases](https://github.com/nuofan-island/PanelCladding/releases/latest), extract
+[GitHub Releases](https://github.com/Island-Exterior-Fabricators/PanelCladding/releases/latest), extract
 all files, close Rhino, and run `Install.cmd` normally. The launcher installs for
 the current Windows user and runs `-Mode Validate` before reporting success.
 Restart Rhino and run `PCeditor`. Use `Uninstall.cmd` with Rhino closed to remove it.
