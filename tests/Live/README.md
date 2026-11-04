@@ -46,6 +46,9 @@ preview_rhino_script  libraryPath = <repo>\tests\Live\PcLive.cs, libraryType = P
 apply_rhino_script    the returned token
 ```
 
+Add `"version":"1.4.0+<commit>"` to pin the build the `commands` suite expects; without it any
+installed version passes if Rhino loads it from its own versioned install folder.
+
 The suite runs after the apply returns; its results are written to `<evidenceDir>\<suite>.json`
 (and `PcLive.Read(Parameters)` returns them while it runs). Several suites can be joined with `+`.
 `excluded` and `otherdocs` reopen documents, so select the document again afterwards.
