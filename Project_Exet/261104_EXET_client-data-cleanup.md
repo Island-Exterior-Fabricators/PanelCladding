@@ -49,8 +49,13 @@ full regression 83/83 in Debug and Release, `Verify-Release.ps1` passed, RHP
 
 ## Acceptance alignment
 
-History scan, regression and release verification are met. Publication of 1.4.1 and withdrawal
-of the old releases follow the merge and are recorded below.
+All PLAN acceptance items are met. After
+[PR 19](https://github.com/Island-Exterior-Fabricators/PanelCladding/pull/19) was merged
+(`a8883d5`), annotated tag `v1.4.1` was created on the verified commit `277bf0f` and the GitHub
+release `PanelCladdingEditor 1.4.1` was published as latest with the verified zip and its
+`.sha256`; the downloaded asset matches the recorded SHA-256. Releases `v1.4.0`, `v1.2.5` and
+`v1.0.97` and their assets were deleted; their (rewritten) tags remain. Live Rhino acceptance was
+not run, as planned.
 
 ## Rollback
 

@@ -61,6 +61,21 @@ Results:
 project-folder paths; its pattern self-test catches project-folder paths and accepts the
 fictional fixtures.
 
+## Publication
+
+```
+gh pr merge 19 --merge                                   # a8883d5
+git tag -a v1.4.1 277bf0f && git push origin v1.4.1
+gh release create v1.4.1 --verify-tag --latest -F RELEASE-NOTES-1.4.1.md <zip> <zip>.sha256
+gh release download v1.4.1                               # asset SHA-256 b47c660f...ee97, matches
+gh release delete v1.4.0 / v1.2.5 / v1.0.97 --yes
+gh release list                                          # only v1.4.1 (Latest)
+git clone --bare <origin>; sanitize.py scan              # 24 refs, 95 commits
+```
+
+The final scan of a fresh clone reports one hit: the sample strings inside the
+`repository-content-guard` smoke itself (company folder-layout patterns, no client data).
+
 ## Not run
 
 Live Rhino acceptance (plug-in code unchanged from 1.4.0 apart from comments, one example code in
