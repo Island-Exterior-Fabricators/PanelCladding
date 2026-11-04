@@ -26,11 +26,14 @@ public static class PcLive
     };
     private static readonly string[] RemovedCommands = { "PCupdate", "PCspawnSrf", "PCspawnCrv" };
 
-    private const string Root = "XYZ-IEF-Wireframe";
-    private const string PanelBranch = Root + "::Surfaces - PNL";
-    private const string CurveBranch = Root + "::Curves - PNL";
+    // The project code comes from the open model's file name ("XYZ - Wireframe.3dm" is XYZ), or from
+    // Parameters.project; Start sets it before any step runs.
+    private static string ProjectCode = "XYZ";
+    private static string Root => ProjectCode + "-IEF-Wireframe";
+    private static string PanelBranch => Root + "::Surfaces - PNL";
+    private static string CurveBranch => Root + "::Curves - PNL";
     private const string SurfaceBranch = "Reference::Surfaces - STEP";
-    private const string TestPanelLayer = PanelBranch + "::PNL-EXT-3A.1";
+    private static string TestPanelLayer => PanelBranch + "::PNL-EXT-3A.1";
     private const string PidKey = "CW_1.01_PID";
     private const string CidKey = "CW_1.02_CID";
     private const string LogicKey = "UD_CLADDING_LOGIC";
@@ -40,6 +43,11 @@ public static class PcLive
     {
         string suite = Text(parameters, "suite");
         string evidence = Text(parameters, "evidenceDir");
+        string project = Text(parameters, "project");
+        if (string.IsNullOrWhiteSpace(project))
+            project = new string(System.IO.Path.GetFileName(doc.Path ?? string.Empty).TakeWhile(char.IsLetterOrDigit).ToArray());
+        if (project.Length == 0) throw new ArgumentException("Save the model as '<PROJECT> - Wireframe.3dm' or pass Parameters.project.");
+        ProjectCode = project.ToUpperInvariant();
         // "commands+bake" runs both suites in order as one run.
         var steps = new List<Step>();
         foreach (string name in suite.Split('+'))
@@ -903,7 +911,7 @@ public static class PcLive
         new Step("3.6 saving the main model leaves excluded panels out of the naming sheet", ctx =>
         {
             RhinoDoc doc = ctx.Doc;
-            string sheet = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(doc.Path), "XYZ - Naming Convention.xlsx");
+            string sheet = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(doc.Path), ProjectCode + " - Naming Convention.xlsx");
             List<Rhino.DocObjects.RhinoObject> panels = PanelsOn(doc, TestPanelLayer);
             int excluded = ExcludedLayer(doc);
             var outside = panels[0].Attributes.Duplicate();
@@ -942,7 +950,7 @@ public static class PcLive
 
     // ---------------------------------------------------------------- 5. PCeditor
 
-    private const string EditorPanelLayer = PanelBranch + "::PNL-EXT-3A.4";
+    private static string EditorPanelLayer => PanelBranch + "::PNL-EXT-3A.4";
     private const string AssignmentsPayload = "{\"v\":1,\"f\":{\"FRM-0\":[\"1D-T000\"]},\"s\":[]}";
 
     private static object EditorWindow() => R.StaticField("PanelCladdingEditor.UI.PanelCladdingEditorCommand", "_window");

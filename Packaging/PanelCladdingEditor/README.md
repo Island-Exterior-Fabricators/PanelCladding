@@ -467,7 +467,7 @@ The installed RHP and its private dependencies live at
 current-user registration directly: root product/startup metadata, `PlugIn\FileName`, and the exact
 thirteen-command `CommandList`. It does not rely on Rhino consuming a shorthand root `FileName` during
 first startup. Installer validation rejects shorthand-only, partial, stale-command, or mixed
-registrations. It removes the legacy `PanelCladdingEditor` and `LegacyPanelCladdingEditor` roots
+registrations. It removes the legacy `PanelCladdingEditor` root
 from Rhino Package Manager discovery. Do not place the RHP under
 `%APPDATA%\McNeel\Rhinoceros\packages` while the registry installation exists; doing so gives
 Rhino two loaders for one plug-in identity and produces `ID already in use`. To move to the Yak
