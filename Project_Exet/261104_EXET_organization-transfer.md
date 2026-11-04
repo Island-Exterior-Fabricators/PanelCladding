@@ -5,7 +5,8 @@
 [PLAN](../Project_Plan/261104_PLAN_organization-transfer.md),
 [TEST evidence](../Project_Test/261104_TEST_organization-transfer/README.md).
 Executed 2026-11-04 on branch `codex/organization-transfer` from `master` (`c54c8d9`), host
-NYCZBF16G9NXU.
+NYCZBF16G9NXU; commit `c6300a9`,
+[PR 18](https://github.com/Island-Exterior-Fabricators/PanelCladding/pull/18).
 
 ## Changes
 
