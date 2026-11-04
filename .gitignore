@@ -83,6 +83,14 @@ _tmp*.csx
 
 # Local models, runtime history, and machine-specific client configuration
 *.3dm
+# Project models, drawings and exports never belong in the public repository
+*.dwg
+*.dxf
+*.rvt
+*.xls
+*.xlsx
+*.xlsm
+*.pdf
 Runtime_Log/*.json
 Runtime_Test/Runtime_Log/*.json
 .claude/settings.local.json

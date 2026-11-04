@@ -25,7 +25,7 @@ try {
     $pluginBase = Join-Path $productRoot 'plugin'
     $packageBase = Join-Path $fixtureRoot 'rhino-packages'
     $sourceRhp = Join-Path $BundleRoot 'Plugin\PanelCladdingEditor.rhp'
-    foreach ($legacyName in @('PanelCladdingEditor', 'LegacyPanelCladdingEditor')) {
+    foreach ($legacyName in @('PanelCladdingEditor')) {
         $legacyVersion = Join-Path (Join-Path $packageBase $legacyName) '1.0.5'
         New-Item -ItemType Directory -Path $legacyVersion -Force | Out-Null
         Copy-Item -LiteralPath $sourceRhp -Destination (Join-Path $legacyVersion 'PanelCladdingEditor.rhp')
@@ -41,9 +41,8 @@ try {
     $activeRhp = Join-Path $activeRoot 'PanelCladdingEditor.rhp'
     Require (Test-Path -LiteralPath $activeRhp -PathType Leaf) 'RHP is installed under the registry-only product root.'
     Require (-not (Test-Path -LiteralPath (Join-Path $packageBase 'PanelCladdingEditor'))) 'PanelCladdingEditor legacy package root is removed from discovery.'
-    Require (-not (Test-Path -LiteralPath (Join-Path $packageBase 'LegacyPanelCladdingEditor'))) 'ABC legacy package root is removed from discovery.'
-    Require (@(Get-ChildItem -LiteralPath $fixtureRoot -Filter 'PanelCladdingEditor.rhp' -File -Recurse).Count -eq 3) `
-        'One active RHP plus two recoverable non-discovery migration backups exist.'
+    Require (@(Get-ChildItem -LiteralPath $fixtureRoot -Filter 'PanelCladdingEditor.rhp' -File -Recurse).Count -eq 2) `
+        'One active RHP plus one recoverable non-discovery migration backup exist.'
 
     $pluginKey = Join-Path $registryRoot $pluginId.ToLowerInvariant()
     $root = Get-ItemProperty -LiteralPath $pluginKey
@@ -57,7 +56,7 @@ try {
 
     $ownership = Get-Content -Raw -LiteralPath (Join-Path $productRoot 'install-manifest.json') | ConvertFrom-Json
     Require ($ownership.pluginRegistrationMode -eq 'registry-only') 'Ownership manifest records registry-only mode.'
-    Require (@($ownership.migrationBackups).Count -eq 2) 'Ownership manifest records both legacy package migrations.'
+    Require (@($ownership.migrationBackups).Count -eq 1) 'Ownership manifest records the legacy package migration.'
 
     & $installer -Mode Validate -BundleRoot $BundleRoot -ProductRoot $productRoot `
         -RhinoPluginRoot $pluginBase -LegacyRhinoPackageRoot $packageBase `

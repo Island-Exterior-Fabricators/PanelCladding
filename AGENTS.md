@@ -10,6 +10,10 @@ This is the standalone Rhino 8 PanelCladdingEditor repository. Read
 - Treat an explicit implementation request as authorization for its required
   PLAN -> EXET -> TEST records. Do not invent new capabilities during runtime use.
 - Use a `codex/` branch for construction changes. Keep unrelated user edits intact.
+- The repository is public. Never commit client project data: no real project names,
+  codes, numbers or file-server paths, and no raw output of live runs on project models
+  (exports, screenshots, object dumps). Use fictional codes (`ABC`, `XYZ`) and record
+  only sanitized conclusions; the plan log and `repository-content-guard` smoke enforce it.
 - Keep rerunnable test code in `tests/`; `Project_Test/` folders hold evidence only.
   Update older smokes that a behaviour change affects; the suite has no accepted failures.
 - Archive completed work consistently: once a PLAN/EXET/TEST set has completed

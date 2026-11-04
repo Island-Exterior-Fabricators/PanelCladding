@@ -103,7 +103,7 @@ function Set-PanelPluginRegistration([string] $RegistryRoot, [string] $PluginId,
     foreach ($entry in ([ordered]@{
         Name = 'PanelCladdingEditor'
         EnglishName = 'PanelCladdingEditor'
-        Organization = 'ABC project team'
+        Organization = 'Panel Cladding Editor contributors'
         Address = ''
         Country = ''
         Phone = ''

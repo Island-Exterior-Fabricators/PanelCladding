@@ -1,5 +1,7 @@
 # Release 1.4.0 TEST
 
+> **Client data removed on 2026-11-04.** Files this record produced from client project models (exports, screenshots, object and layer dumps) were removed from the repository and its history, and project codes and paths here were replaced with fictional ones; see the [client data cleanup EXET](../../Project_Exet/261104_EXET_client-data-cleanup.md). The conclusions below stand; links to the removed files no longer resolve.
+
 Evidence for [the PLAN](../../Project_Plan/261101_PLAN_release-1.4.0.md) and
 [the EXET](../../Project_Exet/261101_EXET_release-1.4.0.md). Host NOVAN-HOME, non-elevated
 Windows PowerShell 5.1, 2026-11-01.

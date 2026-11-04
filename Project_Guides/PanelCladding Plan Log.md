@@ -14,6 +14,15 @@ matching `Project_Test/YYMMDD_TEST_<capability-name>/` folder; it holds no code 
 is built or rerun. When a change alters behaviour that older smokes check, update
 those smokes in the same change; the full suite has no accepted failures.
 
+The repository is public, so records, fixtures and evidence carry no client project data.
+Use fictional project codes (`ABC`, `XYZ`; `QRS`, `JKL` for another project) and generic
+paths such as `C:\Projects\ABC\ABC - Wireframe.3dm`, never real project names, numbers or
+company file-server paths. A live run against a real project model commits only sanitized
+conclusions (step names, pass/fail, counts); its raw output (exported workbooks,
+screenshots, object and layer dumps) stays out of the repository and is deleted after
+the run. `tests/Smoke/repository-content-guard` fails on project data file types and
+company project-folder paths.
+
 After execution, write `Project_Exet/YYMMDD_EXET_<capability-name>.md` with links to
 PLAN and TEST, execution date, changes, deviations, discovered issues, actual
 commands/results, acceptance alignment, rollback, remaining limitations and conclusion.

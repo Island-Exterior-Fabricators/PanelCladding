@@ -1,5 +1,7 @@
 # Live acceptance tests TEST (1.3.0)
 
+> **Client data removed on 2026-11-04.** Files this record produced from client project models (exports, screenshots, object and layer dumps) were removed from the repository and its history, and project codes and paths here were replaced with fictional ones; see the [client data cleanup EXET](../../Project_Exet/261104_EXET_client-data-cleanup.md). The conclusions below stand; links to the removed files no longer resolve.
+
 Evidence for [the PLAN](../../Project_Plan/261031_PLAN_live-acceptance-tests.md) and
 [the EXET](../../Project_Exet/261031_EXET_live-acceptance-tests.md). The rerunnable code is in
 [`tests/Live`](../../tests/Live/README.md). Every item of `PanelCladdingEditor-1.3.0 Manual Tests.md`
