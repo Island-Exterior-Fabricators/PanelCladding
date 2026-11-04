@@ -1,4 +1,5 @@
-// PanelCladdingEditor live acceptance checks (1.3.0 manual test list, sections 1-5).
+// PanelCladdingEditor live acceptance checks (a release's manual test list, sections 1-5; written for
+// 1.3.0, expectations as of 1.4.0).
 //
 // Runs inside Rhino 8 against the open test model through a C# script host that supplies the
 // document, a JSON parameter object and a log callback, for example MCP_Rhino's live scripting
@@ -84,9 +85,14 @@ public static class PcLive
             string version = assembly?.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
                 .OfType<System.Reflection.AssemblyInformationalVersionAttribute>().FirstOrDefault()?.InformationalVersion ?? string.Empty;
             ctx.Note("1.0 loaded plug-in", new { process = System.Diagnostics.Process.GetCurrentProcess().Id, rhino = RhinoApp.Version.ToString(), location, sha256 = hash, version });
-            ctx.Check("1.0 Rhino runs the installed 1.3.0 RHP", version.StartsWith("1.3.0+150f546") &&
-                location.EndsWith(@"PanelCladdingEditor\plugin\1.3.0\PanelCladdingEditor.rhp", StringComparison.OrdinalIgnoreCase),
-                new { location, hash, version });
+            // Parameters.version (for example "1.4.0+abc1234") pins the expected build; otherwise any
+            // installed version passes as long as Rhino loads it from its own versioned install folder.
+            string expected = Text(ctx.Parameters, "version");
+            string folder = version.Split('+')[0];
+            ctx.Check("1.0 Rhino runs the installed RHP" + (expected.Length > 0 ? " " + expected : string.Empty),
+                folder.Length > 0 && (expected.Length == 0 || version.StartsWith(expected, StringComparison.Ordinal)) &&
+                location.EndsWith(@"PanelCladdingEditor\plugin\" + folder + @"\PanelCladdingEditor.rhp", StringComparison.OrdinalIgnoreCase),
+                new { location, hash, version, expected });
             return true;
         }),
         new Step("1.1 command registry", ctx =>
@@ -411,10 +417,8 @@ public static class PcLive
             {
                 RhinoDoc doc = ctx.Doc;
                 Guid d = (Guid)ctx.Bag["panelD"], e = (Guid)ctx.Bag["panelE"];
-                var attributes = doc.Objects.FindId(d).Attributes.Duplicate();
-                ctx.Bag["realAuto"] = Sentinels.Keys.ToDictionary(key => key, key => attributes.GetUserString(key) ?? string.Empty);
-                foreach (var pair in Sentinels) attributes.SetUserString(pair.Key, pair.Value);
-                doc.Objects.ModifyAttributes(d, attributes, true);
+                // Output keys only: writing them queues no refresh, so the next full scan must replace them.
+                WriteValues(doc, d, Sentinels);
                 var control = doc.Objects.FindId(e).Attributes.Duplicate();
                 ctx.Note("panel E width before reopen", control.GetUserString("CW_2.01_UNIT_WIDTH"));
                 control.SetUserString("CW_2.01_UNIT_WIDTH", "1.00000");
@@ -443,7 +447,7 @@ public static class PcLive
                 string all = RhinoApp.CommandHistoryWindowText ?? string.Empty;
                 int start = Math.Min(all.Length, (int)ctx.Bag["historyAtOpen"]);
                 ctx.Check("3.1 control panel E was refreshed on open", width != "1.00000", new { width, history = all.Substring(start) });
-                CheckSentinels(ctx, "3.1 Not in Scope panel keeps its auto values after reopening", d);
+                CheckRefreshed(ctx, "3.1 Not in Scope panel's auto values are refreshed on reopen (1.4.0)", d);
                 return true;
             }, 200),
             PidStep("3.2 PCpid does not number the Not in Scope panel"),
@@ -453,6 +457,7 @@ public static class PcLive
         {
             steps.Add(new Step("3.4 rename to " + name, ctx =>
             {
+                WriteValues(ctx.Doc, (Guid)ctx.Bag["panelD"], Sentinels);
                 RenameLayer(ctx.Doc, ExcludedLayer(ctx.Doc), name);
                 return true;
             }));
@@ -460,7 +465,7 @@ public static class PcLive
             {
                 // Renaming a layer queues the same full scan as opening the model; give it time to run.
                 if ((DateTime.Now - ctx.StepStarted).TotalSeconds < 2) return false;
-                CheckSentinels(ctx, "3.4 " + name + ": auto values are not refreshed", (Guid)ctx.Bag["panelD"]);
+                CheckRefreshed(ctx, "3.4 " + name + ": auto values are refreshed (1.4.0)", (Guid)ctx.Bag["panelD"]);
                 return true;
             }, 200));
             steps.Add(PidStep("3.4 " + name + ": PCpid does not number it"));
@@ -469,8 +474,8 @@ public static class PcLive
         steps.Add(new Step("3.5 restore layer name", ctx =>
         {
             RenameLayer(ctx.Doc, ExcludedLayer(ctx.Doc), ExcludedNames[0]);
-            ctx.Note("3.5 naming convention", "Not testable here: the sync writes only for a main model " +
-                "(<code> - Wireframe.3dm) with <code> - Naming Convention.xlsx beside it; no MET sheet exists.");
+            ctx.Note("3.5 naming convention", "Checked by suite otherdocs (step 3.6) on a copy saved under its " +
+                "main-model name with a naming sheet beside it.");
             return true;
         }));
         return steps;
@@ -523,15 +528,7 @@ public static class PcLive
         Guid d = (Guid)ctx.Bag["panelD"];
         string curves = CurveFingerprint(doc);
         SelectOnly(doc, d);
-        // With the stale test values (a fake UD_PLANE) the panel extent check fails first; record that once.
-        if (!ctx.Notes.ContainsKey("3.3 stale auto values"))
-        {
-            ctx.Note("3.3 stale auto values", ctx.Cmd("_-PCbake _Scope=_Curves _Enter"));
-        }
-        WriteValues(doc, d, (Dictionary<string, string>)ctx.Bag["realAuto"]);
-        SelectOnly(doc, d);
         string history = ctx.Cmd("_-PCbake _Scope=_Curves _Enter");
-        WriteValues(doc, d, Sentinels);
         ctx.Check(id, history.Contains("PANEL_CLADDING_PANEL_LAYER_EXCLUDED") && ManagedCurves(doc, d).Count == 0 &&
             CurveFingerprint(doc) == curves, history);
         doc.Objects.UnselectAll();
@@ -545,11 +542,13 @@ public static class PcLive
         doc.Objects.ModifyAttributes(id, attributes, true);
     }
 
-    private static void CheckSentinels(Ctx ctx, string id, Guid panelId)
+    // Every sentinel replaced by a measured value.
+    private static void CheckRefreshed(Ctx ctx, string id, Guid panelId)
     {
         Rhino.DocObjects.RhinoObject panel = ctx.Doc.Objects.FindId(panelId);
         var values = Sentinels.Keys.ToDictionary(key => key, key => panel.Attributes.GetUserString(key));
-        ctx.Check(id, Sentinels.All(pair => values[pair.Key] == pair.Value), new { layer = LayerPath(ctx.Doc, panel), values });
+        ctx.Check(id, Sentinels.All(pair => !string.IsNullOrEmpty(values[pair.Key]) && values[pair.Key] != pair.Value),
+            new { layer = LayerPath(ctx.Doc, panel), values });
     }
 
     private static bool IsExcludedPath(string path) =>
@@ -876,7 +875,8 @@ public static class PcLive
             var rules = issues.GroupBy(issue => (string)R.Get(R.Get(issue, "Rule"), "Id") + " " + R.Get(R.Get(issue, "Rule"), "Severity") + ": " +
                 (string)R.Get(R.Get(issue, "Rule"), "Title")).OrderBy(group => group.Key).ToDictionary(group => group.Key, group => group.Count());
             ctx.Note("4.14 BKT rules", rules);
-            ctx.Note("4.3 BKT Surfaces - GLS info", glsInfo);
+            ctx.Check("4.3 objects the plug-in does not manage (Surfaces - GLS copies) are not reported (1.4.0)",
+                glsInfo.Count == 0 && !rules.Keys.Any(key => key.StartsWith("D07", StringComparison.Ordinal)), glsInfo);
             ctx.Check("4.14 PCreport on BKT finishes within 30 s", watch.Elapsed.TotalSeconds < 30 && history.Contains("PCreport: "),
                 new { seconds = Math.Round(watch.Elapsed.TotalSeconds, 2), objects, history });
             R.Render(window, ctx.EvidenceFile("report-window-BKT.png"));
@@ -1383,9 +1383,12 @@ public static class PcLive
 
     private static string Cid(Rhino.DocObjects.RhinoObject item) => (item.Attributes.GetUserString(CidKey) ?? string.Empty).Trim();
 
+    // The model's own panels on a layer; the PCpid copy an earlier excluded run may have left there
+    // (NewPanelKey, no PID) is not one of them.
     private static List<Rhino.DocObjects.RhinoObject> PanelsOn(RhinoDoc doc, string layerPath) =>
         doc.Objects.GetObjectList(Everything(Rhino.DocObjects.ObjectType.Brep))
-            .Where(item => string.Equals(LayerPath(doc, item), layerPath, StringComparison.OrdinalIgnoreCase))
+            .Where(item => string.Equals(LayerPath(doc, item), layerPath, StringComparison.OrdinalIgnoreCase) &&
+                item.Attributes.GetUserString(NewPanelKey) == null)
             .OrderBy(Pid, StringComparer.Ordinal).ToList();
 
     // Managed dependencies carry the panel's PID and a CID that starts with the panel's CID.

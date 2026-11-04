@@ -1,0 +1,176 @@
+{
+  "suite": "web",
+  "status": "done",
+  "started": "2026-11-01T01:53:24",
+  "updated": "2026-11-01T01:53:33",
+  "step": "",
+  "passed": 13,
+  "failed": 0,
+  "error": "",
+  "checks": [
+    {
+      "id": "W.0 Wireframe Web is installed",
+      "pass": true,
+      "step": "W.0 setup",
+      "evidence": "C:\\Users\\nuofa\\AppData\\Local\\Programs\\Wireframe Web\\wireframe-web.cmd"
+    },
+    {
+      "id": "W.0 the test model is saved, writable, unmodified and named \u003CCODE\u003E - ...",
+      "pass": true,
+      "step": "W.0 setup",
+      "evidence": {
+        "Path": "C:\\01_Projects\\Panel Cladding Full\\LiveTest-pcweb\\PCW - Wireframe LIVE TEST.3dm",
+        "IsReadOnly": false,
+        "Modified": false
+      }
+    },
+    {
+      "id": "W.1 PCweb starts the launcher and returns at once",
+      "pass": true,
+      "step": "W.1 saved model opens without a question",
+      "evidence": {
+        "result": "Success",
+        "asked": false,
+        "added": "PCweb: opening PCW in Wireframe Web...\n"
+      }
+    },
+    {
+      "id": "W.1 PCweb reports the page address",
+      "pass": true,
+      "step": "W.1 result",
+      "evidence": {
+        "line": "PCweb: PCW is open in Wireframe Web: http://127.0.0.1:8795/?source=api\u0026project=pcw\u0026user=nuofa",
+        "seconds": 4.1
+      }
+    },
+    {
+      "id": "W.1 Wireframe Web loaded the saved file",
+      "pass": true,
+      "step": "W.1 result",
+      "evidence": {
+        "fileName": "PCW - Wireframe LIVE TEST.3dm",
+        "loadedSavedAt": "2026-11-01T06:17:02.292Z",
+        "fileSavedAt": "2026-11-01T06:17:02.2915508Z",
+        "status": "{\u0022configured\u0022:true,\u0022profile\u0022:\u0022default\u0022,\u0022exists\u0022:true,\u0022loadedVersion\u0022:1,\u0022loadedSavedAt\u0022:\u00222026-11-01T06:17:02.292Z\u0022,\u0022newer\u0022:false,\u0022loading\u0022:false,\u0022fileName\u0022:\u0022PCW - Wireframe LIVE TEST.3dm\u0022,\u0022folder\u0022:\u0022LiveTest-pcweb\u0022,\u0022savedAt\u0022:\u00222026-11-01T06:17:02.292Z\u0022,\u0022bytes\u0022:27257388}"
+      }
+    },
+    {
+      "id": "W.2 PCweb asks, keeps the changes unsaved and opens the last save",
+      "pass": true,
+      "step": "W.2 unsaved changes, LastSave",
+      "evidence": {
+        "result": "Success",
+        "asked": true,
+        "Modified": true,
+        "before": "2026-11-01T06:17:02.2915508Z",
+        "added": "PCweb: opening PCW in Wireframe Web...\n"
+      }
+    },
+    {
+      "id": "W.2 a second run while the first waits starts nothing",
+      "pass": true,
+      "step": "W.2 unsaved changes, LastSave",
+      "evidence": {
+        "again": "Nothing",
+        "askedAgain": false,
+        "added": "PCweb: Wireframe Web is still opening the previous model.\n"
+      }
+    },
+    {
+      "id": "W.2 PCweb reports the page address",
+      "pass": true,
+      "step": "W.2 result",
+      "evidence": {
+        "line": "PCweb: PCW is open in Wireframe Web: http://127.0.0.1:8795/?source=api\u0026project=pcw\u0026user=nuofa",
+        "seconds": 1.6
+      }
+    },
+    {
+      "id": "W.2 Wireframe Web loaded the saved file",
+      "pass": true,
+      "step": "W.2 result",
+      "evidence": {
+        "fileName": "PCW - Wireframe LIVE TEST.3dm",
+        "loadedSavedAt": "2026-11-01T06:17:02.292Z",
+        "fileSavedAt": "2026-11-01T06:17:02.2915508Z",
+        "status": "{\u0022configured\u0022:true,\u0022profile\u0022:\u0022default\u0022,\u0022exists\u0022:true,\u0022loadedVersion\u0022:1,\u0022loadedSavedAt\u0022:\u00222026-11-01T06:17:02.292Z\u0022,\u0022newer\u0022:false,\u0022loading\u0022:false,\u0022fileName\u0022:\u0022PCW - Wireframe LIVE TEST.3dm\u0022,\u0022folder\u0022:\u0022LiveTest-pcweb\u0022,\u0022savedAt\u0022:\u00222026-11-01T06:17:02.292Z\u0022,\u0022bytes\u0022:27257388}"
+      }
+    },
+    {
+      "id": "W.3 PCweb asks, saves, then opens",
+      "pass": true,
+      "step": "W.3 unsaved changes, Save",
+      "evidence": {
+        "result": "Success",
+        "asked": true,
+        "Modified": false,
+        "before": "2026-11-01T06:17:02.2915508Z",
+        "after": "2026-11-01T06:53:31.3807061Z",
+        "added": "File successfully saved as C:\\01_Projects\\Panel Cladding Full\\LiveTest-pcweb\\PCW - Wireframe LIVE TEST.3dm.\nPCweb: opening PCW in Wireframe Web...\n"
+      }
+    },
+    {
+      "id": "W.3 PCweb reports the page address",
+      "pass": true,
+      "step": "W.3 result",
+      "evidence": {
+        "line": "PCweb: PCW is open in Wireframe Web: http://127.0.0.1:8795/?source=api\u0026project=pcw\u0026user=nuofa",
+        "seconds": 2.9
+      }
+    },
+    {
+      "id": "W.3 Wireframe Web loaded the saved file",
+      "pass": true,
+      "step": "W.3 result",
+      "evidence": {
+        "fileName": "PCW - Wireframe LIVE TEST.3dm",
+        "loadedSavedAt": "2026-11-01T06:53:31.381Z",
+        "fileSavedAt": "2026-11-01T06:53:31.3807061Z",
+        "status": "{\u0022configured\u0022:true,\u0022profile\u0022:\u0022default\u0022,\u0022exists\u0022:true,\u0022loadedVersion\u0022:2,\u0022loadedSavedAt\u0022:\u00222026-11-01T06:53:31.381Z\u0022,\u0022newer\u0022:false,\u0022loading\u0022:false,\u0022fileName\u0022:\u0022PCW - Wireframe LIVE TEST.3dm\u0022,\u0022folder\u0022:\u0022LiveTest-pcweb\u0022,\u0022savedAt\u0022:\u00222026-11-01T06:53:31.381Z\u0022,\u0022bytes\u0022:27314031}"
+      }
+    },
+    {
+      "id": "W.4 Cancel saves nothing and starts nothing",
+      "pass": true,
+      "step": "W.4 unsaved changes, Cancel",
+      "evidence": {
+        "result": "Cancel",
+        "asked": true,
+        "added": ""
+      }
+    }
+  ],
+  "notes": {
+    "W.0 setup": {
+      "assembly": "",
+      "version": "1.4.0\u002B8a9421bc505eba39d727e95edde40298291d8bce",
+      "launcher": "C:\\Users\\nuofa\\AppData\\Local\\Programs\\Wireframe Web\\wireframe-web.cmd",
+      "model": "C:\\01_Projects\\Panel Cladding Full\\LiveTest-pcweb\\PCW - Wireframe LIVE TEST.3dm",
+      "port": "8795"
+    },
+    "W.1 document": {
+      "before": "01:53:24.838 readOnly=False locked=True modified=False",
+      "after": "01:53:24.840 readOnly=False locked=True modified=False"
+    },
+    "W.1 document at result": "01:53:28.899 readOnly=False locked=True modified=False",
+    "W.2 document": {
+      "before": "01:53:28.955 readOnly=False locked=True modified=True",
+      "after": "01:53:28.956 readOnly=False locked=True modified=True"
+    },
+    "W.2b document": {
+      "before": "01:53:28.956 readOnly=False locked=True modified=True",
+      "after": "01:53:28.957 readOnly=False locked=True modified=True"
+    },
+    "W.2 document at result": "01:53:30.540 readOnly=False locked=True modified=True",
+    "W.3 document": {
+      "before": "01:53:30.636 readOnly=False locked=True modified=True",
+      "after": "01:53:31.408 readOnly=False locked=True modified=False"
+    },
+    "W.3 document at result": "01:53:33.575 readOnly=False locked=True modified=False",
+    "W.4 document": {
+      "before": "01:53:33.607 readOnly=False locked=True modified=True",
+      "after": "01:53:33.607 readOnly=False locked=True modified=True"
+    }
+  },
+  "commands": []
+}

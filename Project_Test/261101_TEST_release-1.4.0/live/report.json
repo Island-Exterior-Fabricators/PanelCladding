@@ -1,0 +1,184 @@
+{
+  "suite": "report",
+  "status": "done",
+  "started": "2026-11-01T01:51:44",
+  "updated": "2026-11-01T01:51:45",
+  "step": "",
+  "passed": 10,
+  "failed": 0,
+  "error": "",
+  "checks": [
+    {
+      "id": "4.1 window opens with error, warning and info counts",
+      "pass": true,
+      "step": "4.1 window opens read-only",
+      "evidence": {
+        "counts": {
+          "errors": "0 errors",
+          "warnings": "9,909 warnings",
+          "info": "801 info",
+          "document": "MET - Wireframe LIVE TEST"
+        },
+        "history": "Command: _PCreport\nPCreport: 0 error(s), 9909 warning(s), 801 info on 401 panel(s), 12 surface(s) and 9521 curve(s).\n",
+        "seconds": 0.2608454
+      }
+    },
+    {
+      "id": "4.2 model not modified, nothing added to Undo",
+      "pass": true,
+      "step": "4.1 window opens read-only",
+      "evidence": {
+        "modified": false,
+        "undoRun": "Command: _Undo\nUndoing Point\n",
+        "note": "Rhino reserves an undo serial for every command, read-only ones included",
+        "serialAcrossPCreport": [
+          37,
+          38
+        ],
+        "serialAcrossSelNone": [
+          39,
+          40
+        ]
+      }
+    },
+    {
+      "id": "4.4 clicking a row selects its object",
+      "pass": true,
+      "step": "4.4 clicking rows selects and zooms",
+      "evidence": {
+        "rule": "CID does not match PID and role",
+        "row": "ad4ae37a-350e-4444-aae1-4dd9881192ba",
+        "selected": [
+          "ad4ae37a-350e-4444-aae1-4dd9881192ba"
+        ]
+      }
+    },
+    {
+      "id": "4.4 and zooms to it",
+      "pass": true,
+      "step": "4.4 clicking rows selects and zooms",
+      "evidence": {
+        "cameraBefore": "1075.436665208919,6024.68643333616,1912.8680002040064",
+        "cameraTarget": "436.4042914425004,4504.343640563429,1342.5",
+        "objectCenter": "436.4042914425004,4504.343640563429,1342.5"
+      }
+    },
+    {
+      "id": "4.5 selecting several rows selects all their objects",
+      "pass": true,
+      "step": "4.4 clicking rows selects and zooms",
+      "evidence": {
+        "expected": [
+          "ad4ae37a-350e-4444-aae1-4dd9881192ba",
+          "f9cce2e9-bbb4-4704-b4bf-5cddc22f70fd",
+          "95f4b39d-1e10-4ecc-b663-54828c86e168"
+        ],
+        "selected": [
+          "95f4b39d-1e10-4ecc-b663-54828c86e168",
+          "ad4ae37a-350e-4444-aae1-4dd9881192ba",
+          "f9cce2e9-bbb4-4704-b4bf-5cddc22f70fd"
+        ]
+      }
+    },
+    {
+      "id": "4.6 locked object: zoomed, not selected",
+      "pass": true,
+      "step": "4.6 locked and hidden objects are zoomed to, not selected",
+      "evidence": {
+        "id": "f6e2e4b7-402b-4a46-834c-95343cea55a2",
+        "selected": 0,
+        "target": "2428.9042914425004,6185.8436405634275,1843.9999999986305",
+        "center": "2428.9042914425004,6185.8436405634275,1843.9999999986305"
+      }
+    },
+    {
+      "id": "4.6 hidden object: zoomed, not selected",
+      "pass": true,
+      "step": "4.6 locked and hidden objects are zoomed to, not selected",
+      "evidence": {
+        "id": "293540f8-d634-4f0d-9ae8-cc1c74ee9def",
+        "selected": 0,
+        "target": "478.40429144250015,5863.843640563434,1767.0781249989025",
+        "center": "478.40429144250015,5863.843640563434,1767.0781249989025"
+      }
+    },
+    {
+      "id": "4.7 clicking a layer-level row selects nothing",
+      "pass": true,
+      "step": "4.7 layer-level row selects nothing",
+      "evidence": {
+        "rule": "Not tracked layer",
+        "layer": "MET-IEF-Wireframe::Surfaces - PNL::Surfaces - Not in Scope",
+        "selected": 0
+      }
+    },
+    {
+      "id": "4.8 Rescan shows the fixed issue gone",
+      "pass": true,
+      "step": "4.8 Rescan after a fix",
+      "evidence": {
+        "panel": "1ea37655-7cb9-43ee-9943-da3b5cc5574e",
+        "detail": "\u0027\u0027; expected \u0027N-01-23\u0027",
+        "before": 397,
+        "after": 396,
+        "counts": "9,908 warnings"
+      }
+    },
+    {
+      "id": "4.9 a command runs while the window is open; the window is modeless",
+      "pass": true,
+      "step": "4.9 Rhino stays usable while the window is open",
+      "evidence": {
+        "history": "Command: _SelNone\n",
+        "isThreadModal": false
+      }
+    }
+  ],
+  "notes": {
+    "4.3 rules": [
+      "A05 Warning x7: CID does not match PID and role",
+      "A06 Warning x397: Name does not match CID",
+      "A10 Info x400: Setup keys missing",
+      "A11 Info x400: Legacy keys",
+      "D01 Warning x9505: No owner panel",
+      "L07 Info x1: Not tracked layer"
+    ]
+  },
+  "commands": [
+    {
+      "step": "4.1 window opens read-only",
+      "macro": "_Point 0,0,-10000",
+      "result": true,
+      "seconds": 0.026,
+      "history": "Command: _Point\nLocation of point object: 0,0,-10000\n"
+    },
+    {
+      "step": "4.1 window opens read-only",
+      "macro": "_PCreport",
+      "result": true,
+      "seconds": 0.261,
+      "history": "Command: _PCreport\nPCreport: 0 error(s), 9909 warning(s), 801 info on 401 panel(s), 12 surface(s) and 9521 curve(s).\n"
+    },
+    {
+      "step": "4.1 window opens read-only",
+      "macro": "_Undo",
+      "result": true,
+      "seconds": 0.044,
+      "history": "Command: _Undo\nUndoing Point\n"
+    },
+    {
+      "step": "4.1 window opens read-only",
+      "macro": "_SelNone",
+      "result": true,
+      "seconds": 0.01,
+      "history": "Command: _SelNone\n"
+    },
+    {
+      "step": "4.9 Rhino stays usable while the window is open",
+      "macro": "_SelNone",
+      "result": true,
+      "seconds": 0.014,
+      "history": "Command: _SelNone\n"
+    }
+  ]
+}

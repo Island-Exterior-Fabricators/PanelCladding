@@ -1,0 +1,33 @@
+Terminal panel (host shell, not the session's), 2026-11-01, after the user ran Install.cmd from
+C:\01_Projects\Panel Cladding Full\PanelCladdingEditor-1.4.0:
+
+& 'C:\01_Projects\Panel Cladding Full\PanelCladdingEditor-attest\Read-Registration.ps1' -Label 'after-1.4.0-install'
+& 'C:\01_Projects\Panel Cladding Full\PanelCladdingEditor-1.4.0\Installer\Install-PanelCladdingEditor.ps1' -Mode Validate
+
+Label           : after-1.4.0-install
+ReadUtc         : 2026-11-01T06:48:15.7254721Z
+FileName        : C:\Users\nuofa\AppData\Local\PanelCladdingEditor\plugin\1.4.0\PanelCladdingEditor.rhp
+FileSha256      : F93BE778A9CD15B353E0EBA6B80ED66B84E490ECF06A86E93195D9E4F0D81208
+CommandCount    : 13
+Commands        : PCbake=2;PCbake; PCclear=2;PCclear; PCcreate=2;PCcreate; PCcrvTemplate=2;PCcrvTemplate; PCeditor=2;PCeditor; PCmatchCrv=2;PCmatchCrv; PCmatchSrf=2;PCmatchSrf; PCpid=2;PCpid; PCreport=2;PCreport; PCsyncCrv=2;PCsyncCrv; PCsyncSrf=2;PCsyncSrf; PCtemplatePNL=2;PCtemplatePNL; PCweb=2;PCweb
+RootTime        : 2026-11-01T06:47:42.0974621Z
+PlugInTime      : 2026-11-01T06:47:42.0974621Z
+CommandListTime : 2026-11-01T06:47:42.1037527Z
+
+PanelCladdingEditor 1.4.0 registry-only installation is valid (complete registration).
+
+After Rhino 35612 started on the MET test model (it loaded plugin\1.4.0\PanelCladdingEditor.rhp,
+1.4.0+8a9421b; live check 1.0):
+
+& 'C:\01_Projects\Panel Cladding Full\PanelCladdingEditor-attest\Read-Registration.ps1' -Label 'after-rhino-start-1.4.0'
+
+Label           : after-rhino-start-1.4.0
+ReadUtc         : 2026-11-01T06:52:06.2340954Z
+FileName        : C:\Users\nuofa\AppData\Local\PanelCladdingEditor\plugin\1.4.0\PanelCladdingEditor.rhp
+FileSha256      : F93BE778A9CD15B353E0EBA6B80ED66B84E490ECF06A86E93195D9E4F0D81208
+CommandCount    : 13
+RootTime        : 2026-11-01T06:48:44.6240394Z
+PlugInTime      : 2026-11-01T06:47:42.0974621Z
+CommandListTime : 2026-11-01T06:48:44.6250452Z
+
+Only the root and CommandList times advanced; PlugIn (installer-owned FileName) is unchanged.
