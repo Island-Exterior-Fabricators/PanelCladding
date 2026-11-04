@@ -14,7 +14,7 @@ public static class WireframeWebLauncher
     public const string RegistryKey = @"Software\IEF\Wireframe Web";
     public const string LauncherValue = "Launcher";
     public const string LauncherFileName = "wireframe-web.cmd";
-    public const string DownloadPage = "https://github.com/nuofan-island/wireframe-web/releases/latest";
+    public const string DownloadPage = "https://github.com/Island-Exterior-Fabricators/wireframe-web/releases/latest";
     public static readonly TimeSpan Timeout = TimeSpan.FromMinutes(3);
 
     // Output files older than this are removed on the next run.
