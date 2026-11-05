@@ -2,10 +2,10 @@
 
 ## Corresponding plan and execution date
 
-[PLAN](../Project_Plan/261105_PLAN_client-data-guard.md),
+Record level: full. [PLAN](../Project_Plan/261105_PLAN_client-data-guard.md),
 [TEST evidence](../Project_Test/261105_TEST_client-data-guard/README.md).
-Executed 2026-11-05 on host NOVAN-HOME, branch `codex/client-data-guard` from `master` at
-`a8883d5` (PR 19).
+Executed 2026-11-05 on host NOVAN-HOME, branch `feature/client-data-guard` (created as
+`codex/client-data-guard`, renamed the same day before any push) from `master` at `a8883d5` (PR 19).
 
 ## Changes
 

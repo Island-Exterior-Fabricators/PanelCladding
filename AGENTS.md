@@ -7,9 +7,13 @@ This is the standalone Rhino 8 PanelCladdingEditor repository. Read
 - Keep this repository independently buildable; do not add MCP_Rhino dependencies.
 - Preserve the product/assembly name `PanelCladdingEditor`, existing command names,
   and plug-in GUID `7C1A4D3B-5E29-4F68-9A72-1D8C6B0F4E35` unless explicitly requested.
-- Treat an explicit implementation request as authorization for its required
-  PLAN -> EXET -> TEST records. Do not invent new capabilities during runtime use.
-- Use a `codex/` branch for construction changes. Keep unrelated user edits intact.
+- Treat an explicit implementation request as authorization for the records its level
+  needs (plan log): PLAN and EXET for substantial changes, with a TEST folder only for
+  evidence that does not fit the EXET; one concise EXET for small changes. Do not create
+  empty TEST folders or records only to complete a set. Do not invent new capabilities
+  during runtime use.
+- Use a `feature/<capability-name>` branch for construction changes, named like its
+  records. Keep unrelated user edits intact.
 - The repository is public. Never commit client project data: no real project names,
   codes, numbers or file-server paths, and no raw output of live runs on project models
   (exports, screenshots, object dumps). Use fictional codes (`ABC`, `XYZ`) and record
@@ -21,12 +25,13 @@ This is the standalone Rhino 8 PanelCladdingEditor repository. Read
   Never bypass them (`--no-verify`); the `repository-content-guard` smoke checks them.
 - Keep rerunnable test code in `tests/`; `Project_Test/` folders hold evidence only.
   Update older smokes that a behaviour change affects; the suite has no accepted failures.
-- Archive completed work consistently: once a PLAN/EXET/TEST set has completed
-  successfully and more than three days have passed since its recorded execution date,
-  move the three together, keeping their names, under `Project_Archive/`. Do not
-  archive incomplete, failed, blocked, unmatched or still-active work. The plan log has
-  the details.
-- Verify Debug and Release builds and managed regressions (`tests/Run-Regression.ps1`). Directly
+- Archive completed work consistently: once a change has completed successfully and more
+  than three days have passed since its recorded execution date, move its records
+  together, keeping their names, under `Project_Archive/` (a lightweight EXET alone). Do
+  not archive incomplete, failed, blocked, unmatched or still-active work. The plan log
+  has the details.
+- Verify Debug and Release builds and managed regressions (`tests/Run-Regression.ps1`); a
+  documentation-only change needs none. The record level never lowers validation. Directly
   verify compiled RHP assembly-level GUID metadata before packaging or installation;
   it must be non-empty and match the manifest and plug-in class GUID.
 - Production installation requires independent host-persistent registry attestation.
