@@ -1,0 +1,23 @@
+{
+  "about": "Rules of Test-RepositoryContent.ps1. Real client names, codes and project numbers are not listed here because the repository is public; they are in the private list the script reads from outside the repository.",
+  "blockedExtensions": [".3dm", ".3dmbak", ".rhl", ".dwg", ".dxf", ".rvt", ".xls", ".xlsx", ".xlsm", ".pdf"],
+  "blockedPaths": [
+    {
+      "pattern": "^Project_(?:Test|Archive)/(?:.+/)?(?:results|live)[^/]*/",
+      "reason": "raw live-run output folder",
+      "newFilesOnly": false
+    },
+    {
+      "pattern": "^Project_(?:Test|Archive)/.+\\.(?:png|jpe?g|gif|bmp|tiff?|webp)$",
+      "reason": "new image in test evidence (record conclusions as text)",
+      "newFilesOnly": true
+    }
+  ],
+  "blockedText": [
+    { "pattern": "0\\d Project Folders", "ignoreCase": true, "reason": "company project-folder root" },
+    { "pattern": "0\\d-Design-Eng|0\\d-BIM", "ignoreCase": true, "reason": "company project-folder layout" },
+    { "pattern": "\\\\EgnyteDrive\\b", "ignoreCase": true, "reason": "company file-server location" },
+    { "pattern": "(?<![A-Za-z0-9])P\\d{5} [A-Z][a-z]", "ignoreCase": false, "reason": "project number followed by a project name" }
+  ],
+  "textRuleExemptions": [".githooks/content-rules.json", "tests/Smoke/repository-content-guard/"]
+}

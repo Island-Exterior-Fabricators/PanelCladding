@@ -1,0 +1,6 @@
+#!/bin/sh
+# Refuses a push whose commits or files carry client project data (Test-RepositoryContent.ps1).
+# Git passes the remote name and the refs being pushed (on standard input) through to the script.
+ps=powershell.exe
+command -v "$ps" >/dev/null 2>&1 || ps=pwsh
+exec "$ps" -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$(dirname "$0")/Test-RepositoryContent.ps1" -Mode Push -Remote "$1"

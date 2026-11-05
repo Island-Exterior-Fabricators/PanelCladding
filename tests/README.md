@@ -1,11 +1,12 @@
 # PanelCladding tests
 
 All rerunnable test code lives here. `Project_Test/YYMMDD_TEST_<name>/` folders keep the
-evidence of one change (README, RESULTS, screenshots, summaries) and are never built or run.
+evidence of one change (README, RESULTS, summaries) and are never built or run. The repository
+is public: they hold no new images and no raw live-run output (see `.githooks`).
 
 | Folder | Contents |
 | --- | --- |
-| `Smoke/<name>/` | Managed smoke projects, one per capability, with their input fixtures. `<name>` is the capability name of the PLAN/EXET/TEST that introduced it. |
+| `Smoke/<name>/` | Managed smoke projects, one per capability, with their input fixtures. `<name>` is the capability name of the change records that introduced it. |
 | `Shared/` | Code compiled into smokes: `RegressionPaths.cs` (all smokes) and `CladdingLogicFixture.cs` (linked by the projects that need it). |
 | `Package/` | Package, installer, registration, identity and Yak checks against a built bundle. |
 | `Checks/` | Static checks that need no build. |
@@ -46,8 +47,9 @@ managed run does not prove live acceptance.
 3. Read repository files through `RegressionPaths.RepositoryRoot`. Write renders and other
    generated files only to `RegressionPaths.Output("<capability-name>")`
    (`artifacts/tests/<capability-name>/`), never into a tracked folder.
-4. Copy any generated file you want to keep as evidence into the change's
-   `Project_Test/YYMMDD_TEST_<capability-name>/` folder and describe it there.
+4. Record what generated files showed as text in the change's EXET, or in its
+   `Project_Test/YYMMDD_TEST_<capability-name>/` folder when it has one; renders and other images
+   stay in `artifacts/` (the hooks refuse new images under `Project_Test/`).
 5. When later work changes behaviour on purpose, update the affected smokes in the same change.
 
 Where each older TEST folder's code went is listed in

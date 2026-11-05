@@ -3,7 +3,7 @@
 # with its UIA Invoke pattern or, where the dialog exposes its buttons only as panes, the WM_COMMAND
 # message the button would send. No keyboard or mouse input is sent and the cursor does not move.
 #
-#   .\Watch-Dialogs.ps1 -ProcessId 64724 -Answers Save,Save,Yes -Log .\results\export-dialogs.json
+#   .\Watch-Dialogs.ps1 -ProcessId 64724 -Answers Save,Save,Yes -Log "$env:LOCALAPPDATA\PanelCladding\LiveEvidence\<yyMMdd>\export-dialogs.json"
 #
 # Each visible dialog that appears takes the next answer, which may list alternatives ("No|Don't
 # Save"). The Save As dialog's offered file name and folder are logged before it is answered. A

@@ -42,7 +42,7 @@ redirected registry and not load its plug-ins), open the test model, select it w
 ```text
 preview_rhino_script  libraryPath = <repo>\tests\Live\PcLive.cs, libraryType = PcLive,
                       script = "Result = PcLive.Start(doc, Parameters, Log);",
-                      parametersJson = {"suite":"bake","evidenceDir":"<repo>\\Project_Test\\<date>_TEST_live-acceptance-tests\\results"}
+                      parametersJson = {"suite":"bake"}
 apply_rhino_script    the returned token
 ```
 
@@ -53,8 +53,14 @@ The suite runs after the apply returns; its results are written to `<evidenceDir
 (and `PcLive.Read(Parameters)` returns them while it runs). Several suites can be joined with `+`.
 `excluded` and `otherdocs` reopen documents, so select the document again afterwards.
 
+`<evidenceDir>` is `%LOCALAPPDATA%\PanelCladding\LiveEvidence\<yyMMdd>` unless `"evidenceDir"` names
+another folder; `Start` returns it. Raw results describe the project model, so `Start` refuses a
+folder inside a git working tree, and the repository hooks refuse `results*`/`live*` folders and new
+images under `Project_Test/`. The change's records keep only sanitized conclusions (step names,
+pass/fail, counts); delete the raw folder after the run.
+
 ```powershell
-python .\tests\Live\Show-Results.py .\Project_Test\<date>_TEST_live-acceptance-tests\results\bake.json --commands
+python .\tests\Live\Show-Results.py "$env:LOCALAPPDATA\PanelCladding\LiveEvidence\<yyMMdd>\bake.json" --commands
 ```
 
 For `export` and `editor`, start the helpers first from a normal user shell (Rhino's process id is in

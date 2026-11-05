@@ -1,0 +1,4 @@
+# Git hooks run under sh, which needs LF line endings.
+.githooks/pre-commit text eol=lf
+.githooks/commit-msg text eol=lf
+.githooks/pre-push text eol=lf

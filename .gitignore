@@ -93,6 +93,11 @@ _tmp*.csx
 *.pdf
 Runtime_Log/*.json
 Runtime_Test/Runtime_Log/*.json
+# Raw output of live runs (results, dumps, captures) stays outside the repository
+Project_Test/**/results*/
+Project_Test/**/live*/
+Project_Archive/**/results*/
+Project_Archive/**/live*/
 .claude/settings.local.json
 .claude/scheduled_tasks.lock
 .codex/config.toml

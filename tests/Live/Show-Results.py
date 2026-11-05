@@ -1,4 +1,4 @@
-"""Prints a live suite's results file (results/<suite>.json) as one line per check.
+"""Prints a live suite's results file (<evidenceDir>/<suite>.json) as one line per check.
 
     python tests/Live/Show-Results.py <results.json> [--commands] [--width N]
 """
