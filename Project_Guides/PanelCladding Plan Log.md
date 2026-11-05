@@ -9,9 +9,9 @@ Put rerunnable test code in `tests/` (see `tests/README.md`): a managed smoke in
 `tests/Smoke/<capability-name>/`, package checks in `tests/Package/`. Prefer focused
 managed smoke projects and PowerShell verification scripts. Mark tests requiring
 Rhino/native initialization or UI separately; a build does not prove live acceptance.
-Place the change's evidence (commands and results, screenshots, summaries) in the
-matching `Project_Test/YYMMDD_TEST_<capability-name>/` folder; it holds no code that
-is built or rerun. When a change alters behaviour that older smokes check, update
+Place the change's evidence (commands and results, summaries) in the matching
+`Project_Test/YYMMDD_TEST_<capability-name>/` folder; it holds no code that is built or
+rerun, and since 2026-11-05 no new images: describe what a capture showed instead. When a change alters behaviour that older smokes check, update
 those smokes in the same change; the full suite has no accepted failures.
 
 The repository is public, so records, fixtures and evidence carry no client project data.
@@ -20,8 +20,16 @@ paths such as `C:\Projects\ABC\ABC - Wireframe.3dm`, never real project names, n
 company file-server paths. A live run against a real project model commits only sanitized
 conclusions (step names, pass/fail, counts); its raw output (exported workbooks,
 screenshots, object and layer dumps) stays out of the repository and is deleted after
-the run. `tests/Smoke/repository-content-guard` fails on project data file types and
-company project-folder paths.
+the run. The live suites write it to `%LOCALAPPDATA%\PanelCladding\LiveEvidence` and refuse
+a folder inside a git working tree. The hooks in `.githooks` (pre-commit, commit-msg,
+pre-push; `tests/Run-Regression.ps1` sets `core.hooksPath`) run
+`.githooks/Test-RepositoryContent.ps1` with the rules in `.githooks/content-rules.json`
+(project data file types, `results*`/`live*` folders and new images under `Project_Test/`,
+company project-folder paths) and a private client list outside the repository
+(`%APPDATA%\PanelCladding\content-denylist.txt`, or `PANELCLADDING_CONTENT_DENYLIST`) that
+names each real client project's name, code and number. Add every new client project to that
+list; never commit it or bypass the hooks. `tests/Smoke/repository-content-guard` checks the
+rules, the hook wiring, the tracked files and the hooks' behaviour.
 
 After execution, write `Project_Exet/YYMMDD_EXET_<capability-name>.md` with links to
 PLAN and TEST, execution date, changes, deviations, discovered issues, actual

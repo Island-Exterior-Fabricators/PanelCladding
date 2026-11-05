@@ -1,0 +1,5 @@
+#!/bin/sh
+# Refuses a commit message that carries client project data (Test-RepositoryContent.ps1).
+ps=powershell.exe
+command -v "$ps" >/dev/null 2>&1 || ps=pwsh
+exec "$ps" -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$(dirname "$0")/Test-RepositoryContent.ps1" -Mode Message -MessageFile "$1"

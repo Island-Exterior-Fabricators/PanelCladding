@@ -2,7 +2,7 @@
 # then keeps it open until the live suite writes rhino-done.txt, so the suite can export over a
 # workbook that Excel holds. No window is shown and no input is sent.
 #
-#   .\Hold-Workbook.ps1 -EvidenceDir .\results
+#   .\Hold-Workbook.ps1 -EvidenceDir "$env:LOCALAPPDATA\PanelCladding\LiveEvidence\<yyMMdd>"
 #
 # Reads the workbook path from <EvidenceDir>\export-path.txt, writes <EvidenceDir>\excel-holding.txt
 # (sheet list) once the workbook is open and <EvidenceDir>\excel-sheets.json at the end.

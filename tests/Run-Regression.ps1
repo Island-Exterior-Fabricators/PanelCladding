@@ -13,6 +13,17 @@ $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $artifacts = Join-Path $repo 'artifacts\tests'
 
+# The repository is public: the hooks in .githooks refuse commits and pushes that carry client
+# project data. Enable them for this clone and its worktrees unless another hooks folder is set.
+$hooksPath = & git -C $repo config --get core.hooksPath
+if (-not $hooksPath) {
+    & git -C $repo config core.hooksPath .githooks
+    Write-Output 'Enabled the repository hooks (core.hooksPath = .githooks).'
+}
+elseif ($hooksPath -ne '.githooks') {
+    Write-Warning "core.hooksPath is '$hooksPath', so the client data hooks in .githooks do not run."
+}
+
 $smokes = @(Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'Smoke') -Directory | Sort-Object Name | Where-Object {
     $folder = $_.Name
     @($Name | Where-Object { $folder -like $_ }).Count -gt 0

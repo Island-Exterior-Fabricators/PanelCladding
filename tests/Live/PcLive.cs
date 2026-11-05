@@ -9,8 +9,11 @@
 //   Result = PcLive.Read(Parameters);               // returns the suite's results so far (JSON)
 //
 // Parameters: { "suite": "commands|bake|excluded|report|scan|export|editor|otherdocs|web|probe" (several
-// joined by '+'), "evidenceDir": "<folder>", and "mainModel" for otherdocs, "assembly" for web, "macro"
-// for probe }.
+// joined by '+'), optional "evidenceDir": "<folder outside the repository>", and "mainModel" for
+// otherdocs, "assembly" for web, "macro" for probe }.
+// Raw results (object dumps, exported workbooks, viewport captures) describe the project model, so they
+// go to %LOCALAPPDATA%\PanelCladding\LiveEvidence\<yyMMdd> by default and a folder inside a git working
+// tree is refused; the public repository records only sanitized conclusions (AGENTS.md).
 // A suite is a list of steps run one per RhinoApp.Idle tick, outside the host's own undo record,
 // the way typed commands run. Commands are sent with RhinoApp.RunScript; objects are picked with
 // a preselection or the transparent '_SelID command. No keyboard or mouse input is generated.
@@ -42,7 +45,7 @@ public static class PcLive
     public static object Start(RhinoDoc doc, JsonElement parameters, Action<string> log)
     {
         string suite = Text(parameters, "suite");
-        string evidence = Text(parameters, "evidenceDir");
+        string evidence = EvidenceFolder(Text(parameters, "evidenceDir"));
         string project = Text(parameters, "project");
         if (string.IsNullOrWhiteSpace(project))
             project = new string(System.IO.Path.GetFileName(doc.Path ?? string.Empty).TakeWhile(char.IsLetterOrDigit).ToArray());
@@ -69,7 +72,23 @@ public static class PcLive
         }
         var runner = new Runner(new Ctx(suite, doc.RuntimeSerialNumber, evidence, parameters), steps);
         runner.Begin();
-        return new { suite, steps = steps.Select(step => step.Name).ToArray() };
+        return new { suite, evidenceDir = evidence, steps = steps.Select(step => step.Name).ToArray() };
+    }
+
+    private static string EvidenceFolder(string requested)
+    {
+        string folder = requested.Length > 0
+            ? System.IO.Path.GetFullPath(requested)
+            : System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "PanelCladding", "LiveEvidence", DateTime.Now.ToString("yyMMdd"));
+        for (var directory = new System.IO.DirectoryInfo(folder); directory != null; directory = directory.Parent)
+        {
+            string marker = System.IO.Path.Combine(directory.FullName, ".git");
+            if (System.IO.Directory.Exists(marker) || System.IO.File.Exists(marker))
+                throw new ArgumentException("evidenceDir " + folder + " is inside the git working tree " + directory.FullName +
+                    "; raw live output stays outside the repository. Omit evidenceDir to use %LOCALAPPDATA%\\PanelCladding\\LiveEvidence.");
+        }
+        return folder;
     }
 
     public static object Read(JsonElement parameters) =>

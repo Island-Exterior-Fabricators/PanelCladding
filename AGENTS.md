@@ -13,7 +13,12 @@ This is the standalone Rhino 8 PanelCladdingEditor repository. Read
 - The repository is public. Never commit client project data: no real project names,
   codes, numbers or file-server paths, and no raw output of live runs on project models
   (exports, screenshots, object dumps). Use fictional codes (`ABC`, `XYZ`) and record
-  only sanitized conclusions; the plan log and `repository-content-guard` smoke enforce it.
+  only sanitized conclusions. Live suites write raw output under
+  `%LOCALAPPDATA%\PanelCladding\LiveEvidence`, never into the repository. The hooks in
+  `.githooks` (enabled by `tests/Run-Regression.ps1`) refuse such commits and pushes, also
+  against a private client list kept outside the repository
+  (`%APPDATA%\PanelCladding\content-denylist.txt`; add each new client project there).
+  Never bypass them (`--no-verify`); the `repository-content-guard` smoke checks them.
 - Keep rerunnable test code in `tests/`; `Project_Test/` folders hold evidence only.
   Update older smokes that a behaviour change affects; the suite has no accepted failures.
 - Archive completed work consistently: once a PLAN/EXET/TEST set has completed
