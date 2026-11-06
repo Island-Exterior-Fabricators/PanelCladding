@@ -8,7 +8,7 @@ Executed 2026-10-26 under
 ## Related artifacts
 
 [Scoped TEST](../Project_Test/261026_TEST_pctemplatepnl-naming-format/README.md); the checks are in
-[the naming-convention smoke](../../Project_Test/261023_TEST_panel-cladding-naming-convention/README.md).
+[the naming-convention smoke](../Project_Test/261023_TEST_panel-cladding-naming-convention/README.md).
 Same working branch `codex/panel-cladding-layer-standard`, on top of the uncommitted 1.0.98–1.1.4
 changes; no commit or PR was requested or created. Before editing, the naming-sync files were last
 modified on 2026-10-23 and no other session was changing them.

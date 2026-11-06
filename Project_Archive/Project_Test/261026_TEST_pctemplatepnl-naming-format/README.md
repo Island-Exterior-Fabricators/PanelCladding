@@ -5,7 +5,7 @@ Plan: [261026_PLAN_pctemplatepnl-naming-format](../../Project_Plan/261026_PLAN_p
 ## Managed regression
 
 The checks live in the naming-convention smoke, which already owns the PNL sheet code:
-[`261023_TEST_panel-cladding-naming-convention`](../../../Project_Test/261023_TEST_panel-cladding-naming-convention/README.md)
+[`261023_TEST_panel-cladding-naming-convention`](../261023_TEST_panel-cladding-naming-convention/README.md)
 (`Program.cs` and `Program.Template.cs`). They cover:
 
 - format tokens `AA`, `A`, `A1`, `01`, `001`; sequences without I/O; the two-character
