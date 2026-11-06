@@ -1,6 +1,6 @@
 # PCMatch Parent Fidelity Smoke
 
-> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/pcmatch-parent-fidelity`](../../../tests/Smoke/pcmatch-parent-fidelity/) (run `.\tests\Run-Regression.ps1 -Name pcmatch-parent-fidelity`). Commands below are historical; see the [regression test layout EXET](../../../Project_Exet/261028_EXET_regression-test-layout.md).
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/pcmatch-parent-fidelity`](../../../tests/Smoke/pcmatch-parent-fidelity/) (run `.\tests\Run-Regression.ps1 -Name pcmatch-parent-fidelity`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
 
 Verifies exact transfer of the reported 2x2 parent-cell configuration, a valid non-canonical parent
 direction, and the Rhino `ObjectAttributes` application path.

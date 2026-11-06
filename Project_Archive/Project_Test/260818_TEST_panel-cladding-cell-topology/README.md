@@ -1,6 +1,6 @@
 # Panel Cladding Cell Topology Smoke
 
-> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-cell-topology`](../../../tests/Smoke/panel-cladding-cell-topology/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-cell-topology`). Commands below are historical; see the [regression test layout EXET](../../../Project_Exet/261028_EXET_regression-test-layout.md).
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-cell-topology`](../../../tests/Smoke/panel-cladding-cell-topology/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-cell-topology`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
 
 Focused managed/WPF regression coverage for `260818_PLAN_panel-cladding-cell-topology`.
 

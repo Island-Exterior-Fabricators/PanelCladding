@@ -1,6 +1,6 @@
 # Cladding Surface Coverage Metadata Regression
 
-> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/cladding-surface-coverage-metadata`](../../../tests/Smoke/cladding-surface-coverage-metadata/) (run `.\tests\Run-Regression.ps1 -Name cladding-surface-coverage-metadata`). Commands below are historical; see the [regression test layout EXET](../../../Project_Exet/261028_EXET_regression-test-layout.md).
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/cladding-surface-coverage-metadata`](../../../tests/Smoke/cladding-surface-coverage-metadata/) (run `.\tests\Run-Regression.ps1 -Name cladding-surface-coverage-metadata`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
 
 Validates `Merge_Mark` encoding, spawn persistence, sync migration/refresh, fail-closed metadata validation, and metadata-authoritative hidden-mullion offset behavior.
 

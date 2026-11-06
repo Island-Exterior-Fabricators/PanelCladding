@@ -53,4 +53,4 @@ managed run does not prove live acceptance.
 5. When later work changes behaviour on purpose, update the affected smokes in the same change.
 
 Where each older TEST folder's code went is listed in
-[`Project_Test/261028_TEST_regression-test-layout/folder-map.md`](../Project_Test/261028_TEST_regression-test-layout/folder-map.md).
+[`Project_Archive/Project_Test/261028_TEST_regression-test-layout/folder-map.md`](../Project_Archive/Project_Test/261028_TEST_regression-test-layout/folder-map.md).

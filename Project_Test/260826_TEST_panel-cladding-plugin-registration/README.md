@@ -1,6 +1,6 @@
 # PanelCladdingEditor plug-in registration regression
 
-> **Code moved on 2026-10-28.** This folder keeps the evidence only: `Test-PanelCladdingPluginRegistration.ps1` moved to [`tests/Package`](../../tests/Package/). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: `Test-PanelCladdingPluginRegistration.ps1` moved to [`tests/Package`](../../tests/Package/). Commands below are historical; see the [regression test layout EXET](../../Project_Archive/Project_Exet/261028_EXET_regression-test-layout.md).
 
 `Test-PanelCladdingPluginRegistration.ps1` exercises the packaged installer against isolated
 filesystem roots and an isolated current-user registry key.

@@ -1,6 +1,6 @@
 # Panel cladding naming-convention TEST
 
-> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-naming-convention`](../../tests/Smoke/panel-cladding-naming-convention/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-naming-convention`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-naming-convention`](../../tests/Smoke/panel-cladding-naming-convention/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-naming-convention`). Commands below are historical; see the [regression test layout EXET](../../Project_Archive/Project_Exet/261028_EXET_regression-test-layout.md).
 
 Plan: [261023_PLAN_panel-cladding-naming-convention](../../Project_Plan/261023_PLAN_panel-cladding-naming-convention.md)
 
@@ -30,7 +30,7 @@ The smoke checks:
   struck through in grey; schema-valid output; no rewrite when nothing changed; no style
   growth; a locked file left unchanged; no temporary or backup files left.
 
-Since 1.2.0 (PCtemplatePNL, [261026 PLAN](../../Project_Plan/261026_PLAN_pctemplatepnl-naming-format.md))
+Since 1.2.0 (PCtemplatePNL, [261026 PLAN](../../Project_Archive/Project_Plan/261026_PLAN_pctemplatepnl-naming-format.md))
 the smoke also checks the PNL format tokens and sequences, frame-config codes per format, and
 `Program.Template.cs`: the template on XYZ-like and ABC-like sheets (placeholders only, segment
 widening/narrowing with cells, merges and widths, refusals) and the save-time sync leaving a

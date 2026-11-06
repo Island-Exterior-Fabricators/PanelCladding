@@ -8,7 +8,7 @@ their names. Selection reads the full EXET including addenda: a set is archived 
 its PLAN and EXET treat as required passed. Optional or future live checks do not block; required
 acceptance recorded as pending, including live Rhino checks, keeps a set active, as do dated
 follow-ups on or after 2026-10-25. Regression code for every set already lives in `tests/`
-(see the [regression test layout EXET](../Project_Exet/261028_EXET_regression-test-layout.md)), so
+(see the [regression test layout EXET](Project_Exet/261028_EXET_regression-test-layout.md)), so
 archiving moves evidence only. Relative Markdown links were rewritten for the new locations.
 
 ## Archived sets
@@ -114,7 +114,7 @@ archiving moves evidence only. Relative Markdown links were rewritten for the ne
 | [261007_pc-editor-canvas-assignment](../Project_Exet/261007_EXET_pc-editor-canvas-assignment.md) | 2026-10-07 | The 1.0.88 live-load check is pending. |
 | [261007_pcmatchcrv-extrusion-assignments](../Project_Exet/261007_EXET_pcmatchcrv-extrusion-assignments.md) | 2026-10-07 | Installation and live acceptance were not performed. |
 | [261023_panel-cladding-id-separators](../Project_Exet/261023_EXET_panel-cladding-id-separators.md) | 2026-10-23 | Publication follow-up dated 2026-10-27; native acceptance is pending. |
-| [261023_panel-cladding-layer-standard](../Project_Exet/261023_EXET_panel-cladding-layer-standard.md) | 2026-10-23 | Publication follow-up dated 2026-10-27. |
+| [261023_panel-cladding-layer-standard](Project_Exet/261023_EXET_panel-cladding-layer-standard.md) | 2026-10-23 | Publication follow-up dated 2026-10-27. |
 | [261023_panel-cladding-naming-convention](../Project_Exet/261023_EXET_panel-cladding-naming-convention.md) | 2026-10-23 | Publication follow-up dated 2026-10-27; the 1.1.4 install is pending. |
 
 Sets executed on or after 2026-10-25 (261026, 261027 and 261028) are not yet eligible.

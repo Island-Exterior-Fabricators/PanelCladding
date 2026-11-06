@@ -1,6 +1,6 @@
 # Repository migration validation
 
-> **Code moved on 2026-10-28.** This folder keeps the evidence only: `Verify-Migration.py` moved to [`tests/Checks`](../../../tests/Checks/). Commands below are historical; see the [regression test layout EXET](../../../Project_Exet/261028_EXET_regression-test-layout.md).
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: `Verify-Migration.py` moved to [`tests/Checks`](../../../tests/Checks/). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
 
 Executed 2026-10-13 after moving to `C:\Projects\PanelCladding`.
 

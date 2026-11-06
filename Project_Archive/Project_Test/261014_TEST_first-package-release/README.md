@@ -1,6 +1,6 @@
 # First release validation — 2026-10-14
 
-> **Code moved on 2026-10-28.** This folder keeps the evidence only: `Test-Package.ps1`, `Test-UserInstallation.ps1`, `Verify-Release.ps1` moved to [`tests/Package`](../../../tests/Package/). Commands below are historical; see the [regression test layout EXET](../../../Project_Exet/261028_EXET_regression-test-layout.md).
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: `Test-Package.ps1`, `Test-UserInstallation.ps1`, `Verify-Release.ps1` moved to [`tests/Package`](../../../tests/Package/). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
 
 Run from the repository in a **non-elevated** PowerShell session:
 

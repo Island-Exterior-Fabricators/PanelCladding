@@ -1,6 +1,6 @@
 # Panel cladding match topology-mask smoke
 
-> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-match-topology-masks`](../../../tests/Smoke/panel-cladding-match-topology-masks/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-match-topology-masks`). Commands below are historical; see the [regression test layout EXET](../../../Project_Exet/261028_EXET_regression-test-layout.md).
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-match-topology-masks`](../../../tests/Smoke/panel-cladding-match-topology-masks/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-match-topology-masks`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
 
 This focused smoke verifies that `PCMatchSrf` ignores the two panel-level topology masks
 while preserving target-owned H/V divider offsets. It also covers different source/target masks,

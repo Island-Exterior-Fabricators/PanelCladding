@@ -1,6 +1,6 @@
 # Panel cladding logical-cell cleanup smoke
 
-> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-logical-cell-cleanup`](../../../tests/Smoke/panel-cladding-logical-cell-cleanup/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-logical-cell-cleanup`). Commands below are historical; see the [regression test layout EXET](../../../Project_Exet/261028_EXET_regression-test-layout.md).
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-logical-cell-cleanup`](../../../tests/Smoke/panel-cladding-logical-cell-cleanup/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-logical-cell-cleanup`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
 
 Verifies that structural Save collapses physical cells hidden by missing extrusion segments into deterministic logical representatives.
 
