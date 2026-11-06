@@ -55,9 +55,8 @@ The suite runs after the apply returns; its results are written to `<evidenceDir
 
 `<evidenceDir>` is `%LOCALAPPDATA%\PanelCladding\LiveEvidence\<yyMMdd>` unless `"evidenceDir"` names
 another folder; `Start` returns it. Raw results describe the project model, so `Start` refuses a
-folder inside a git working tree, and the repository hooks refuse `results*`/`live*` folders and new
-images under `Project_Test/`. The change's records keep only sanitized conclusions (step names,
-pass/fail, counts); delete the raw folder after the run.
+folder inside a git working tree. Report only sanitized conclusions (step names, pass/fail, counts),
+for example in the pull request description; delete the raw folder after the run.
 
 ```powershell
 python .\tests\Live\Show-Results.py "$env:LOCALAPPDATA\PanelCladding\LiveEvidence\<yyMMdd>\bake.json" --commands
