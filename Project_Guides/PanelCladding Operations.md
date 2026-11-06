@@ -43,8 +43,12 @@ dotnet build .\src\PanelCladdingEditor\PanelCladdingEditor.csproj -c Release -t:
 .\tests\Run-Regression.ps1 -List                            # also -NoBuild, -TimeoutSeconds (default 900)
 ```
 
-- It first sets `core.hooksPath = .githooks` when unset (only warns if another folder is set): run
-  it once per clone. It then builds each smoke serially into `artifacts/tests/bin/<Configuration>/`,
+- It first makes git run this checkout's own `.githooks`: it sets `core.hooksPath = .githooks` when
+  unset, and in a linked worktree whose `config.worktree` points `core.hooksPath` at another
+  checkout's `.githooks` (the Claude desktop app writes the main checkout's absolute path into each
+  worktree it creates) it runs `git config --worktree core.hooksPath .githooks`. Any other hooks
+  folder only gets a warning, and the `repository-content-guard` smoke then fails. Run it once per
+  clone and in each new app worktree. It then builds each smoke serially into `artifacts/tests/bin/<Configuration>/`,
   runs it from the repository root with stdin closed, logs to `artifacts/tests/logs/<Configuration>/`,
   writes `artifacts/tests/regression-<Configuration>.json`, and exits 1 on any failure (no accepted
   failures). Rhino-native parts print `[SKIP]`; a managed pass is not live acceptance.
@@ -315,8 +319,9 @@ See `tests/Live/README.md` for the full procedure. In short:
   client list outside the repository (`%APPDATA%\PanelCladding\content-denylist.txt` or
   `PANELCLADDING_CONTENT_DENYLIST`; add every new client project; without it the guard warns and
   applies the other rules). Exit 0 clean, 1 blocked, 2 guard failure; check by hand with
-  `-Mode Tracked` or `-Mode Commit -Rev <rev>`. Never bypass (`--no-verify`). Each clone and machine
-  needs one regression run and its own copy of the list. The `repository-content-guard` smoke checks
+  `-Mode Tracked` or `-Mode Commit -Rev <rev>`. Never bypass (`--no-verify`). Git must run the
+  checkout's own `.githooks`, so each clone and each new app worktree needs one regression run, and
+  each machine its own copy of the list. The `repository-content-guard` smoke checks
   rules, wiring and hook behaviour.
 
 ## Known pitfalls
@@ -334,6 +339,8 @@ See `tests/Live/README.md` for the full procedure. In short:
 | Yak build aborts on a "content version" warning | `*>&1` under Windows PowerShell 5.1 | Call it without the redirect |
 | Yak publish: "Bump the version" | Version already in the source with other content | Bump the version |
 | Commits are not checked | `core.hooksPath` unset (fresh clone, old worktree) | Run the regression once, or `git config core.hooksPath .githooks` |
+| `repository-content-guard` fails in an app worktree: "not this checkout's ...\.githooks" | The Claude desktop app set `core.hooksPath` in the worktree's `config.worktree` to the main checkout's `.githooks`; hooks run that checkout's branch, or nothing if it has no `.githooks` | Run the regression (it points the worktree back), or `git config --worktree core.hooksPath .githooks` |
+| `repository-content-guard`: "Filename too long" on its scratch push | Checkout path too long for MAX_PATH (for example under a session scratchpad) | Use a checkout at a shorter path |
 | Guard says there is no private list | List written from the sandbox (`%APPDATA%` redirected) | Write or move it from a host shell |
 | MCP_Rhino refuses every script after a live run | `RhinoDoc.Undo()` left an open undo record | Restart Rhino; steps use `_Undo` |
 | Live Rhino lacks its plug-ins, or dialogs are not found | Rhino or `Watch-Dialogs.ps1` started in the sandbox | Start both from a host shell |
