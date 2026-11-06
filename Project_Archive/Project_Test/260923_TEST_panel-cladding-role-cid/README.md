@@ -1,6 +1,6 @@
 # Panel unit-type CID regression
 
-> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-role-cid`](../../../tests/Smoke/panel-cladding-role-cid/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-role-cid`). Commands below are historical; see the [regression test layout EXET](../../../Project_Exet/261028_EXET_regression-test-layout.md).
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-role-cid`](../../../tests/Smoke/panel-cladding-role-cid/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-role-cid`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
 
 Run from the repository root:
 

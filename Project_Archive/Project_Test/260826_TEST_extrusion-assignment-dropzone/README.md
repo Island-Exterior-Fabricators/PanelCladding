@@ -1,6 +1,6 @@
 # Extrusion assignment drop-zone smoke
 
-> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/extrusion-assignment-dropzone`](../../../tests/Smoke/extrusion-assignment-dropzone/) (run `.\tests\Run-Regression.ps1 -Name extrusion-assignment-dropzone`). Commands below are historical; see the [regression test layout EXET](../../../Project_Exet/261028_EXET_regression-test-layout.md).
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/extrusion-assignment-dropzone`](../../../tests/Smoke/extrusion-assignment-dropzone/) (run `.\tests\Run-Regression.ps1 -Name extrusion-assignment-dropzone`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
 
 Validates that extrusion catalogue tiles are drag-only, the assignment section is the only profile
 drop target, assigned cards carry profile previews and inline curve modifiers, and the available

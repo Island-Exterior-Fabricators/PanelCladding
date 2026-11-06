@@ -1,6 +1,6 @@
 # Panel Cladding Logic Persistence Smoke
 
-> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-logic-persistence`](../../../tests/Smoke/panel-cladding-logic-persistence/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-logic-persistence`). Commands below are historical; see the [regression test layout EXET](../../../Project_Exet/261028_EXET_regression-test-layout.md).
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-logic-persistence`](../../../tests/Smoke/panel-cladding-logic-persistence/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-logic-persistence`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
 
 Validates the material-free `CW_2.13_CLADDING_LOGIC` contract and its use by `PCSyncSrf`.
 

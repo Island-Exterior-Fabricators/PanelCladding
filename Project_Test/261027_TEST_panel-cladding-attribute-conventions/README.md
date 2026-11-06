@@ -1,6 +1,6 @@
 # Panel cladding attribute conventions TEST
 
-> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-attribute-conventions`](../../tests/Smoke/panel-cladding-attribute-conventions/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-attribute-conventions`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-attribute-conventions`](../../tests/Smoke/panel-cladding-attribute-conventions/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-attribute-conventions`). Commands below are historical; see the [regression test layout EXET](../../Project_Archive/Project_Exet/261028_EXET_regression-test-layout.md).
 
 Regression for [the PLAN](../../Project_Plan/261027_PLAN_panel-cladding-attribute-conventions.md):
 the plug-in follows the attribute conventions of the current XYZ and ABC wireframe models (1.2.5).

@@ -1,6 +1,6 @@
 # Panel Cladding Hide Mask Smoke
 
-> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-hide-mask`](../../../tests/Smoke/panel-cladding-hide-mask/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-hide-mask`). Commands below are historical; see the [regression test layout EXET](../../../Project_Exet/261028_EXET_regression-test-layout.md).
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-hide-mask`](../../../tests/Smoke/panel-cladding-hide-mask/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-hide-mask`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
 
 Validates the `CW_2.11_HIDE_MASK` contract:
 

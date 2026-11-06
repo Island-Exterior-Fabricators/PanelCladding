@@ -1,6 +1,6 @@
 # Panel Cladding Latest UI Test
 
-> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-latest-ui`](../../../tests/Smoke/panel-cladding-latest-ui/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-latest-ui`). Commands below are historical; see the [regression test layout EXET](../../../Project_Exet/261028_EXET_regression-test-layout.md).
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-latest-ui`](../../../tests/Smoke/panel-cladding-latest-ui/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-latest-ui`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
 
 This focused smoke validates the corrected WPF implementation against the actual newest handoff,
 `Design/PanelCladdingEditor/Panel-Cladding-Editor.zip!/panel-cladding-editor.html`.

@@ -1,6 +1,6 @@
 # PCMatchSrf logical-cell smoke
 
-> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/pcmatch-srf-logical-cells`](../../../tests/Smoke/pcmatch-srf-logical-cells/) (run `.\tests\Run-Regression.ps1 -Name pcmatch-srf-logical-cells`). Commands below are historical; see the [regression test layout EXET](../../../Project_Exet/261028_EXET_regression-test-layout.md).
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/pcmatch-srf-logical-cells`](../../../tests/Smoke/pcmatch-srf-logical-cells/) (run `.\tests\Run-Regression.ps1 -Name pcmatch-srf-logical-cells`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
 
 Run:
 

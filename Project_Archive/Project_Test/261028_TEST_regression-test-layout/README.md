@@ -2,7 +2,7 @@
 
 Evidence for [the PLAN](../../Project_Plan/261028_PLAN_regression-test-layout.md) and
 [the EXET](../../Project_Exet/261028_EXET_regression-test-layout.md). The code it verifies is in
-[`tests/`](../../tests/README.md).
+[`tests/`](../../../tests/README.md).
 
 | File | Contents |
 | --- | --- |

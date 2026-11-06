@@ -1,6 +1,6 @@
 # PCSpawnCrv Curve Simplification Smoke
 
-> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/pcspawncrv-curve-simplification`](../../tests/Smoke/pcspawncrv-curve-simplification/) (run `.\tests\Run-Regression.ps1 -Name pcspawncrv-curve-simplification`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/pcspawncrv-curve-simplification`](../../tests/Smoke/pcspawncrv-curve-simplification/) (run `.\tests\Run-Regression.ps1 -Name pcspawncrv-curve-simplification`). Commands below are historical; see the [regression test layout EXET](../../Project_Archive/Project_Exet/261028_EXET_regression-test-layout.md).
 
 This smoke verifies that:
 

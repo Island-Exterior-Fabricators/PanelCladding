@@ -2,7 +2,7 @@
 
 ## Background and authorization
 
-The 1.3.0 live acceptance run ([TEST](../Project_Test/261031_TEST_live-acceptance-tests/README.md)
+The 1.3.0 live acceptance run ([TEST](../Project_Archive/Project_Test/261031_TEST_live-acceptance-tests/README.md)
 on `codex/live-acceptance-tests`) found three plug-in points the user asked on 2026-10-31 to change:
 
 - Finding 3: panels on `Not in Scope` / `By Others` layers no longer get their auto values refreshed,

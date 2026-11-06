@@ -1,6 +1,6 @@
 # Panel and dependency object-name verification
 
-> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-object-names`](../../../tests/Smoke/panel-cladding-object-names/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-object-names`). Commands below are historical; see the [regression test layout EXET](../../../Project_Exet/261028_EXET_regression-test-layout.md).
+> **Code moved on 2026-10-28.** This folder keeps the evidence only: the smoke project is in [`tests/Smoke/panel-cladding-object-names`](../../../tests/Smoke/panel-cladding-object-names/) (run `.\tests\Run-Regression.ps1 -Name panel-cladding-object-names`). Commands below are historical; see the [regression test layout EXET](../../Project_Exet/261028_EXET_regression-test-layout.md).
 
 Executed 2026-10-06. Focused naming checks pass in Debug and Release. They exercise
 short names for panels, corner roles, surfaces, frame curves, and intermediate
