@@ -165,5 +165,7 @@ first.
 - `src/PanelCladdingEditor/` - plug-in source: application logic, Rhino adapters and WPF UI.
 - `Packaging/PanelCladdingEditor/` - package and installer scripts, release notes.
 - `tests/` - regression smokes and package checks ([test runner](tests/README.md)).
-- `Project_Plan/`, `Project_Exet/`, `Project_Test/` - development records (see the
-  [plan log](Project_Guides/PanelCladding%20Plan%20Log.md)); completed ones move to `Project_Archive/`.
+- `Project_Guides/` - contributor guides: [architecture](Project_Guides/PanelCladding%20Architecture.md),
+  [workflow](Project_Guides/PanelCladding%20Workflow.md),
+  [operations](Project_Guides/PanelCladding%20Operations.md) and
+  [decisions](Project_Guides/PanelCladding%20Decisions.md).
