@@ -37,12 +37,6 @@ production project before packaging (the package script does).
 Parts that need a Rhino host or native initialization print `[SKIP]` in a plain run; a build or
 managed run does not prove live acceptance.
 
-UI smokes lay out WPF views off-screen at the workstation's display scaling. Views with
-`UseLayoutRounding` snap sizes to whole device pixels, so at 125% a 79-DIP width arranges as 79.2.
-Compare an `ActualWidth` or `ActualHeight` with the layout-rounded value
-(`Math.Round(value * scale) / scale`, `scale` from `VisualTreeHelper.GetDpi(element)`), not with
-the raw DIP value.
-
 ## Adding a smoke
 
 1. Create `Smoke/<capability-name>/` with one `.csproj` (copy a neighbour) and `Program.cs`.
@@ -54,7 +48,12 @@ the raw DIP value.
    (`artifacts/tests/<capability-name>/`), never into a tracked folder.
 4. Describe what generated files showed as text in the pull request description; renders and
    other images stay in `artifacts/`.
-5. When later work changes behaviour on purpose, update the affected smokes in the same change.
+5. UI smokes lay out WPF views off-screen at the workstation's display scaling. Views with
+   `UseLayoutRounding` snap sizes to whole device pixels (a 79-DIP width arranges as 79.2 at
+   125%), so compare an `ActualWidth` or `ActualHeight` with the layout-rounded value
+   (`Math.Round(value * scale) / scale`, `scale` from `VisualTreeHelper.GetDpi(element)`), never
+   with the raw DIP value.
+6. When later work changes behaviour on purpose, update the affected smokes in the same change.
 
 Where the test code of the former `Project_Test/` folders went is listed in
 `Project_Archive/Project_Test/261028_TEST_regression-test-layout/folder-map.md` at tag
