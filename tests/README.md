@@ -38,6 +38,12 @@ production project before packaging (the package script does).
 Parts that need a Rhino host or native initialization print `[SKIP]` in a plain run; a build or
 managed run does not prove live acceptance.
 
+UI smokes lay out WPF views off-screen at the workstation's display scaling. Views with
+`UseLayoutRounding` snap sizes to whole device pixels, so at 125% a 79-DIP width arranges as 79.2.
+Compare an `ActualWidth` or `ActualHeight` with the layout-rounded value
+(`Math.Round(value * scale) / scale`, `scale` from `VisualTreeHelper.GetDpi(element)`), not with
+the raw DIP value.
+
 ## Adding a smoke
 
 1. Create `Smoke/<capability-name>/` with one `.csproj` (copy a neighbour) and `Program.cs`.

@@ -363,8 +363,12 @@ internal static class Program
             .Select(index => configured.ItemContainerGenerator.ContainerFromIndex(index) as ListBoxItem ??
                 throw new InvalidOperationException($"Catalogue tile {index} was not generated."))
             .ToArray();
-        Require(tiles.All(tile => Math.Abs(tile.ActualWidth - dialog.CatalogueItemWidth) < 0.01d),
-            "Catalogue tiles do not share the longest-code-governed width.");
+        double expectedTileWidth = LayoutRounded(dialog.CatalogueItemWidth, tiles[0]);
+        ListBoxItem? mismatchedTile = tiles.FirstOrDefault(tile =>
+            Math.Abs(tile.ActualWidth - expectedTileWidth) >= 0.01d);
+        Require(mismatchedTile is null,
+            "Catalogue tiles do not share the longest-code-governed width " +
+            $"(tile {mismatchedTile?.ActualWidth:0.###}, expected {expectedTileWidth:0.###}).");
         int firstRowCount = tiles.Count(tile =>
             Math.Abs(tile.TranslatePoint(new Point(0, 0), panel).Y -
                      tiles[0].TranslatePoint(new Point(0, 0), panel).Y) < 0.01d);
@@ -516,6 +520,18 @@ internal static class Program
         element.Measure(new Size(width, height));
         element.Arrange(new Rect(0, 0, width, height));
         element.UpdateLayout();
+    }
+
+    // With UseLayoutRounding, WPF snaps arranged sizes to whole device pixels, so a DIP width
+    // survives layout exactly only at 100% scaling. Mirror WPF's rounding at the element's DPI.
+    private static double LayoutRounded(double value, FrameworkElement element)
+    {
+        if (!element.UseLayoutRounding)
+        {
+            return value;
+        }
+        double scale = VisualTreeHelper.GetDpi(element).DpiScaleX;
+        return Math.Round(value * scale) / scale;
     }
 
     private static void Render(FrameworkElement element, int width, int height, string path)
