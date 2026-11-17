@@ -57,9 +57,12 @@ internal static class Program
             "The material catalogue is not a taller, code-width-governed wrapping viewport.");
         ListBoxItem firstTile = (ListBoxItem)(configured.ItemContainerGenerator.ContainerFromIndex(0)
             ?? throw new InvalidOperationException("The first catalogue tile was not generated."));
-        Require(Math.Abs(firstTile.ActualWidth - dialog.CatalogueItemWidth) < 0.01d &&
+        double expectedTileWidth = LayoutRounded(dialog.CatalogueItemWidth, firstTile);
+        Require(Math.Abs(firstTile.ActualWidth - expectedTileWidth) < 0.01d &&
                 cataloguePanel.ActualWidth > firstTile.ActualWidth,
-            "The catalogue tile width is not shared with a wider responsive wrapping panel.");
+            "The catalogue tile width is not shared with a wider responsive wrapping panel " +
+            $"(tile {firstTile.ActualWidth:0.###}, expected {expectedTileWidth:0.###}, " +
+            $"panel {cataloguePanel.ActualWidth:0.###}).");
         TextBlock[] tileText = Descendants<TextBlock>(firstTile).ToArray();
         Require(tileText.Length == 1 && tileText[0].Text == "MET-001",
             "The catalogue tile preview contains fields other than the material code.");
@@ -338,6 +341,18 @@ internal static class Program
         element.Measure(new Size(width, height));
         element.Arrange(new Rect(0, 0, width, height));
         element.UpdateLayout();
+    }
+
+    // With UseLayoutRounding, WPF snaps arranged sizes to whole device pixels, so a DIP width
+    // survives layout exactly only at 100% scaling. Mirror WPF's rounding at the element's DPI.
+    private static double LayoutRounded(double value, FrameworkElement element)
+    {
+        if (!element.UseLayoutRounding)
+        {
+            return value;
+        }
+        double scale = VisualTreeHelper.GetDpi(element).DpiScaleX;
+        return Math.Round(value * scale) / scale;
     }
 
     private static void Render(FrameworkElement element, int width, int height, string path)

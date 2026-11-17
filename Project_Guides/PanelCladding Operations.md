@@ -329,6 +329,7 @@ See `tests/Live/README.md` for the full procedure. In short:
 | Validate: "ownership manifest is missing or incompatible" | Bundle of another version | Validate from the installed version's bundle |
 | Installer prints a `staged\...` path and stops | Rhino was running | Close every Rhino window; run the printed command |
 | MSB3030, or the identity check finds no RHP | Parallel or solution builds left the test-host DLL | `-m:1`; rebuild the csproj with `-t:Rebuild` last |
+| A UI smoke misses a size check by a fraction of a DIP on one workstation only | Display scaling is not 100%: `UseLayoutRounding` snaps sizes to whole device pixels (79 DIP arranges as 79.2 at 125%) | Compare with the layout-rounded value (`tests/README.md`, adding a smoke) |
 | `Test-UserInstallation.ps1` refuses to run | Elevated token | Run package checks non-elevated |
 | Release RHP names an older commit | Package built before the final commit | `Verify-Release.ps1` on the commit you tag |
 | Yak build aborts on a "content version" warning | `*>&1` under Windows PowerShell 5.1 | Call it without the redirect |
