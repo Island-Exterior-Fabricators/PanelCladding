@@ -451,3 +451,20 @@ The knowledge later work needs was spread over hundreds of dated files while the
 and dated evidence folders were where client data had leaked.
 
 **Status:** current
+
+### 2026-11-06 — Each checkout runs its own client-data hooks
+
+**Decision:** Git must take the hooks from the checkout's own `.githooks` folder. The Claude desktop
+app writes the main checkout's absolute `.githooks` path as `core.hooksPath` into the
+`config.worktree` of each worktree it creates; `tests/Run-Regression.ps1` replaces exactly that shape
+(worktree scope, another checkout's `.githooks`) with `git config --worktree core.hooksPath .githooks`
+and only warns about any other hooks folder. The `repository-content-guard` smoke accepts any
+`core.hooksPath` that resolves to the checkout's own `.githooks` and fails on anything else.
+
+**Why:** With the main checkout's path, a worktree's commits and pushes are checked by whatever branch
+the main checkout has checked out: a branch's own rule changes are not exercised, and no hook runs
+at all if that branch has no `.githooks`. A relative `.githooks` works in every worktree because git
+runs hooks from the working tree root. Changing only that one shape in the worktree's own config
+leaves a deliberately chosen hooks manager alone.
+
+**Status:** current
