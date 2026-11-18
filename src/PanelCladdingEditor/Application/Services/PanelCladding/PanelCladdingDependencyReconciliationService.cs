@@ -12,26 +12,17 @@ public sealed class PanelCladdingDependencyReconciliationService
         _ => true
     };
 
-    // Curves may carry hand-assigned components, so a panel that already owns a managed curve
-    // keeps all of its curves; only panels without curves get new ones.
-    public static IReadOnlySet<Guid> CurvePreservedPanels(IEnumerable<PanelCladdingExistingDependency> existing) =>
-        (existing ?? Array.Empty<PanelCladdingExistingDependency>())
-            .Where(item => item.Kind == PanelCladdingDependencyKind.Curve && item.SourcePanelObjectId != Guid.Empty)
-            .Select(item => item.SourcePanelObjectId)
-            .ToHashSet();
-
-    // Existing curves are never rebuilt or deleted, and nothing outside the scope is touched.
+    // Surfaces and curves reconcile alike: an existing object whose panel ID and CID are still
+    // expected is overwritten in place, missing ones are created, obsolete or duplicate ones are
+    // deleted. Nothing outside the scope is touched.
     public OperationResponse<PanelCladdingDependencyReconciliationPlan> CreatePlan(
         IReadOnlyList<PanelCladdingExpectedDependency> expected,
         IReadOnlyList<PanelCladdingExistingDependency> existing,
         PanelCladdingBakeScope scope)
     {
-        IReadOnlySet<Guid> preservedCurvePanels = CurvePreservedPanels(existing);
         PanelCladdingExpectedDependency[] expectedItems = (expected ??
                 Array.Empty<PanelCladdingExpectedDependency>())
             .Where(item => Includes(scope, item.Kind))
-            .Where(item => item.Kind != PanelCladdingDependencyKind.Curve ||
-                !preservedCurvePanels.Contains(item.SourcePanelObjectId))
             .OrderBy(item => item.PanelId, StringComparer.OrdinalIgnoreCase)
             .ThenBy(item => item.Kind)
             .ThenBy(item => item.Cid, StringComparer.OrdinalIgnoreCase)
@@ -39,7 +30,7 @@ public sealed class PanelCladdingDependencyReconciliationService
         PanelCladdingExistingDependency[] existingItems = (existing ??
                 Array.Empty<PanelCladdingExistingDependency>())
             .Where(item => item.ObjectId != Guid.Empty)
-            .Where(item => Includes(scope, item.Kind) && item.Kind != PanelCladdingDependencyKind.Curve)
+            .Where(item => Includes(scope, item.Kind))
             .GroupBy(item => item.ObjectId)
             .Select(group => group.First())
             .ToArray();
@@ -103,10 +94,7 @@ public sealed class PanelCladdingDependencyReconciliationService
             {
                 Creates = creates,
                 Updates = updates,
-                Deletes = deletes,
-                PreservedCurvePanelIds = Includes(scope, PanelCladdingDependencyKind.Curve)
-                    ? preservedCurvePanels.OrderBy(id => id.ToString("D"), StringComparer.Ordinal).ToArray()
-                    : Array.Empty<Guid>()
+                Deletes = deletes
             });
     }
 

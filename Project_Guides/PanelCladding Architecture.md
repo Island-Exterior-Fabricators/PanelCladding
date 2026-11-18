@@ -202,10 +202,9 @@ Managed objects are generated from panel attributes by PCbake and read back by P
   row, upper case, `;`-separated (`Svc/PanelCladdingSurfaceCoverageService.cs`).
   `CW_1.03_CLADDING_CELLS` is a read-only alias; differing values fail; sync rewrites `Merge_Mark`.
 - **Bake reconciliation** (`Svc/PanelCladdingDependencyReconciliationService.cs`). Within the
-  selected `Scope` (`Surfaces` default, `Curves`, `All`): surfaces matching by kind + PID + CID are
-  replaced in place, missing ones created, stale or duplicate ones deleted. Curves are never rebuilt
-  or deleted: a panel that owns any managed curve keeps all of them; only panels without curves get
-  new ones. Objects outside the scope are untouched.
+  selected `Scope` (`Surfaces` default, `Curves`, `All`): surfaces and curves matching by kind +
+  PID + CID are replaced in place (geometry, layer, colour, user text), missing ones created, stale
+  or duplicate ones deleted. Objects outside the scope are untouched.
 - **Locked and hidden objects** (`Live/LivePanelCladdingUpdateService.cs`). Dependencies are found
   including locked and hidden ones (reference objects excluded) and changed with
   `Replace(..., ignoreModes: true)` / `Delete(..., ignoreModes: true)`, keeping the object's `Mode`.

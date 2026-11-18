@@ -155,14 +155,11 @@ internal static class Program
 
         Require(plan.Creates.Count == 1 && ReferenceEquals(plan.Creates[0], surfaceB),
             "The missing surface was not the only create action.");
-        Require(plan.Updates.Select(action => action.ObjectId).ToHashSet().SetEquals([SurfaceKeep]),
-            "The existing canonical surface was not retained for replacement.");
+        Require(plan.Updates.Select(action => action.ObjectId).ToHashSet().SetEquals([SurfaceKeep, CurveKeep]),
+            "The existing canonical surface and curve were not retained for replacement.");
         Require(plan.Deletes.ToHashSet().SetEquals([SurfaceDuplicate, SurfaceStale, WrongKind]),
             "Duplicate, obsolete, or wrong-kind managed objects were not scheduled for deletion.");
-        // Since 1.3.0 (PCbake) an existing curve is never rebuilt or deleted; its panel keeps all curves.
-        Require(plan.PreservedCurvePanelIds.SequenceEqual([PanelId]),
-            "The panel that owns an existing curve must keep its curves.");
-        Console.WriteLine("[OK] reconciliation creates missing, updates retained, and deletes stale/duplicate surface CIDs; existing curves are kept");
+        Console.WriteLine("[OK] reconciliation creates missing, updates retained, and deletes stale/duplicate surface and curve CIDs");
     }
 
     private static void VerifyDuplicateExpectedRejection()
