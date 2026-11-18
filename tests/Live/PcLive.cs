@@ -265,12 +265,13 @@ public static class PcLive
             doc.Objects.UnselectAll();
             return true;
         }),
-        new Step("2.5 panel with curves keeps them", ctx =>
+        new Step("2.5 existing curves are overwritten from the panel", ctx =>
         {
             RhinoDoc doc = ctx.Doc;
             Guid b = (Guid)ctx.Bag["panelB"];
             List<Rhino.DocObjects.RhinoObject> curves = ManagedCurves(doc, b);
-            // Hand edits: move one curve, give it an assigned extrusion and a colour.
+            string baked = CurveState(curves);
+            // Hand edits on the curve only (not synced to the panel): move it, assign an extrusion, recolour.
             Guid edited = curves[0].Id;
             doc.Objects.Transform(edited, Rhino.Geometry.Transform.Translation(0, 0, 1.5), true);
             Rhino.DocObjects.RhinoObject moved = doc.Objects.FindId(edited);
@@ -280,30 +281,40 @@ public static class PcLive
             attributes.ObjectColor = System.Drawing.Color.FromArgb(255, 10, 20, 30);
             attributes.ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject;
             doc.Objects.ModifyAttributes(moved, attributes, true);
-            string before = CurveState(ManagedCurves(doc, b));
+            ctx.Check("2.5 hand edits changed the curve", CurveState(ManagedCurves(doc, b)) != baked, new { edited });
             SelectOnly(doc, b);
             string curvesRun = ctx.Cmd("_-PCbake _Scope=_Curves _Enter");
             string afterCurves = CurveState(ManagedCurves(doc, b));
+            ctx.Check("2.5 Curves overwrites the edited curve in place from the panel", afterCurves == baked &&
+                curvesRun.Contains("PCbake (Curves) processed 1 panel(s): created 0 surface(s) and 0 curve(s)") &&
+                curvesRun.Contains("updated 0 surface(s) and " + (int)ctx.Bag["curveCountB"] + " curve(s)"),
+                new { curvesRun, edited });
             SelectOnly(doc, b);
             string allRun = ctx.Cmd("_-PCbake _Scope=_All _Enter");
-            string afterAll = CurveState(ManagedCurves(doc, b));
-            ctx.Check("2.5 Curves leaves every curve of the panel unchanged", afterCurves == before, new { edited });
-            ctx.Check("2.5 All leaves every curve of the panel unchanged", afterAll == before, null);
-            ctx.Check("2.5 command line reports kept curves", curvesRun.Contains("Kept the existing curves of 1 panel(s)") &&
-                allRun.Contains("Kept the existing curves of 1 panel(s)"), new { curvesRun, allRun });
+            ctx.Check("2.5 All bakes the same curves again", CurveState(ManagedCurves(doc, b)) == baked, null);
+            ctx.Check("2.5 no prompt to delete curves first", !curvesRun.Contains("delete a panel's curves") &&
+                !allRun.Contains("delete a panel's curves"), new { curvesRun, allRun });
             doc.Objects.UnselectAll();
             return true;
         }),
-        new Step("2.7 curves are baked again after deleting them", ctx =>
+        new Step("2.7 changed layout replaces curves; deleted curves come back", ctx =>
         {
             RhinoDoc doc = ctx.Doc;
             Guid b = (Guid)ctx.Bag["panelB"];
+            string before = CurveState(ManagedCurves(doc, b));
+            WriteLayout(doc, b, 0.4, 0.6, FourCells);
+            SelectOnly(doc, b);
+            string changedRun = ctx.Cmd("_-PCbake _Scope=_Curves _Enter");
+            string changed = CurveState(ManagedCurves(doc, b));
+            ctx.Check("2.7 Curves follows the changed layout", changed != before &&
+                changedRun.Contains("PCbake (Curves) processed 1 panel(s)"), new { changedRun });
+            WriteLayout(doc, b, 0.5, 0.5, FourCells);
             foreach (var curve in ManagedCurves(doc, b)) doc.Objects.Delete(curve.Id, true);
             SelectOnly(doc, b);
             string history = ctx.Cmd("_-PCbake _Scope=_Curves _Enter");
             var curves = ManagedCurves(doc, b);
-            ctx.Check("2.7 Curves creates them again", curves.Count == (int)ctx.Bag["curveCountB"] &&
-                !history.Contains("Kept the existing curves"), new { history, curves = curves.Count });
+            ctx.Check("2.7 Curves creates deleted curves again", curves.Count == (int)ctx.Bag["curveCountB"],
+                new { history, curves = curves.Count });
             doc.Objects.UnselectAll();
             return true;
         }),

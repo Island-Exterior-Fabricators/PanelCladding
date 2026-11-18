@@ -44,7 +44,6 @@ public sealed class PanelCladdingDependencyReconciliationPlan
     public IReadOnlyList<PanelCladdingDependencyUpdateAction> Updates { get; init; } =
         Array.Empty<PanelCladdingDependencyUpdateAction>();
     public IReadOnlyList<Guid> Deletes { get; init; } = Array.Empty<Guid>();
-    public IReadOnlyList<Guid> PreservedCurvePanelIds { get; init; } = Array.Empty<Guid>();
 }
 
 public sealed class PanelCladdingUpdateResult
@@ -55,7 +54,6 @@ public sealed class PanelCladdingUpdateResult
     public IReadOnlyList<PanelCladdingDuplicateCidGroup> DuplicateCidGroups { get; init; } =
         Array.Empty<PanelCladdingDuplicateCidGroup>();
     public IReadOnlyList<Guid> PreservedAmbiguousDependencyIds { get; init; } = Array.Empty<Guid>();
-    public IReadOnlyList<Guid> PreservedCurvePanelIds { get; init; } = Array.Empty<Guid>();
     public IReadOnlyList<Guid> CreatedSurfaceIds { get; init; } = Array.Empty<Guid>();
     public IReadOnlyList<Guid> CreatedCurveIds { get; init; } = Array.Empty<Guid>();
     public IReadOnlyList<Guid> UpdatedSurfaceIds { get; init; } = Array.Empty<Guid>();

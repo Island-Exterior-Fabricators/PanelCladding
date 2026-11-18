@@ -18,7 +18,7 @@ Windows x64 and Rhino 8 (.NET 8) only. No MCP server, .NET SDK or administrator 
 | `PCmatchSrf` | Copies the grid, cladding cells and materials from a configured source panel to target panels. |
 | `PCmatchCrv` | Copies the frame configuration (segment, merge and hide masks) from a source panel to target panels with the same grid. |
 | `PCclear` | Clears the cladding assignments of the selected panels. |
-| `PCbake` | Bakes the panels' saved settings into managed geometry. `Scope`: `Surfaces` (default), `Curves` or `All`. Surfaces are rebuilt, created or removed to match; existing curves are never overwritten. |
+| `PCbake` | Bakes the panels' saved settings into managed geometry. `Scope`: `Surfaces` (default), `Curves` or `All`. Surfaces and curves are overwritten from the panel's current values, created or removed to match. |
 | `PCsyncSrf` | Reads edited cladding surfaces and material layers back into the panel. |
 | `PCsyncCrv` | Reads edited extrusion curves back into the panel's grid. |
 | `PCreport` | Checks the model's layers, panel attributes and managed geometry without changing anything. Click an issue to zoom to it; export to Excel. |
@@ -88,8 +88,9 @@ full-run merge to panels that have no frame configuration yet.
 
 Run `PCbake`, select the panels and choose `Scope`: `Surfaces` (default), `Curves` or `All`.
 Panels need a `CW_1.05_LOT` value before their surfaces can be baked. Rerun `PCbake` after any
-change: surfaces are updated in place. Curves are only created for panels that have none, so
-delete a panel's curves first to bake them again.
+change: surfaces and curves are overwritten in place from the panel's current values, missing ones
+are added and obsolete ones removed. Hand edits on baked geometry are replaced, so sync them first
+(step 6) if you want to keep them.
 
 ### 6. Edit geometry by hand (optional)
 

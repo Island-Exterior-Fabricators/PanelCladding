@@ -4,7 +4,8 @@ using PanelCladdingEditor.Domain.Models.PanelCladding;
 
 namespace PcBakeCommandSmoke;
 
-// PCbake (1.3.0): Scope option (Surfaces by default, Curves, All) and existing curves never overwritten.
+// PCbake: Scope option (Surfaces by default, Curves, All); surfaces and curves alike are overwritten
+// from the panel's current values, created when missing and deleted when obsolete or duplicate.
 internal static class Program
 {
     private static readonly Guid PanelA = Guid.Parse("10000000-0000-0000-0000-00000000000a");
@@ -13,6 +14,7 @@ internal static class Program
     private static readonly Guid SurfaceStaleA = Guid.Parse("20000000-0000-0000-0000-0000000000a2");
     private static readonly Guid CurveA = Guid.Parse("30000000-0000-0000-0000-00000000000a");
     private static readonly Guid CurveStaleA = Guid.Parse("30000000-0000-0000-0000-0000000000a2");
+    private static readonly Guid CurveDuplicateA = Guid.Parse("30000000-0000-0000-0000-0000000000a3");
 
     private static int Main()
     {
@@ -21,7 +23,8 @@ internal static class Program
             VerifyScopeTable();
             VerifySurfaceScope();
             VerifyCurveScope();
-            VerifyAllScopeKeepsExistingCurves();
+            VerifyCurveScopeOverwritesExistingCurves();
+            VerifyAllScopeOverwritesExistingCurves();
             VerifyCommandContract();
             VerifyLiveContract();
             Console.WriteLine("PASS: PCbake command regression");
@@ -65,8 +68,6 @@ internal static class Program
                 plan.Updates.Select(action => action.ObjectId).SequenceEqual([SurfaceA]) &&
                 plan.Deletes.SequenceEqual([SurfaceStaleA]),
             "The Surfaces scope must create, rebuild and delete surfaces only.");
-        Require(plan.PreservedCurvePanelIds.Count == 0,
-            "The Surfaces scope must not report kept curves.");
         Console.WriteLine("[OK] Surfaces scope reconciles surfaces and leaves every curve alone");
     }
 
@@ -88,7 +89,30 @@ internal static class Program
         Console.WriteLine("[OK] Curves scope bakes curves for panels without curves and leaves surfaces alone");
     }
 
-    private static void VerifyAllScopeKeepsExistingCurves()
+    private static void VerifyCurveScopeOverwritesExistingCurves()
+    {
+        PanelCladdingDependencyReconciliationPlan plan = Plan(PanelCladdingBakeScope.Curves,
+            [
+                Expected(PanelA, "CID-A_0A", PanelCladdingDependencyKind.Surface),
+                Expected(PanelA, "CID-A_FRM-0", PanelCladdingDependencyKind.Curve),
+                Expected(PanelA, "CID-A_INT-A1", PanelCladdingDependencyKind.Curve)
+            ],
+            [
+                Existing(SurfaceStaleA, PanelA, "CID-A_OLD", PanelCladdingDependencyKind.Surface),
+                Existing(CurveA, PanelA, "CID-A_FRM-0", PanelCladdingDependencyKind.Curve),
+                Existing(CurveDuplicateA, PanelA, "CID-A_FRM-0", PanelCladdingDependencyKind.Curve),
+                Existing(CurveStaleA, PanelA, "CID-A_OLD", PanelCladdingDependencyKind.Curve)
+            ]);
+        Require(plan.Creates.Select(item => item.Cid).SequenceEqual(["CID-A_INT-A1"]),
+            "A panel that already has curves must still get its missing curves.");
+        Require(plan.Updates.Select(action => action.ObjectId).SequenceEqual([CurveA]),
+            "An existing curve whose CID is still expected must be overwritten in place.");
+        Require(plan.Deletes.ToHashSet().SetEquals([CurveDuplicateA, CurveStaleA]),
+            "Obsolete and duplicate curves must be deleted; surfaces stay outside the Curves scope.");
+        Console.WriteLine("[OK] Curves scope overwrites existing curves, adds missing ones and deletes obsolete or duplicate ones");
+    }
+
+    private static void VerifyAllScopeOverwritesExistingCurves()
     {
         PanelCladdingDependencyReconciliationPlan plan = Plan(PanelCladdingBakeScope.All,
             [
@@ -102,17 +126,13 @@ internal static class Program
                 Existing(CurveA, PanelA, "CID-A_FRM-0", PanelCladdingDependencyKind.Curve),
                 Existing(CurveStaleA, PanelA, "CID-A_OLD", PanelCladdingDependencyKind.Curve)
             ]);
-        Require(plan.Creates.Select(item => item.Cid).SequenceEqual(["CID-B_FRM-0"]),
-            "Only the panel without curves may get new curves; a panel with curves gets none, not even missing ones.");
-        Require(plan.Updates.Select(action => action.ObjectId).SequenceEqual([SurfaceA]) &&
-                plan.Deletes.Count == 0,
-            "An existing curve, current or stale, must never be rebuilt or deleted.");
-        Require(plan.PreservedCurvePanelIds.SequenceEqual([PanelA]),
-            "The panel whose curves were kept must be reported.");
-        Require(PanelCladdingDependencyReconciliationService.CurvePreservedPanels(
-                    [Existing(CurveA, Guid.Empty, "CID-A_FRM-0", PanelCladdingDependencyKind.Curve)]).Count == 0,
-            "A curve without an owning panel cannot mark a panel as kept.");
-        Console.WriteLine("[OK] All scope keeps every curve of a panel that has curves and reports it");
+        Require(plan.Creates.Select(item => item.Cid).OrderBy(cid => cid, StringComparer.Ordinal)
+                    .SequenceEqual(["CID-A_INT-A1", "CID-B_FRM-0"]),
+            "Missing curves must be created on panels with and without curves.");
+        Require(plan.Updates.Select(action => action.ObjectId).ToHashSet().SetEquals([SurfaceA, CurveA]) &&
+                plan.Deletes.SequenceEqual([CurveStaleA]),
+            "The All scope must overwrite current surfaces and curves and delete the stale curve.");
+        Console.WriteLine("[OK] All scope reconciles surfaces and curves alike");
     }
 
     private static void VerifyCommandContract()
@@ -151,23 +171,26 @@ internal static class Program
     {
         string source = Source("src", "PanelCladdingEditor", "Infrastructure", "Rhino", "Live", "PanelCladding",
             "LivePanelCladdingUpdateService.cs").Replace("\r\n", "\n", StringComparison.Ordinal);
-        int read = source.IndexOf("IReadOnlyList<PanelCladdingExistingDependency> existing = ReadManagedDependencies(", StringComparison.Ordinal);
-        int prepare = source.IndexOf("preparedResponse = PrepareDependencies(", StringComparison.Ordinal);
-        Require(read >= 0 && prepare > read,
-            "Existing dependencies must be read before generation so kept curves need no curve plan.");
         string[] required =
         {
-            "PanelCladdingDependencyReconciliationService.CurvePreservedPanels(existing)",
-            "!curvePreservedPanels.Contains(source.ObjectId)",
+            "if (PanelCladdingDependencyReconciliationService.Includes(scope, PanelCladdingDependencyKind.Curve))\n            {",
             "SourcePanelObjectId = owners[0].ObjectId,",
-            "PreservedCurvePanelIds = plan.PreservedCurvePanelIds,",
             "existing,\n                    scope);"
         };
         foreach (string token in required)
         {
             Require(source.Contains(token, StringComparison.Ordinal), $"Live PCbake is missing: {token}");
         }
-        Console.WriteLine("[OK] live bake reads existing dependencies first and skips curve planning for kept panels");
+        string command = Source("src", "PanelCladdingEditor", "UI", "PanelCladdingBakeCommand.cs");
+        foreach (string removed in new[] { "curvePreservedPanels", "PreservedCurvePanelIds", "CurvePreservedPanels" })
+        {
+            Require(!source.Contains(removed, StringComparison.Ordinal) &&
+                    !command.Contains(removed, StringComparison.Ordinal),
+                $"Curve preservation must be gone: {removed}");
+        }
+        Require(!command.Contains("delete a panel's curves", StringComparison.OrdinalIgnoreCase),
+            "PCbake must not ask the user to delete curves before baking.");
+        Console.WriteLine("[OK] live bake plans curves for every selected panel whenever the scope includes curves");
     }
 
     private static bool Includes(PanelCladdingBakeScope scope, PanelCladdingDependencyKind kind) =>
