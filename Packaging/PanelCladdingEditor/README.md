@@ -13,12 +13,12 @@ spellings (`PCEditor`, `PCSyncCrv`, ...), aliases and toolbar macros still run.
 `PCbake` (1.3.0) replaces `PCupdate`, `PCspawnSrf` and `PCspawnCrv`; aliases and macros that call
 them must use `PCbake`. It treats the selected panels' saved attributes as authoritative and bakes
 them into managed geometry. Its `Scope` option is `Surfaces` (the default on every run), `Curves` or
-`All`; objects of a kind outside the scope are left as they are. Cladding surfaces are reconciled:
-matching surfaces are rebuilt, missing ones are created, and stale or duplicate ones are deleted.
-Extrusion curves are never overwritten, since they may carry hand-assigned components: a panel that
-already has managed curves keeps all of them and is reported, and a panel without curves gets them.
-Delete a panel's curves to bake new ones. `PCsyncSrf` and `PCsyncCrv` go the other way, reading
-edited geometry back into the panel. `PCcrvTemplate`
+`All`; objects of a kind outside the scope are left as they are. Cladding surfaces and extrusion
+curves are reconciled alike from the panel's current values: matching objects are overwritten in
+place (geometry, layer, colour and user text), missing ones are created, and stale or duplicate ones
+are deleted. Edits made directly on baked curves or surfaces are replaced, so run `PCsyncSrf` or
+`PCsyncCrv` first to keep them; one Undo restores the whole run. `PCsyncSrf` and `PCsyncCrv` go the
+other way, reading edited geometry back into the panel. `PCcrvTemplate`
 assigns a full-run horizontal or vertical merge mask only to selected
 panel Breps that do not already have a merge code. Configured panels in a mixed selection are
 skipped and reported while the remaining eligible panels are updated. Selecting only configured

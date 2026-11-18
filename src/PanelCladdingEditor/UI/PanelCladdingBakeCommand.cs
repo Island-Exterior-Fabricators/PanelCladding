@@ -83,12 +83,6 @@ public sealed class PanelCladdingBakeCommand : RhinoCommand
             $"created {result.CreatedSurfaceIds.Count} surface(s) and {result.CreatedCurveIds.Count} curve(s), " +
             $"updated {result.UpdatedSurfaceIds.Count} surface(s) and {result.UpdatedCurveIds.Count} curve(s), " +
             $"deleted {result.DeletedObjectIds.Count} obsolete or duplicate object(s).");
-        if (result.PreservedCurvePanelIds.Count > 0)
-        {
-            RhinoApp.WriteLine(
-                $"Kept the existing curves of {result.PreservedCurvePanelIds.Count} panel(s); " +
-                "delete a panel's curves to bake new ones.");
-        }
         if (result.DuplicateCidGroups.Count > 0)
         {
             int skippedCount = result.DuplicateCidGroups.Sum(group => group.PanelObjectIds.Count);
