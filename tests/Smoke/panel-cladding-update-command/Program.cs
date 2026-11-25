@@ -251,11 +251,11 @@ internal static class Program
         {
             "IsManagedSurfaceLayerPath(layerPath)",
             "IsManagedExtrusionLayerPath(layerPath,",
-            "PanelCladdingUpdateSelectionService.CreatePlan(sources.Data)",
+            "PanelCladdingUpdateSelectionService.CreatePlan(sources)",
             "PanelCladdingUpdateSelectionService.FindDependencyOwners(candidates, panelId, cid)",
             "owners.Count != 1 || !processableIds.Contains(owners[0].ObjectId)",
             "sourceIds.Contains(rhinoObject.Id)",
-            "selection.ProcessableSources,",
+            ".Where(source => candidates.Contains(source.ObjectId))",
             "document.Objects.UnselectAll()",
             "document.Objects.FindId(id)?.Select(true)",
             "cid.Length == 0",

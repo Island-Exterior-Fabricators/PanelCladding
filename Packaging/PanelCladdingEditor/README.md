@@ -17,7 +17,11 @@ them into managed geometry. Its `Scope` option is `Surfaces` (the default on eve
 curves are reconciled alike from the panel's current values: matching objects are overwritten in
 place (geometry, layer, colour and user text), missing ones are created, and stale or duplicate ones
 are deleted. Edits made directly on baked curves or surfaces are replaced, so run `PCsyncSrf` or
-`PCsyncCrv` first to keep them; one Undo restores the whole run. `PCsyncSrf` and `PCsyncCrv` go the
+`PCsyncCrv` first to keep them; one Undo restores the whole run. A panel with its own problem (no PID,
+locked or hidden, duplicate CID, a layout that cannot be generated, a layer name Rhino cannot create)
+does not stop the run: it is skipped and left unchanged, marked with a red dot on layer
+`PCbake Issues` that names the problem, listed on the command line and left selected, while the other
+panels bake. The next `PCbake` on that panel removes its dot. `PCsyncSrf` and `PCsyncCrv` go the
 other way, reading edited geometry back into the panel. `PCcrvTemplate`
 assigns a full-run horizontal or vertical merge mask only to selected
 panel Breps that do not already have a merge code. Configured panels in a mixed selection are
@@ -318,9 +322,9 @@ opens its own record only when called without an active command record. A succes
 appears as one normal Rhino Undo entry without attempting an unsupported nested record.
 Since version 1.0.83, PCbake normalizes parent/child CIDs before checking selected
 panel identities. Parent and child panels sharing a PID can update together.
-Every panel in a duplicate-CID group is skipped; unique-CID panels still update,
-and skipped panels remain selected with their duplicate CIDs reported. An
-all-duplicate selection succeeds without dependency changes. Legacy unsuffixed
+Every panel in a duplicate-CID group is skipped and marked like any other failing
+panel; unique-CID panels still update. An all-duplicate selection succeeds without
+dependency changes. Legacy unsuffixed
 dependencies whose ownership is ambiguous between selected panels are preserved
 and reported; dependencies belonging to skipped panels are excluded from updates.
 Existing managed dependencies can remain object-locked, object-hidden, or on locked/hidden managed

@@ -24,7 +24,7 @@ This log records why PanelCladdingEditor works the way it does where the code al
 
 **Why:** The user should recover with one Undo. Rhino has no transaction across many objects, so a half-applied batch is hard to diagnose. Inside a command Rhino refuses a nested `BeginUndoRecord`, and closing the command's own record breaks Rhino's tracking of who owns it.
 
-**Status:** current
+**Status:** current; for `PCbake`, superseded in part on 2026-11-25 by "PCbake skips a failing panel and marks it with a dot" (the single Undo record and the rollback of a failed write stand)
 
 ### 2026-08-05 — Plug-in id comes from the assembly-level GUID; the RHP is built directly
 
@@ -480,5 +480,27 @@ deleted. Nothing asks the user to delete curves first.
 unable to apply changed panel values without deleting the curves by hand. The panel is the source
 of truth for curves as well (frame assignments on curves are only copies), and `PCsyncCrv` reads
 hand edits back into the panel before a bake when they must be kept. One Undo restores a run.
+
+**Status:** current
+
+### 2026-11-25 — PCbake skips a failing panel and marks it with a dot
+
+**Decision:** A problem that belongs to one panel no longer stops `PCbake`. That panel is skipped
+whole and left unchanged (no CID, point-order, surface or curve write; its existing dependents are
+protected), it gets a text dot on the top-level layer `PCbake Issues` naming the step and the reason,
+and it stays selected; the other panels bake normally. Panel problems are: not found, no PID,
+locked/hidden/reference, duplicate CID, point order, and surface or curve generation (including a
+layer name Rhino cannot create and two dependents claiming one CID). A panel that fails after its
+CID or point order was written has both restored before the run goes on. A dot carries its panel's
+object id (`PCbake_Panel`); each run deletes the dots of the panels it was given before adding new
+ones, so a fixed panel loses its dot on the next bake. Failures that are not about one panel (no
+saved document, unreadable material workbook, no Undo record, Rhino refusing a write) still stop the
+run and roll it back. The run stays one Undo record, dots included.
+
+**Why:** One panel with any problem stopped the whole bake, so nothing in the batch was baked. The
+user asked that a problem panel be left with a dot explaining the problem while the other panels
+bake normally. Duplicate-CID panels were already skipped and
+`PCcrvTemplate` and `PCsyncSrf`/`PCsyncCrv` already skip problem panels; a dot shows where each
+skipped panel is and why.
 
 **Status:** current

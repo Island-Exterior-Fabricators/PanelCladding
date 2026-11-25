@@ -366,7 +366,60 @@ public static class PcLive
             doc.Objects.UnselectAll();
             return true;
         }),
+        new Step("2.10 a failing panel is skipped and marked; the others bake", ctx =>
+        {
+            RhinoDoc doc = ctx.Doc;
+            Guid a = (Guid)ctx.Bag["panelA"], c = (Guid)ctx.Bag["panelC"];
+            string pid = Pid(doc.Objects.FindId(c));
+            WriteValues(doc, c, new Dictionary<string, string> { [PidKey] = string.Empty });
+            string panelCBefore = PanelState(doc, c), surfacesCBefore = SurfaceState(ManagedSurfaces(doc, c));
+            WriteLayout(doc, a, 0.4, 0.5, FourCells);
+            string surfacesABefore = SurfaceState(ManagedSurfaces(doc, a));
+            SelectOnly(doc, a, c);
+            string history = ctx.Cmd("_-PCbake _Enter");
+            ctx.Check("2.10 the good panel bakes", history.Contains("PCbake (Surfaces) processed 1 panel(s)") &&
+                SurfaceState(ManagedSurfaces(doc, a)) != surfacesABefore, history);
+            ctx.Check("2.10 the failing panel is reported and unchanged", history.Contains("Skipped 1 panel(s) with issues") &&
+                history.Contains("No PID") && PanelState(doc, c) == panelCBefore &&
+                SurfaceState(ManagedSurfaces(doc, c)) == surfacesCBefore, history);
+            var dots = IssueDots(doc, c);
+            ctx.Check("2.10 one dot marks the failing panel", dots.Count == 1 && IssueDots(doc, a).Count == 0 &&
+                ((Rhino.Geometry.TextDot)dots[0].Geometry).Text.StartsWith("PCbake: No PID") &&
+                LayerPath(doc, dots[0]) == "PCbake Issues", new { dots = dots.Count });
+            ctx.Check("2.10 only the failing panel stays selected", IsSelected(doc, c) && !IsSelected(doc, a), null);
+            WriteValues(doc, c, new Dictionary<string, string> { [PidKey] = pid });
+            SelectOnly(doc, c);
+            string again = ctx.Cmd("_-PCbake _Enter");
+            ctx.Check("2.10 baking the fixed panel removes its dot", again.Contains("PCbake (Surfaces) processed 1 panel(s)") &&
+                !again.Contains("Skipped") && IssueDots(doc, c).Count == 0, again);
+            WriteLayout(doc, a, 0.5, 0.5, FourCells);
+            doc.Objects.UnselectAll();
+            return true;
+        }),
     };
+
+    private static List<Rhino.DocObjects.RhinoObject> IssueDots(RhinoDoc doc, Guid panelId) =>
+        doc.Objects.GetObjectList(new Rhino.DocObjects.ObjectEnumeratorSettings
+            {
+                NormalObjects = true, LockedObjects = true, HiddenObjects = true,
+                ObjectTypeFilter = Rhino.DocObjects.ObjectType.TextDot
+            })
+            .Where(dot => string.Equals((dot.Attributes.GetUserString("PCbake_Panel") ?? string.Empty).Trim(),
+                panelId.ToString("D"), StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+    private static void DeleteIssueDots(RhinoDoc doc, Guid panelId)
+    {
+        foreach (var dot in IssueDots(doc, panelId)) doc.Objects.Delete(dot, true, true);
+    }
+
+    private static string PanelState(RhinoDoc doc, Guid panelId)
+    {
+        Rhino.DocObjects.RhinoObject panel = doc.Objects.FindId(panelId);
+        var strings = panel.Attributes.GetUserStrings();
+        return panel.Geometry.GetBoundingBox(true) + "|" + string.Join(";", strings.AllKeys.OrderBy(key => key, StringComparer.Ordinal)
+            .Select(key => key + "=" + strings[key]));
+    }
 
     private static void CheckCurveColours(Ctx ctx, string id, List<Rhino.DocObjects.RhinoObject> curves)
     {
@@ -489,7 +542,7 @@ public static class PcLive
                 return true;
             }, 200),
             PidStep("3.2 PCpid does not number the Not in Scope panel"),
-            BakeExcludedStep("3.3 PCbake Curves fails on the Not in Scope panel"),
+            BakeExcludedStep("3.3 PCbake Curves skips and marks the Not in Scope panel"),
         };
         foreach (string name in ExcludedNames.Skip(1))
         {
@@ -507,7 +560,7 @@ public static class PcLive
                 return true;
             }, 200));
             steps.Add(PidStep("3.4 " + name + ": PCpid does not number it"));
-            steps.Add(BakeExcludedStep("3.4 " + name + ": PCbake Curves fails"));
+            steps.Add(BakeExcludedStep("3.4 " + name + ": PCbake Curves skips and marks it"));
         }
         steps.Add(new Step("3.5 restore layer name", ctx =>
         {
@@ -568,7 +621,8 @@ public static class PcLive
         SelectOnly(doc, d);
         string history = ctx.Cmd("_-PCbake _Scope=_Curves _Enter");
         ctx.Check(id, history.Contains("PANEL_CLADDING_PANEL_LAYER_EXCLUDED") && ManagedCurves(doc, d).Count == 0 &&
-            CurveFingerprint(doc) == curves, history);
+            CurveFingerprint(doc) == curves && IssueDots(doc, d).Count == 1, history);
+        DeleteIssueDots(doc, d);
         doc.Objects.UnselectAll();
         return true;
     });
