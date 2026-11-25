@@ -83,13 +83,15 @@ public sealed class PanelCladdingBakeCommand : RhinoCommand
             $"created {result.CreatedSurfaceIds.Count} surface(s) and {result.CreatedCurveIds.Count} curve(s), " +
             $"updated {result.UpdatedSurfaceIds.Count} surface(s) and {result.UpdatedCurveIds.Count} curve(s), " +
             $"deleted {result.DeletedObjectIds.Count} obsolete or duplicate object(s).");
-        if (result.DuplicateCidGroups.Count > 0)
+        if (result.Issues.Count > 0)
         {
-            int skippedCount = result.DuplicateCidGroups.Sum(group => group.PanelObjectIds.Count);
-            RhinoApp.WriteLine($"Skipped {skippedCount} panel(s) with duplicate CIDs; these panels remain selected for inspection.");
-            foreach (PanelCladdingDuplicateCidGroup group in result.DuplicateCidGroups)
+            string issueLayer = PanelCladdingBakeIssueService.IssueLayerPath;
+            RhinoApp.WriteLine(
+                $"Skipped {result.Issues.Count} panel(s) with issues; they are unchanged, marked with dots on " +
+                $"layer \"{issueLayer}\" and left selected.");
+            foreach (PanelCladdingBakeIssue issue in result.Issues)
             {
-                RhinoApp.WriteLine($"Duplicate CID {group.Cid}: {group.PanelObjectIds.Count} panels.");
+                RhinoApp.WriteLine($"Skipped panel {issue.PanelObjectId:D}: {issue.Stage}: {issue.Detail}");
             }
         }
         if (result.PreservedAmbiguousDependencyIds.Count > 0)

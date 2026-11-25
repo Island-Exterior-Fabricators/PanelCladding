@@ -18,7 +18,7 @@ Windows x64 and Rhino 8 (.NET 8) only. No MCP server, .NET SDK or administrator 
 | `PCmatchSrf` | Copies the grid, cladding cells and materials from a configured source panel to target panels. |
 | `PCmatchCrv` | Copies the frame configuration (segment, merge and hide masks) from a source panel to target panels with the same grid. |
 | `PCclear` | Clears the cladding assignments of the selected panels. |
-| `PCbake` | Bakes the panels' saved settings into managed geometry. `Scope`: `Surfaces` (default), `Curves` or `All`. Surfaces and curves are overwritten from the panel's current values, created or removed to match. |
+| `PCbake` | Bakes the panels' saved settings into managed geometry. `Scope`: `Surfaces` (default), `Curves` or `All`. Surfaces and curves are overwritten from the panel's current values, created or removed to match. A panel with a problem is skipped and marked with a dot; the others still bake. |
 | `PCsyncSrf` | Reads edited cladding surfaces and material layers back into the panel. |
 | `PCsyncCrv` | Reads edited extrusion curves back into the panel's grid. |
 | `PCreport` | Checks the model's layers, panel attributes and managed geometry without changing anything. Click an issue to zoom to it; export to Excel. |
@@ -91,6 +91,9 @@ Panels need a `CW_1.05_LOT` value before their surfaces can be baked. Rerun `PCb
 change: surfaces and curves are overwritten in place from the panel's current values, missing ones
 are added and obsolete ones removed. Hand edits on baked geometry are replaced, so sync them first
 (step 6) if you want to keep them.
+A panel that cannot be baked (no PID, a duplicate CID, a layout that cannot be generated, ...) is
+skipped and left unchanged: a red dot on layer `PCbake Issues` says why, the command line lists it
+and it stays selected. Fix it and bake it again; its dot is removed.
 
 ### 6. Edit geometry by hand (optional)
 

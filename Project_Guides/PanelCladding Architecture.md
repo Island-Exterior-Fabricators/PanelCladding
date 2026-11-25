@@ -194,8 +194,8 @@ Managed objects are generated from panel attributes by PCbake and read back by P
 - **CID scope.** CIDs are re-derived, never edited directly: changing PID, unit type or role and
   running any normalizing write updates the panel CID and name; PCbake rebuilds surfaces with new
   CIDs; PCsync reindexes dependency PID, CID, `CRV`, name, lot and colour without moving geometry.
-  Selected panels sharing a CID are skipped by PCbake and left selected
-  (`Svc/PanelCladdingUpdateSelectionService.cs`); duplicate selected PIDs fail PCsync.
+  Selected panels sharing a CID are skipped by PCbake like any other failing panel
+  (`Svc/PanelCladdingUpdateSelectionService.cs`, below); duplicate selected PIDs fail PCsync.
 - **Lot (release).** A dependency's `CW_1.05_LOT` mirrors the panel: case variants removed, absent
   when the panel has none, drift alone counts as a change.
 - **Coverage metadata.** `Merge_Mark` = owner cell first, then the other covered cells by column and
@@ -208,7 +208,17 @@ Managed objects are generated from panel attributes by PCbake and read back by P
 - **Locked and hidden objects** (`Live/LivePanelCladdingUpdateService.cs`). Dependencies are found
   including locked and hidden ones (reference objects excluded) and changed with
   `Replace(..., ignoreModes: true)` / `Delete(..., ignoreModes: true)`, keeping the object's `Mode`.
-  Source panels must not be locked, hidden or reference objects.
+  Locked, hidden or reference source panels are skipped as issues.
+- **Per-panel issues** (`Svc/PanelCladdingBakeIssueService.cs`, `Live/LivePanelCladdingBakeIssueDots.cs`).
+  PCbake skips a panel with its own problem (not found, no PID, not editable, duplicate CID, point
+  order, surface or curve generation, an uncreatable layer name, two dependents with one CID) and
+  bakes the rest. A skipped panel is not changed: only candidates get CID and point-order writes,
+  and a candidate that fails later has both restored. Every selected panel with a PID stays an
+  ownership candidate, so a skipped panel's dependents are never matched to another panel. Each
+  skipped panel gets a `TextDot` at its bounding-box centre on the top-level layer `PCbake Issues`
+  (red when created) with `PCbake: <stage>` and a short reason, user text `PCbake_Panel` (panel
+  object id) and `PCbake_Issue` (full reason), and stays selected. A run first deletes the dots of
+  all panels it was given. Failures that are not about one panel still roll back the whole run.
 - **Point order.** PCbake and PCpid rebuild straight quad panels to the standard corner order in
   the same Undo scope (`Svc/PanelCladdingPointOrderService.cs`, `Live/LivePanelCladdingPointOrderService.cs`);
   unsupported shapes are skipped with a warning.
@@ -262,8 +272,8 @@ Managed objects are generated from panel attributes by PCbake and read back by P
    passed path (`FILE_NOT_ACTIVE`, `ACTIVE_DOC_UNSAVED`), then builds Domain snapshots.
    `LivePanelCladdingRepository.ReadLayout` measures the panel in its frame and parses keys.
 3. **Plan**: a pure `Svc/` planner validates the whole batch and returns writes/deletes. Nothing is
-   mutated when any panel fails (PCsync instead reports per-panel issues, skips those panels and
-   selects them).
+   mutated when any panel fails (PCsync and PCbake instead report per-panel issues, skip those
+   panels and select them; PCbake also marks them with dots).
 4. **Prepare**: proposed `ObjectAttributes` are duplicates of the originals with the plan applied,
    then `LivePanelCladdingCidService.Normalize`: rename `CW_9.xx` to `UD_` keys, lowercase the role,
    write canonical `UD_FRAME_CONFIG` and its `CW_1.08` code, rewrite the panel CID and name. The
@@ -309,7 +319,7 @@ Registered once in `PanelCladdingEditorPlugin.OnLoad`; they are not commands.
 | PCcrvTemplate | Panels, H or V priority | Maximal merge runs on the priority axis, split at missing segments and hide changes; panels already merged are skipped (all skipped = success, no Undo) | `Svc/PanelCladdingCurveTemplatePlanningService.cs` |
 | PCsyncSrf | Panels, associated surfaces (and curves) | Offsets from surface edges plus stored tracks protected by complete `Merge_Mark` coverage (unmarked stored tracks without geometric evidence are dropped); tracks aligned to the stored layout and masks remapped (`Svc/PanelCladdingLayoutReconciliationService.cs`); owner graph and logic from coverage and material layers (a saved owner is kept when the covered cells resolve to it); surface PID/CID/`Cladding`/`Merge_Mark`/lot/name | `Svc/PanelCladdingSurfaceSyncPlanningService.cs`, `Live/LivePanelCladdingSurfaceSyncRepository.cs` |
 | PCsyncCrv | Panels, associated curves | Curve-inferred offsets (authoritative) and topology from curve spans; stored hidden segments without a curve stay hidden; curve PID/CID/`CRV`/lot/colour/name; cladding keys only on configured panels | same |
-| PCbake | Panels | Managed surfaces/curves (above), panel CID, point order | `Live/LivePanelCladdingUpdateService.cs` |
+| PCbake | Panels | Managed surfaces/curves (above), panel CID, point order; issue dots for skipped panels | `Live/LivePanelCladdingUpdateService.cs` |
 | PCpid | All panels in the project panel scope as context | PID, CID, elevation, level, placeholders, name, point order; selected panels only | `Svc/PanelCladdingPidPlanningService.cs`, `Live/LivePanelCladdingPidService.cs` |
 | PCreport | Whole model, read-only | Nothing; optional `.xlsx` export (`Summary`, `Issues`) | `Svc/PanelCladdingComplianceService.cs` (rules L01–L07, A01–A13, D01–D06) |
 | PCtemplatePNL | Naming sheet | Sheet layout and `PNLFormat` property; document mirror | `Infrastructure/File/OpenXmlPanelNamingTemplate.cs` |

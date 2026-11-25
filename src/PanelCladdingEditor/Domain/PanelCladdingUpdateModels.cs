@@ -59,7 +59,12 @@ public sealed class PanelCladdingUpdateResult
     public IReadOnlyList<Guid> UpdatedSurfaceIds { get; init; } = Array.Empty<Guid>();
     public IReadOnlyList<Guid> UpdatedCurveIds { get; init; } = Array.Empty<Guid>();
     public IReadOnlyList<Guid> DeletedObjectIds { get; init; } = Array.Empty<Guid>();
+    // Panels skipped whole because of their own problem; each is marked with an issue dot.
+    public IReadOnlyList<PanelCladdingBakeIssue> Issues { get; set; } = Array.Empty<PanelCladdingBakeIssue>();
 }
+
+// Stage names the step that refused the panel (see PanelCladdingBakeIssueService); Detail is the full reason.
+public sealed record PanelCladdingBakeIssue(Guid PanelObjectId, string Stage, string Detail);
 
 public sealed record PanelCladdingUpdateSource(Guid ObjectId, string PanelId, string PanelCid);
 

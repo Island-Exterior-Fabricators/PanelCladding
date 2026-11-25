@@ -6,6 +6,7 @@ namespace PcBakeCommandSmoke;
 
 // PCbake: Scope option (Surfaces by default, Curves, All); surfaces and curves alike are overwritten
 // from the panel's current values, created when missing and deleted when obsolete or duplicate.
+// A panel with its own problem is skipped whole and marked with a dot; the other panels still bake.
 internal static class Program
 {
     private static readonly Guid PanelA = Guid.Parse("10000000-0000-0000-0000-00000000000a");
@@ -27,6 +28,8 @@ internal static class Program
             VerifyAllScopeOverwritesExistingCurves();
             VerifyCommandContract();
             VerifyLiveContract();
+            VerifyIssueDotRules();
+            VerifyPerPanelContract();
             Console.WriteLine("PASS: PCbake command regression");
             return 0;
         }
@@ -191,6 +194,101 @@ internal static class Program
         Require(!command.Contains("delete a panel's curves", StringComparison.OrdinalIgnoreCase),
             "PCbake must not ask the user to delete curves before baking.");
         Console.WriteLine("[OK] live bake plans curves for every selected panel whenever the scope includes curves");
+    }
+
+    private static void VerifyIssueDotRules()
+    {
+        var excluded = new PanelCladdingBakeIssue(PanelA, PanelCladdingBakeIssueService.CurveStage,
+            "PANEL_CLADDING_PANEL_LAYER_EXCLUDED: ABC-IEF-Wireframe::Curves - PNL::Curves - Not in Scope");
+        Require(PanelCladdingBakeIssueService.DotText(excluded) ==
+                "PCbake: Curves\nPANEL_LAYER_EXCLUDED: ABC-IEF-Wireframe::Curves - PNL::Curves - Not in Scope",
+            "The dot must name the stage and the reason without the PANEL_CLADDING_ prefix.");
+        var noPid = new PanelCladdingBakeIssue(PanelA, PanelCladdingBakeIssueService.PidStage,
+            $"PANEL_CLADDING_UPDATE_PID_REQUIRED: {PanelA:D}");
+        Require(PanelCladdingBakeIssueService.DotText(noPid) == "PCbake: No PID\nUPDATE_PID_REQUIRED",
+            "Object ids must be left out of the dot text.");
+        Require(PanelCladdingBakeIssueService.DotText(new PanelCladdingBakeIssue(PanelA, "Duplicate CID", "")) ==
+                "PCbake: Duplicate CID",
+            "A dot without detail shows the stage only.");
+        string longText = PanelCladdingBakeIssueService.ShortDetail(new string('X', 200));
+        Require(longText.Length == 80 && longText.EndsWith('…'), "Long reasons must be shortened on the dot.");
+
+        IReadOnlyList<PanelCladdingBakeIssue> merged = PanelCladdingBakeIssueService.Merge(
+        [
+            new PanelCladdingBakeIssue(PanelA, PanelCladdingBakeIssueService.NotEditableStage, "first"),
+            new PanelCladdingBakeIssue(PanelA, PanelCladdingBakeIssueService.SurfaceStage, "later"),
+            new PanelCladdingBakeIssue(PanelB, PanelCladdingBakeIssueService.DuplicateCidStage, "CID-B"),
+            new PanelCladdingBakeIssue(Guid.Empty, PanelCladdingBakeIssueService.PidStage, "none")
+        ]);
+        Require(merged.Count == 2 && merged[0].Detail == "first" && merged[1].PanelObjectId == PanelB,
+            "Each panel keeps one issue, the earliest one.");
+
+        var panels = new HashSet<Guid> { PanelA };
+        Require(PanelCladdingBakeIssueService.IsDotOf($" {PanelA:D} ", panels) &&
+                !PanelCladdingBakeIssueService.IsDotOf(PanelB.ToString("D"), panels) &&
+                !PanelCladdingBakeIssueService.IsDotOf(null, panels) &&
+                !PanelCladdingBakeIssueService.IsDotOf("not a guid", panels),
+            "Only dots of the panels given to the run are replaced.");
+        Console.WriteLine("[OK] issue dots name the stage and a short reason; one dot per panel; a run replaces only its panels' dots");
+    }
+
+    private static void VerifyPerPanelContract()
+    {
+        string source = Source("src", "PanelCladdingEditor", "Infrastructure", "Rhino", "Live", "PanelCladding",
+            "LivePanelCladdingUpdateService.cs").Replace("\r\n", "\n", StringComparison.Ordinal);
+        string[] required =
+        {
+            "PanelCladdingBakeIssueService.MissingPanelStage",
+            "PanelCladdingBakeIssueService.PidStage",
+            "PanelCladdingBakeIssueService.NotEditableStage",
+            "PanelCladdingBakeIssueService.DuplicateCidStage",
+            "PanelCladdingBakeIssueService.PointOrderStage",
+            "PanelCladdingBakeIssueService.SurfaceStage",
+            "PanelCladdingBakeIssueService.CurveStage",
+            "LivePanelCladdingCidService.Prepare(document, candidatePanelIds)",
+            "RestoreOrThrow(restoreSource, source.ObjectId);",
+            "IsCreatableLayerPath(document, layerPath)",
+            "PANEL_CLADDING_UPDATE_DUPLICATE_EXPECTED_CID",
+            "baked.Select(source => source.ObjectId).ToHashSet(),",
+            "LivePanelCladdingBakeIssueDots.Mark(",
+            "result.Issues = PanelCladdingBakeIssueService.Merge(issues);"
+        };
+        foreach (string token in required)
+        {
+            Require(source.Contains(token, StringComparison.Ordinal), $"Per-panel PCbake is missing: {token}");
+        }
+        foreach (string removed in new[]
+                 {
+                     "PANEL_CLADDING_UPDATE_SURFACE_PREPARE_FAILED",
+                     "PANEL_CLADDING_UPDATE_CURVE_PREPARE_FAILED",
+                     "Fail($\"PANEL_CLADDING_UPDATE_SOURCE_NOT_EDITABLE",
+                     "Fail($\"PANEL_CLADDING_UPDATE_PID_REQUIRED",
+                     "Fail(prepared.Message)"
+                 })
+        {
+            Require(!source.Contains(removed, StringComparison.Ordinal),
+                $"A problem of one panel must not fail the whole run: {removed}");
+        }
+
+        string dots = Source("src", "PanelCladdingEditor", "Infrastructure", "Rhino", "Live", "PanelCladding",
+            "LivePanelCladdingBakeIssueDots.cs");
+        foreach (string token in new[]
+                 {
+                     "ObjectTypeFilter = ObjectType.TextDot",
+                     "PanelCladdingBakeIssueService.IsDotOf(",
+                     "document.Objects.Delete(dot, quiet: true, ignoreModes: true)",
+                     "document.Objects.AddTextDot(dot, attributes)",
+                     "PanelCladdingBakeIssueService.PanelUserTextKey, issue.PanelObjectId.ToString(\"D\")"
+                 })
+        {
+            Require(dots.Contains(token, StringComparison.Ordinal), $"Issue dots are missing: {token}");
+        }
+
+        string command = Source("src", "PanelCladdingEditor", "UI", "PanelCladdingBakeCommand.cs");
+        Require(command.Contains("foreach (PanelCladdingBakeIssue issue in result.Issues)", StringComparison.Ordinal) &&
+                command.Contains("PanelCladdingBakeIssueService.IssueLayerPath", StringComparison.Ordinal),
+            "PCbake must report every skipped panel and where its dot is.");
+        Console.WriteLine("[OK] live bake skips a failing panel whole, restores its source writes and marks it; the batch goes on");
     }
 
     private static bool Includes(PanelCladdingBakeScope scope, PanelCladdingDependencyKind kind) =>
