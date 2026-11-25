@@ -81,7 +81,6 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
         }
         PanelCladdingUpdateSelection selection = PanelCladdingUpdateSelectionService.CreatePlan(sources.Data);
 
-        // Existing dependencies first: panels that keep their curves need no curve plan at all.
         var ambiguousDependencies = new List<Guid>();
         IReadOnlyList<PanelCladdingExistingDependency> existing = ReadManagedDependencies(
             document,
@@ -94,8 +93,7 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
             filePath,
             selection.ProcessableSources,
             generator,
-            scope,
-            PanelCladdingDependencyReconciliationService.CurvePreservedPanels(existing));
+            scope);
         if (!preparedResponse.Success || preparedResponse.Data is null)
         {
             return OperationResponse<PanelCladdingUpdateResult>.Fail(preparedResponse.Message);
@@ -158,8 +156,7 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
         string filePath,
         IReadOnlyList<PanelCladdingUpdateSource> sources,
         LivePanelCladdingSpawnService generator,
-        PanelCladdingBakeScope scope,
-        IReadOnlySet<Guid> curvePreservedPanels)
+        PanelCladdingBakeScope scope)
     {
         var prepared = new List<PreparedDependency>();
         foreach (PanelCladdingUpdateSource source in sources)
@@ -183,8 +180,7 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
                     PreparedDependency.FromSurface(source, region)));
             }
 
-            if (PanelCladdingDependencyReconciliationService.Includes(scope, PanelCladdingDependencyKind.Curve) &&
-                !curvePreservedPanels.Contains(source.ObjectId))
+            if (PanelCladdingDependencyReconciliationService.Includes(scope, PanelCladdingDependencyKind.Curve))
             {
                 OperationResponse<LivePanelCladdingSpawnService.PreparedPanel> curves =
                     generator.PreparePanel(
@@ -466,7 +462,6 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
             SourcePanelIds = selection.ProcessableSources.Select(source => source.ObjectId).ToArray(),
             DuplicateCidGroups = selection.DuplicateCidGroups,
             PreservedAmbiguousDependencyIds = ambiguousDependencies,
-            PreservedCurvePanelIds = plan.PreservedCurvePanelIds,
             CreatedSurfaceIds = createdSurfaces,
             CreatedCurveIds = createdCurves,
             UpdatedSurfaceIds = updatedSurfaces,

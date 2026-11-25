@@ -404,7 +404,7 @@ It writes when Rhino is idle, outside Undo, only for keys that changed, and neve
 
 **Why:** "Bake" names the direction, attributes into geometry, which is the opposite of sync; the spawn commands duplicated what update already did. Existing curves carry hand work that a rebuild would lose while assignment is suspended. To re-bake curves, delete them first.
 
-**Status:** current
+**Status:** superseded in part on 2026-11-18 by "PCbake overwrites existing curves"; the command replacement and the Scope option stand
 
 ### 2026-10-31 — PCreport is read-only with fixed rules
 
@@ -466,5 +466,19 @@ the main checkout has checked out: a branch's own rule changes are not exercised
 at all if that branch has no `.githooks`. A relative `.githooks` works in every worktree because git
 runs hooks from the working tree root. Changing only that one shape in the worktree's own config
 leaves a deliberately chosen hooks manager alone.
+
+**Status:** current
+
+### 2026-11-18 — PCbake overwrites existing curves
+
+**Decision:** `PCbake` reconciles extrusion curves the way it reconciles surfaces. Within the
+`Curves` or `All` scope, a curve whose kind, PID and CID are still expected is overwritten in place
+from the panel's current values, missing curves are created, and obsolete or duplicate curves are
+deleted. Nothing asks the user to delete curves first.
+
+**Why:** The user found that keeping every curve of a panel that already had curves made `PCbake`
+unable to apply changed panel values without deleting the curves by hand. The panel is the source
+of truth for curves as well (frame assignments on curves are only copies), and `PCsyncCrv` reads
+hand edits back into the panel before a bake when they must be kept. One Undo restores a run.
 
 **Status:** current
