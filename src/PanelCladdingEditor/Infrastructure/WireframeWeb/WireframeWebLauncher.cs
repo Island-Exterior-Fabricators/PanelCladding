@@ -4,11 +4,6 @@ using PanelCladdingEditor.Application.Services.PanelCladding;
 
 namespace PanelCladdingEditor.Infrastructure.WireframeWeb;
 
-// Opens a saved model in Wireframe Web, a separate per-user install, through its launch command:
-// "<Launcher>" --open "<model>.3dm". The command starts Wireframe Web or reuses the running one,
-// loads the file's latest save and opens a browser tab on the project. Exit 0 prints the page
-// address as the last line of stdout; 1 (bad model), 2 (server did not start) and 3 (model failed
-// to load) print one line on stderr. Nothing else of Wireframe Web is used.
 public static class WireframeWebLauncher
 {
     public const string RegistryKey = @"Software\IEF\Wireframe Web";
@@ -17,7 +12,6 @@ public static class WireframeWebLauncher
     public const string DownloadPage = "https://github.com/Island-Exterior-Fabricators/wireframe-web/releases/latest";
     public static readonly TimeSpan Timeout = TimeSpan.FromMinutes(3);
 
-    // Output files older than this are removed on the next run.
     private static readonly TimeSpan OutputLifetime = TimeSpan.FromDays(1);
 
     public static string NotInstalledMessage =>
@@ -25,7 +19,6 @@ public static class WireframeWebLauncher
 
     public static string OutputFolder => Path.Combine(Path.GetTempPath(), "PanelCladdingEditor", "PCweb");
 
-    // The registry's Launcher, else the default install; null when neither file exists.
     public static string? FindLauncher() =>
         FindLauncher(ReadRegisteredLauncher(), Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
 
@@ -37,8 +30,6 @@ public static class WireframeWebLauncher
         return File.Exists(fallback) ? fallback : null;
     }
 
-    // Wireframe Web needs "<CODE> - ….3dm": the project code is the text before the first " - ".
-    // Returns the code, or empty when the name does not follow it.
     public static string ProjectCode(string? modelPath)
     {
         string path = (modelPath ?? string.Empty).Trim();
@@ -48,14 +39,10 @@ public static class WireframeWebLauncher
             : string.Empty;
     }
 
-    // Runs the launcher and waits for it to exit (up to timeout). Blocks: call it off the UI thread.
-    // A launcher still running after the timeout is left running.
-    //
-    // The shell starts cmd.exe, so the launcher inherits none of the caller's handles. Started
-    // directly with redirected output it would inherit them all, and Rhino's handle on the open model
-    // would pass on to the browser the launcher starts: while that lives, Rhino cannot save the model
-    // ("File Is Read-only"). cmd.exe writes the output to files instead of pipes.
-    public static WireframeWebResult Open(string launcher, string modelPath, TimeSpan timeout)
+    public static WireframeWebResult Open(string launcher, string modelPath, TimeSpan timeout) =>
+        Open(launcher, modelPath, timeout, TimeProvider.System);
+
+    public static WireframeWebResult Open(string launcher, string modelPath, TimeSpan timeout, TimeProvider clock)
     {
         if (!File.Exists(launcher))
             return WireframeWebResult.Failed(-1, $"Wireframe Web could not be started: {launcher} is missing.");
@@ -63,7 +50,7 @@ public static class WireframeWebLauncher
         try
         {
             Directory.CreateDirectory(OutputFolder);
-            RemoveOldOutput();
+            RemoveOldOutput(clock.GetUtcNow().UtcDateTime);
             string run = Path.Combine(OutputFolder, Guid.NewGuid().ToString("N"));
             output = run + ".out.txt";
             error = run + ".err.txt";
@@ -86,8 +73,14 @@ public static class WireframeWebLauncher
             using Process? process = Process.Start(start);
             if (process is null)
                 return WireframeWebResult.Failed(-1, "Wireframe Web could not be started.");
-            if (!process.WaitForExit((int)Math.Min(timeout.TotalMilliseconds, int.MaxValue)))
+            using var stop = new CancellationTokenSource();
+            Task exited = process.WaitForExitAsync(stop.Token);
+            Task expired = Task.Delay(timeout, clock, stop.Token);
+            bool answered = Task.WaitAny(exited, expired) == 0;
+            stop.Cancel();
+            if (!answered)
                 return WireframeWebResult.Failed(-1, $"Wireframe Web did not answer within {Describe(timeout)}.");
+            process.WaitForExit();
             exitCode = process.ExitCode;
         }
         catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or InvalidOperationException)
@@ -109,8 +102,6 @@ public static class WireframeWebLauncher
         return key?.GetValue(LauncherValue) as string;
     }
 
-    // Children of the launcher (the browser) may keep the file open, so it is read shared and
-    // deleted when it can be; what is left is removed by a later run.
     private static string[] ReadLines(string path)
     {
         try
@@ -128,11 +119,11 @@ public static class WireframeWebLauncher
         }
     }
 
-    private static void RemoveOldOutput()
+    private static void RemoveOldOutput(DateTime nowUtc)
     {
         foreach (string file in Directory.EnumerateFiles(OutputFolder, "*.txt"))
         {
-            if (DateTime.UtcNow - File.GetLastWriteTimeUtc(file) > OutputLifetime) TryDelete(file);
+            if (nowUtc - File.GetLastWriteTimeUtc(file) > OutputLifetime) TryDelete(file);
         }
     }
 
@@ -151,7 +142,6 @@ public static class WireframeWebLauncher
         span.TotalMinutes >= 1 ? $"{span.TotalMinutes:0.#} minute(s)" : $"{span.TotalSeconds:0.#} second(s)";
 }
 
-// ExitCode is the launcher's, or -1 when it could not be started or did not exit in time.
 public sealed record WireframeWebResult(bool Success, int ExitCode, string Address, string Message)
 {
     public static WireframeWebResult Opened(string address) => new(true, 0, address, string.Empty);

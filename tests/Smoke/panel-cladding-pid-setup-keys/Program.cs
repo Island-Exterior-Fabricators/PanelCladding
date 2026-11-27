@@ -38,8 +38,6 @@ assignment = Plan(panel);
 var writes = Required(setup.CreateWrites(assignment, panel));
 string[] generated = ["CW_1.01_PID", "CW_1.02_CID", "CW_1.03_ELEVATION", "CW_1.04_LEVEL",
     "CW_2.00_UNIT_DIMENSION", "CW_2.01_UNIT_WIDTH", "CW_2.02_UNIT_HEIGHT"];
-// Since 1.2.5 existing setup keys (any case, blank or not) are never rewritten; only the generated
-// values and a Definition A role that changes ("Child" -> "child") are written.
 Check(writes.Keys.ToHashSet().SetEquals(generated.Append("CW_5.00_DEFINITION_A")) && writes["CW_5.00_DEFINITION_A"] == "child",
     "Existing non-generated keys are not rewritten: " + string.Join(", ", writes.Keys));
 Check(writes["CW_1.02_CID"] == "CID-ABC-N1-01-01_C", "CID agrees with retained unit role");

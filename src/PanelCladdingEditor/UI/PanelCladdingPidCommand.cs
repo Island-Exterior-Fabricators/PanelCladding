@@ -28,7 +28,6 @@ public sealed class PanelCladdingPidCommand : RhinoCommand
             RhinoApp.WriteLine("Save the Rhino document before running PCpid.");
             return Result.Failure;
         }
-        // The file name names the project (ABC - Wireframe.3dm is ABC); it is offered as the default.
         string fileProject = PanelCladdingProjectService.CodeFromDocumentPath(doc.Path);
         bool hasDefault = PanelCladdingPidPlanningService.IsProjectCode(fileProject);
         string project;

@@ -9,14 +9,10 @@ namespace PanelCladdingEditor.Application.Services.PanelCladding;
 public sealed partial class PanelCladdingKeyService
 {
     public const int OffsetDecimalPlaces = 5;
-    // Retained only to clean up suspended cladding type metadata.
     public const string TypeCodeKey = "CW_2.14_CLADDING_TYPE";
     public const string FrameConfigKey = "CW_1.08_FRAME_CONFIG";
-    // Hand-filled frame type; the plug-in only reads it for the naming-convention sheet.
     public const string FrameTypeKey = "CW_1.09_FRAME_TYPE";
-    // Frame/extrusion assignment payload, kept in CW_1.09_FRAME_TYPE until 1.2.5.
     public const string FrameAssignmentsKey = "UD_FRAME_ASSIGNMENTS";
-    // Panel frame, an auto value: origin;X axis;Y axis (Z points out of the facade).
     public const string PlaneKey = "UD_PLANE";
     public const string LegacyFrameTypologyKey = "CW_1.5D_FRAME TYPOLOGY";
     public const string LegacyFrameAssignmentsKey = "CW_2.09_FRAME_ASSIGNMENTS";
@@ -29,7 +25,6 @@ public sealed partial class PanelCladdingKeyService
     public const string CladdingLogicKey = "UD_CLADDING_LOGIC";
     public const string LegacyCladdingLogicKey = "CW_2.13_CLADDING_LOGIC";
     public const string FrameConfigBackupKey = "UD_FRAME_CONFIG";
-    // The UD_ series replaced CW_9.xx in 1.2.2; panels not written since still carry these.
     public const string LegacyUserDefinedCladdingLogicKey = "CW_9.01_CLADDING_LOGIC";
     public const string LegacyUserDefinedFrameConfigKey = "CW_9.02_FRAME_CONFIG";
     public const string UnitDimensionKey = "CW_2.00_UNIT_DIMENSION";
@@ -135,13 +130,9 @@ public sealed partial class PanelCladdingKeyService
         });
     }
 
-    // A panel's cladding is configured once a plug-in write stored UD_CLADDING_LOGIC (or CW_9.01).
     public static bool IsCladdingConfigured(IReadOnlyDictionary<string, string> userText) =>
         ReadUserDefinedValue(userText, CladdingLogicKey).Length > 0;
 
-    // Cell values keyed by CW_4.xx name, read from UD_CLADDING_LOGIC; empty while unconfigured.
-    // CW_4.xx is output only. The one exception is logic written before 1.2.4, which holds no
-    // materials: each root cell then takes its material from its own CW_4.xx key until rewritten.
     public OperationResponse<IReadOnlyDictionary<string, string>> ReadCladdingCellValues(
         IReadOnlyDictionary<string, string> userText)
     {
@@ -436,8 +427,6 @@ public sealed partial class PanelCladdingKeyService
         IReadOnlyDictionary<string, string> userText,
         IReadOnlyDictionary<string, string> expectedWrites)
     {
-        // CW_1.08 holds the code derived from UD_FRAME_CONFIG on write, so only the configuration is
-        // compared. A stored CW_9.02 is never expected, so a legacy panel is rewritten (and renamed).
         foreach (string topologyKey in new[] { FrameConfigBackupKey, LegacyUserDefinedFrameConfigKey, SegmentMaskKey, MergeMaskKey, HideMaskKey })
         {
             KeyValuePair<string, string>[] stored = userText

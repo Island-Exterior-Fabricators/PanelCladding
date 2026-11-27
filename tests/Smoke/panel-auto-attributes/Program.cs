@@ -16,7 +16,6 @@ internal static class Program
         Console.WriteLine("PASS: panel auto attribute regression");
     }
 
-    // The user's example: a 90 x 305 in panel with CW_6.01_PSF = 85.
     private static void VerifyUserExample()
     {
         var values = PanelCladdingAutoAttributeService.CreateValues(
@@ -29,14 +28,12 @@ internal static class Program
                 values["CW_6.02_UNIT_WEIGHT"] == "16203.125",
             "The 90 x 305 in, PSF 85 panel gives the user's five values: " + string.Join("; ", values));
 
-        // A millimetre model: 2286 x 7747 mm is the same panel; the area is still square feet.
         var metric = PanelCladdingAutoAttributeService.CreateValues(
             2286, 7747, 2286d * 7747d / SquareMillimetresPerSquareFoot, new Dictionary<string, string> { ["cw_6.01_psf"] = "85 psf" });
         Require(metric["CW_2.00_UNIT_DIMENSION"] == "2286.00000x7747.00000" &&
                 metric["CW_2.07_UNIT_AREA"] == "190.625 sqf" && metric["CW_6.02_UNIT_WEIGHT"] == "16203.125",
             "Millimetre dimensions stay in model units; area converts to square feet.");
 
-        // Weight uses the unrounded area: 12.5 x 190.6254 = 2382.8175.
         var rounded = PanelCladdingAutoAttributeService.CreateValues(
             90, 305, 190.6254, new Dictionary<string, string> { ["CW_6.01_PSF"] = "12.5" });
         Require(rounded["CW_2.07_UNIT_AREA"] == "190.625 sqf" && rounded["CW_6.02_UNIT_WEIGHT"] == "2382.818",

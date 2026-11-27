@@ -1,0 +1,24 @@
+P:System.DateTime.Now;Tests take the time from a ManualTimeProvider (tests/Shared/ManualTimeProvider.cs).
+P:System.DateTime.UtcNow;Tests take the time from a ManualTimeProvider (tests/Shared/ManualTimeProvider.cs).
+P:System.DateTime.Today;Tests take the time from a ManualTimeProvider (tests/Shared/ManualTimeProvider.cs).
+P:System.DateTimeOffset.Now;Tests take the time from a ManualTimeProvider (tests/Shared/ManualTimeProvider.cs).
+P:System.DateTimeOffset.UtcNow;Tests take the time from a ManualTimeProvider (tests/Shared/ManualTimeProvider.cs).
+T:System.Diagnostics.Stopwatch;Tests do not measure or assert how long something took.
+M:System.Threading.Thread.Sleep(System.Int32);Tests wait for an event, never for a duration.
+M:System.Threading.Thread.Sleep(System.TimeSpan);Tests wait for an event, never for a duration.
+M:System.Threading.Tasks.Task.Delay(System.Int32);Tests wait for an event, never for a duration.
+M:System.Threading.Tasks.Task.Delay(System.TimeSpan);Tests wait for an event, never for a duration.
+M:System.Threading.Tasks.Task.Delay(System.Int32,System.Threading.CancellationToken);Tests wait for an event, never for a duration.
+M:System.Threading.Tasks.Task.Delay(System.TimeSpan,System.Threading.CancellationToken);Tests wait for an event, never for a duration.
+M:System.Threading.Tasks.Task.Wait(System.Int32);Tests have no time limit of their own.
+M:System.Threading.Tasks.Task.Wait(System.TimeSpan);Tests have no time limit of their own.
+M:System.Threading.WaitHandle.WaitOne(System.Int32);Tests have no time limit of their own.
+M:System.Threading.WaitHandle.WaitOne(System.TimeSpan);Tests have no time limit of their own.
+M:System.Diagnostics.Process.WaitForExit(System.Int32);Tests have no time limit of their own.
+M:System.Diagnostics.Process.WaitForExit(System.TimeSpan);Tests have no time limit of their own.
+M:System.Threading.CancellationTokenSource.CancelAfter(System.Int32);Tests have no time limit of their own.
+M:System.Threading.CancellationTokenSource.CancelAfter(System.TimeSpan);Tests have no time limit of their own.
+M:System.Threading.CancellationTokenSource.#ctor(System.Int32);Tests have no time limit of their own.
+M:System.Threading.CancellationTokenSource.#ctor(System.TimeSpan);Tests have no time limit of their own.
+T:System.Threading.Timer;Tests take timers from a ManualTimeProvider.
+T:System.Timers.Timer;Tests take timers from a ManualTimeProvider.

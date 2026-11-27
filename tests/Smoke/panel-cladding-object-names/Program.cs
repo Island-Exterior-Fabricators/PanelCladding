@@ -64,14 +64,11 @@ foreach (var (stalePanel, staleSurface, staleCurve) in new[]
 }
 Console.WriteLine("[OK] both sync scopes commit isolated/all name-only changes and make no writes when names already match");
 
-// Rhino mutation adapters cannot execute without a native document. Verify the compiled
-// production source routes all existing write paths through the shared naming policy.
 var root = new DirectoryInfo(AppContext.BaseDirectory);
 while (root is not null && !File.Exists(Path.Combine(root.FullName, "AGENTS.md"))) root = root.Parent;
 Check(root is not null, "Repository root");
 string Source(string relative) => File.ReadAllText(Path.Combine(root!.FullName, "src/PanelCladdingEditor", relative));
 const string live = "Infrastructure/Rhino/Live/PanelCladding/";
-// Since 1.3.0 PCbake is the only generator (the spawn commands' own write path is gone).
 Check(Source(live + "LivePanelCladdingUpdateService.cs").Contains("ShortName(dependency.Expected.Cid)"),
     "PCbake replacements and creations use dependency CID");
 var syncSource = Source(live + "LivePanelCladdingSurfaceSyncRepository.cs");

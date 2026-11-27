@@ -133,8 +133,6 @@ internal static class Program
         Console.WriteLine("[OK] PCbake generates through the live spawn adapter; command GUIDs are unique");
     }
 
-    // Since 1.3.0 PCbake is the only command that generates cladding geometry. The live spawn
-    // adapter remains its per-panel generator and no longer has a batch entry of its own.
     private static void VerifyCommandContract()
     {
         Assembly assembly = typeof(PanelCladdingSpawnPlanningService).Assembly;

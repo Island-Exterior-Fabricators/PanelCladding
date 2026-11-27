@@ -9,7 +9,6 @@ public enum PanelGeometryClass
 
 public readonly record struct PanelPoint3(double X, double Y, double Z);
 
-// A panel frame as stored in UD_PLANE: origin and unit X/Y axes (Z = X x Y).
 public readonly record struct PanelPlaneFrame(PanelPoint3 Origin, PanelPoint3 XAxis, PanelPoint3 YAxis);
 
 public readonly record struct PanelPoint2(double X, double Y);
@@ -686,7 +685,6 @@ public sealed class PanelCladdingSurfaceSyncPanelPlan
     public IReadOnlyDictionary<string, string> CellValues { get; init; } =
         new Dictionary<string, string>();
     public string CladdingLogic { get; init; } = string.Empty;
-    // False for PCsyncCrv on an unconfigured panel: its CW_4.xx keys and logic are left as they are.
     public bool WritesCladding { get; init; } = true;
     public bool CladdingChanged { get; init; }
     public bool NameChanged { get; init; }

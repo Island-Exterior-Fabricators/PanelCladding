@@ -4,7 +4,6 @@ namespace PanelCladdingEditor.Application.Services.PanelCladding;
 
 public static class PanelCladdingUpdateSelectionService
 {
-    // Sources must carry the resolved CID, including any parent/child role correction.
     public static PanelCladdingUpdateSelection CreatePlan(IEnumerable<PanelCladdingUpdateSource> sources)
     {
         var groups = sources.DistinctBy(source => source.ObjectId)

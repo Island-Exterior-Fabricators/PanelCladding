@@ -112,7 +112,6 @@ internal static class Program
     private static void VerifyRhinoAttributeWriteContracts()
     {
         string root = FindRepositoryRoot();
-        // PCbake (1.3.0) is the only generator; the PCspawnCrv write path was removed with the command.
         string update = File.ReadAllText(Path.Combine(
             root, "src", "PanelCladdingEditor", "Infrastructure", "Rhino", "Live",
             "PanelCladding", "LivePanelCladdingUpdateService.cs"));

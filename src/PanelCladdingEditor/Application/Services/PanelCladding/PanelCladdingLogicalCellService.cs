@@ -12,8 +12,6 @@ public sealed class PanelCladdingLogicalCellService
         return ExpandGroups(BuildGroups(cells, topology), logicalValues);
     }
 
-    // UI topology already has these groups, including unsaved deleted boundaries.
-    // Each group starts with its canonical representative (lowest row, then column).
     public IReadOnlyDictionary<string, string> ExpandGroups(
         IReadOnlyList<IReadOnlyList<PanelCladdingCell>> groups,
         IReadOnlyDictionary<string, string> logicalValues)

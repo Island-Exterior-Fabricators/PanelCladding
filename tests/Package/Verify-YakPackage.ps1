@@ -1,6 +1,5 @@
 [CmdletBinding()]
 param(
-    # Built .yak package. Defaults to the single package for the manifest version in the artifacts folder.
     [string] $PackagePath,
     [string] $YakPath = (Join-Path $env:ProgramFiles 'Rhino 8\System\Yak.exe')
 )
@@ -24,7 +23,6 @@ function Check([bool] $condition, [string] $message) {
 $work = Join-Path ([IO.Path]::GetTempPath()) ("pc-yak-test-" + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $work | Out-Null
 try {
-    # 1. Package contents.
     $extract = Join-Path $work 'extract'
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     [IO.Compression.ZipFile]::ExtractToDirectory($PackagePath, $extract)
@@ -43,7 +41,6 @@ try {
     Check (-not ($entries | Where-Object { [IO.Path]::GetFileName($_) -match '^(MCP_Rhino|ModelContextProtocol|Microsoft\.Extensions\.Hosting)' })) 'package omits MCP dependencies'
     Check (-not ($entries | Where-Object { $_.StartsWith('runtimes/') -and -not $_.StartsWith('runtimes/win-x64/') })) 'package ships only win-x64 runtimes'
 
-    # 2. Manifest.
     $manifest = Get-Content -Raw -LiteralPath (Join-Path $extract 'manifest.yml')
     $guid = ([string]$definition.pluginId).ToLowerInvariant()
     Check ($manifest -match '(?m)^name:\s*PanelCladdingEditor\s*$') 'manifest name is PanelCladdingEditor'
@@ -51,13 +48,11 @@ try {
     Check ($manifest -match "(?m)^\s*-\s*guid:$guid\s*$") 'manifest keywords carry the plug-in GUID'
     Check ($manifest -match '(?m)^platform:\s*win\s*$') 'manifest platform is win'
 
-    # 3. Compiled plug-in identity of the packaged RHP.
     $identity = Join-Path $PSScriptRoot 'Verify-PluginAssemblyIdentity.ps1'
     $identityOk = $true
     try { & $identity -PluginPath (Join-Path $extract 'PanelCladdingEditor.rhp') | Out-Host } catch { $identityOk = $false; Write-Host $_ }
     Check $identityOk 'packaged RHP assembly GUID matches the manifest and plug-in class'
 
-    # 4. Folder source round trip: publish through the script, then search through the same source.
     $buildYak = Join-Path $packaging 'Build-PanelCladdingEditorYak.ps1'
     $source = Join-Path $work 'source'
     New-Item -ItemType Directory -Path $source | Out-Null
@@ -79,7 +74,6 @@ try {
     try { & $buildYak -PackagePath $tampered -Source $source | Out-Null } catch { $conflictRefused = $_.Exception.Message -match 'Bump the version' }
     Check $conflictRefused 'replacing a published version with different content is refused'
 
-    # 5. The build script refuses the public server before building anything.
     $refused = $false
     try {
         & (Join-Path $packaging 'Build-PanelCladdingEditorYak.ps1') -OutputRoot (Join-Path $work 'out') -Source 'https://yak.rhino3d.com/' | Out-Null

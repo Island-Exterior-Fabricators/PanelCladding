@@ -12,9 +12,6 @@ public sealed class PanelCladdingDependencyReconciliationService
         _ => true
     };
 
-    // Surfaces and curves reconcile alike: an existing object whose panel ID and CID are still
-    // expected is overwritten in place, missing ones are created, obsolete or duplicate ones are
-    // deleted. Nothing outside the scope is touched.
     public OperationResponse<PanelCladdingDependencyReconciliationPlan> CreatePlan(
         IReadOnlyList<PanelCladdingExpectedDependency> expected,
         IReadOnlyList<PanelCladdingExistingDependency> existing,

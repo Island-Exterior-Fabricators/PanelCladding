@@ -39,7 +39,6 @@ public sealed class PanelCladdingPidSetupService
         "CW_7.00_BLIND_DOUBLE"
     });
 
-    // Bounds are tight in the panel plane. Measure in that plane, not a world XY box.
     public OperationResponse<IReadOnlyDictionary<string, string>> CreateWrites(
         PanelCladdingPidAssignment assignment, PanelCladdingPidPanel panel)
     {
@@ -71,16 +70,11 @@ public sealed class PanelCladdingPidSetupService
         };
         foreach (string key in RequiredKeys)
         {
-            // A key that already exists (any case, blank or not) is never overwritten; many of
-            // these fields are hand-filled. Only a missing key gets the placeholder.
             if (writes.ContainsKey(key) ||
                 panel.UserText.Keys.Any(existing => string.Equals(existing, key, StringComparison.OrdinalIgnoreCase))) continue;
-            // Empty user strings are not retained reliably by Rhino. A space is the
-            // same persisted blank convention used by the editor's unassigned cells.
             writes[key] = PanelCladdingKeyService.PersistedBlankCellValue;
         }
         ReserveRoleDefinition(writes, panel.UserText);
-        // Existing keys are not copied into the writes, so the CID check reads both.
         var effective = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach ((string key, string value) in panel.UserText) effective[key] = value;
         foreach ((string key, string value) in writes) effective[key] = value;
@@ -89,9 +83,6 @@ public sealed class PanelCladdingPidSetupService
         return OperationResponse<IReadOnlyDictionary<string, string>>.Ok(writes);
     }
 
-    // Definition A is reserved for the panel role. A non-role value moves the existing
-    // definitions down one letter (adding E, F, ... as needed); flat and curved panels are
-    // always parent, multi-face panels keep their role. Roles are stored lowercase.
     public static void ReserveRoleDefinition(IDictionary<string, string> writes, IReadOnlyDictionary<string, string> userText)
     {
         string Value(string key) => writes.TryGetValue(key, out string? written) ? written
@@ -121,7 +112,6 @@ public sealed class PanelCladdingPidSetupService
             string value = string.IsNullOrWhiteSpace(values[index])
                 ? PanelCladdingKeyService.PersistedBlankCellValue
                 : values[index];
-            // An existing key that already holds the value is left as it is.
             if (!writes.ContainsKey(key) &&
                 userText.Any(item => string.Equals(item.Key, key, StringComparison.OrdinalIgnoreCase) && item.Value == value)) continue;
             writes[key] = value;

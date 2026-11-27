@@ -42,7 +42,6 @@ internal static class Program
         Console.WriteLine("[OK] key names and clear scope");
     }
 
-    // XYZ corner panels hold text in CW_1.09; the payload lives in UD_FRAME_ASSIGNMENTS.
     private static void VerifyFrameAssignmentsMoved()
     {
         var service = new PanelFrameAssignmentService();
@@ -168,7 +167,6 @@ internal static class Program
             var workbook = new OpenXmlPanelNamingConventionWorkbook();
             PanelNamingFormat met = Required(PanelNamingFormat.Parse(XyzFormat));
 
-            // ABC: Frame-Type header in row 7, no table yet. Nothing to record leaves the sheet alone.
             string abc = Path.Combine(directory, "ABC - Naming Convention.xlsx");
             CreateWorkbook(abc, xyzTable: false);
             PanelNamingConventionSheetContent abcSheet = Required(workbook.Read(abc));
@@ -193,7 +191,6 @@ internal static class Program
             }
             Require(Required(workbook.Read(abc)).FrameTypes["01"] == "oCornerL", "The new table reads back.");
 
-            // XYZ: titled table with NA, two values and placeholder rows.
             string xyzPath = Path.Combine(directory, "XYZ - Naming Convention.xlsx");
             CreateWorkbook(xyzPath, xyzTable: true);
             PanelNamingConventionSheetContent xyzSheet = Required(workbook.Read(xyzPath));
@@ -317,7 +314,6 @@ internal static class Program
     private static string Rows(IEnumerable<PanelNamingCodeRow> rows) =>
         string.Join(" ", rows.Select(row => $"{row.Code}={row.Description}{(row.Used ? "+" : "-")}"));
 
-    // An 80 x 231.25623 flat panel facing +Y.
     private static PanelCladdingPidPanel Rect(IReadOnlyDictionary<string, string> userText)
     {
         PanelPoint3 Point(double x, double z) => new(-x, 0, z);
@@ -326,7 +322,6 @@ internal static class Program
             new Dictionary<string, string>(userText) { ["CW_1.06_UNIT_TYPE"] = "F" });
     }
 
-    // A PNL sheet with the ABC code tables; xyzTable adds XYZ's titled Frame-Type table.
     private static void CreateWorkbook(string path, bool xyzTable)
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create(path, SpreadsheetDocumentType.Workbook);

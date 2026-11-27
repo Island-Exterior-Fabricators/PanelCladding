@@ -47,7 +47,7 @@ dotnet build .\src\PanelCladdingEditor\PanelCladdingEditor.csproj -c Release -t:
 ```powershell
 .\tests\Run-Regression.ps1                                  # every smoke, Debug and Release
 .\tests\Run-Regression.ps1 -Configuration Debug -Name panel-cladding-pid*
-.\tests\Run-Regression.ps1 -List                            # also -NoBuild, -TimeoutSeconds (default 900)
+.\tests\Run-Regression.ps1 -List                            # also -NoBuild
 ```
 
 - It builds each smoke serially into `artifacts/tests/bin/<Configuration>/`,
@@ -291,7 +291,7 @@ See `tests/Live/README.md` for the full procedure. In short:
   `libraryPath = <repo>\tests\Live\PcLive.cs`, `libraryType = PcLive`,
   `script = "Result = PcLive.Start(doc, Parameters, Log);"`, `parametersJson = {"suite":"bake"}`
   (join suites with `+`; optional `version`, `project`, `mainModel`, `assembly`), then
-  `apply_rhino_script` with the returned token. `Show-Results.py <evidenceDir>\<suite>.json`
+  `apply_rhino_script` with the returned token. `Show-Results.ps1 -Path <evidenceDir>\<suite>.json`
   prints the results.
 - `export` and `editor` need `Watch-Dialogs.ps1` (Windows UI Automation) and `Hold-Workbook.ps1`
   running in a host shell; under AGENTS.md, UI Automation needs an explicit user request.

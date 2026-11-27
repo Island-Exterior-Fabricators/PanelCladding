@@ -12,7 +12,6 @@ namespace PanelCladdingEditor.Infrastructure.Rhino.Live.PanelCladding;
 
 public sealed class LivePanelCladdingPidGeometryService
 {
-    // Measurement only: neither the Brep nor the boundary is transformed/rebuilt.
     public OperationResponse<PanelCladdingPidPanel> Read(Guid id, Brep brep, double tolerance,
         IReadOnlyDictionary<string, string> userText)
     {
@@ -24,8 +23,6 @@ public sealed class LivePanelCladdingPidGeometryService
         var front = face.NormalAt(face.Domain(0).Mid, face.Domain(1).Mid);
         if (face.OrientationIsReversed) front.Reverse();
         if (!front.Unitize()) return Fail($"Panel {id} has an invalid face normal.");
-        // Use the accepted plane, with the original front's sign. A sampled normal
-        // and a bounding-box thickness must not override Rhino's face planarity test.
         var normal = surfacePlane.Normal;
         if (normal * front < 0) normal.Reverse();
         var right = Vector3d.CrossProduct(Vector3d.ZAxis, normal);
@@ -49,8 +46,6 @@ public sealed class LivePanelCladdingPidGeometryService
         }
         else
         {
-            // Detached curve bounds respect trims and avoid document-object box
-            // caches. Only its in-plane extents are measurements of a planar face.
             bounds = boundary.GetBoundingBox(frame);
         }
         if (!bounds.IsValid) return Fail($"Panel {id} has invalid bounds.");

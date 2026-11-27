@@ -1,17 +1,14 @@
-using System.Diagnostics;
+using System.IO.Pipes;
 using PanelCladdingEditor.Infrastructure.WireframeWeb;
 
 namespace PcWebCommandSmoke;
 
-// PCweb: finds the Wireframe Web launcher, checks the model name, and runs a fake launcher (in a
-// folder with spaces) through every exit the launch contract defines. The command itself needs
-// Rhino; its source is checked for the save question, the worker-thread launch and a launcher
-// started without Rhino's handles.
 internal static class Program
 {
     private const string Address = "http://127.0.0.1:8795/?source=api&project=xyz&user=tester";
     private static readonly string Root = RegressionPaths.Output("pcweb-command");
     private static readonly string Log = Path.Combine(Root, "launcher-calls.txt");
+    private static readonly DateTimeOffset Now = new(2026, 1, 15, 12, 0, 0, TimeSpan.Zero);
 
     private static int Main()
     {
@@ -79,15 +76,21 @@ internal static class Program
         File.WriteAllText(model, "");
         Environment.SetEnvironmentVariable("PCWEB_FAKE_LOG", Log);
         TimeSpan timeout = TimeSpan.FromSeconds(30);
+        var clock = new ManualTimeProvider(Now);
         Directory.CreateDirectory(WireframeWebLauncher.OutputFolder);
         string stale = Path.Combine(WireframeWebLauncher.OutputFolder, "stale.out.txt");
+        string recent = Path.Combine(WireframeWebLauncher.OutputFolder, "recent.out.txt");
         File.WriteAllText(stale, "");
-        File.SetLastWriteTimeUtc(stale, DateTime.UtcNow.AddDays(-2));
+        File.SetLastWriteTimeUtc(stale, Now.UtcDateTime.AddDays(-2));
+        File.WriteAllText(recent, "");
+        File.SetLastWriteTimeUtc(recent, Now.UtcDateTime.AddHours(-1));
 
-        WireframeWebResult ok = Run(launcher, model, "ok", timeout, out _);
+        WireframeWebResult ok = Run(launcher, model, "ok", timeout, clock);
         Require(ok.Success && ok.ExitCode == 0 && ok.Address == Address, $"Exit 0 returns the last stdout line: {ok}");
         Require(File.ReadAllLines(Log).Single() == $"--open \"{model}\"", "The launcher receives --open and the quoted model path.");
         Require(!File.Exists(stale), "Output files older than a day are removed.");
+        Require(File.Exists(recent), "Output files younger than a day are kept.");
+        File.Delete(recent);
 
         foreach ((string mode, int code, string message) in new[]
                  {
@@ -96,28 +99,47 @@ internal static class Program
                      ("load", 3, "The model failed to load."),
                  })
         {
-            WireframeWebResult failed = Run(launcher, model, mode, timeout, out _);
+            WireframeWebResult failed = Run(launcher, model, mode, timeout, clock);
             Require(!failed.Success && failed.ExitCode == code && failed.Message == message && failed.Address.Length == 0,
                 $"Exit {code} returns its stderr line: {failed}");
         }
-        WireframeWebResult silent = Run(launcher, model, "silent", timeout, out _);
+        WireframeWebResult silent = Run(launcher, model, "silent", timeout, clock);
         Require(!silent.Success && silent.ExitCode == 2 && silent.Message == "Wireframe Web exited with code 2.",
             $"A failure without stderr names the exit code: {silent}");
         Console.WriteLine("[OK] fake launcher: --open \"<model>\" with spaces and '&'; exit 0 address; exits 1/2/3 messages");
 
-        WireframeWebResult slow = Run(launcher, model, "slow", TimeSpan.FromSeconds(1), out TimeSpan slowTime);
-        Require(!slow.Success && slow.ExitCode == -1 && slow.Message.Contains("did not answer", StringComparison.Ordinal) &&
-                slowTime < TimeSpan.FromSeconds(3), $"A launcher past the timeout is reported: {slow} after {slowTime}");
+        string slowPipe = PipeName();
+        using (var hold = new NamedPipeServerStream(slowPipe, PipeDirection.Out))
+        {
+            Task connected = hold.WaitForConnectionAsync();
+            var slowClock = new ManualTimeProvider(Now);
+            Environment.SetEnvironmentVariable("PCWEB_FAKE_PIPE", slowPipe);
+            Task<WireframeWebResult> pending = Task.Run(() => Run(launcher, model, "slow", timeout, slowClock));
+            connected.Wait();
+            slowClock.WaitForTimer();
+            slowClock.Advance(timeout);
+            WireframeWebResult slow = pending.Result;
+            Require(!slow.Success && slow.ExitCode == -1 && slow.Message == "Wireframe Web did not answer within 30 second(s).",
+                $"A launcher still running when the clock passes the timeout is reported: {slow}");
+            Require(hold.IsConnected, "The timed-out launcher is left running.");
+        }
 
-        WireframeWebResult child = Run(launcher, model, "child", timeout, out TimeSpan childTime);
-        Require(child.Success && child.Address == Address && childTime < TimeSpan.FromSeconds(5),
-            $"A child that keeps the output open does not hold the result: {child} after {childTime}");
+        string childPipe = PipeName();
+        using (var hold = new NamedPipeServerStream(childPipe, PipeDirection.Out))
+        {
+            Task connected = hold.WaitForConnectionAsync();
+            Environment.SetEnvironmentVariable("PCWEB_FAKE_PIPE", childPipe);
+            WireframeWebResult child = Run(launcher, model, "child", timeout, new ManualTimeProvider(Now));
+            connected.Wait();
+            Require(child.Success && child.Address == Address && hold.IsConnected,
+                $"A child that keeps the output open does not hold the result: {child}");
+        }
 
-        WireframeWebResult missing = WireframeWebLauncher.Open(Path.Combine(Root, "missing.cmd"), model, timeout);
+        WireframeWebResult missing = WireframeWebLauncher.Open(Path.Combine(Root, "missing.cmd"), model, timeout, clock);
         Require(!missing.Success && missing.ExitCode == -1 && missing.Message.StartsWith("Wireframe Web could not be started", StringComparison.Ordinal),
             $"A launcher that cannot start is reported: {missing}");
-        Console.WriteLine($"[OK] timeout reported after {slowTime.TotalSeconds:0.0} s; a child holding the output for 8 s " +
-            $"returned after {childTime.TotalSeconds:0.0} s; unstartable launcher reported");
+        Console.WriteLine("[OK] timeout reported when the clock passes it, the launcher left running; a child holding the output " +
+            "does not hold the result; unstartable launcher reported");
     }
 
     private static void VerifyCommandSource()
@@ -144,8 +166,6 @@ internal static class Program
                 source.Contains("AddOption(\"Save\")", StringComparison.Ordinal) &&
                 source.Contains("AddOption(\"LastSave\")", StringComparison.Ordinal),
             "Interactive runs ask Yes/No/Cancel; scripted runs offer Save and LastSave.");
-        // A launcher started with redirected output inherits Rhino's handles, including its lock on
-        // the open model; a browser it starts then keeps Rhino from saving ("File Is Read-only").
         string launcher = File.ReadAllText(Path.Combine(
             RegressionPaths.RepositoryRoot, "src", "PanelCladdingEditor", "Infrastructure", "WireframeWeb", "WireframeWebLauncher.cs"));
         Require(launcher.Contains("UseShellExecute = true", StringComparison.Ordinal) &&
@@ -156,15 +176,14 @@ internal static class Program
             "the launcher is started by the shell (no inherited handles)");
     }
 
-    private static WireframeWebResult Run(string launcher, string model, string mode, TimeSpan timeout, out TimeSpan elapsed)
+    private static WireframeWebResult Run(string launcher, string model, string mode, TimeSpan timeout, TimeProvider clock)
     {
         File.WriteAllText(Log, "");
         Environment.SetEnvironmentVariable("PCWEB_FAKE_MODE", mode);
-        var watch = Stopwatch.StartNew();
-        WireframeWebResult result = WireframeWebLauncher.Open(launcher, model, timeout);
-        elapsed = watch.Elapsed;
-        return result;
+        return WireframeWebLauncher.Open(launcher, model, timeout, clock);
     }
+
+    private static string PipeName() => "pcweb-smoke-" + Guid.NewGuid().ToString("N");
 
     private static string Fresh(string name)
     {
@@ -174,8 +193,6 @@ internal static class Program
         return path;
     }
 
-    // Behaves like wireframe-web.cmd for each PCWEB_FAKE_MODE; "child" leaves a process holding
-    // the output after the launcher exits, as a browser it starts may.
     private const string FakeLauncher = """
         @echo off
         >>"%PCWEB_FAKE_LOG%" echo(%*
@@ -197,10 +214,10 @@ internal static class Program
         :silent
         exit /b 2
         :slow
-        ping -n 5 127.0.0.1 >nul
+        type "\\.\pipe\%PCWEB_FAKE_PIPE%" >nul
         exit /b 0
         :child
-        start "" /b cmd /c "ping -n 9 127.0.0.1 >nul"
+        start "" /b cmd /d /c "type "\\.\pipe\%PCWEB_FAKE_PIPE%" >nul"
         echo http://127.0.0.1:8795/?source=api^&project=xyz^&user=tester
         exit /b 0
         """;

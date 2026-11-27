@@ -1,12 +1,3 @@
-# Closes a Rhino process the normal way (WM_CLOSE to its main window, "Don't Save" on the save
-# prompt through Watch-Dialogs.ps1) and starts Rhino again on a model, then waits until the
-# MCP_Rhino route for the new process is published. Run it from a normal user shell: a Rhino started
-# from a sandboxed or virtualized shell reads that shell's redirected registry and may not load its
-# plug-ins (MCP_Rhino did not).
-#
-#   .\Restart-Rhino.ps1 -ProcessId 64724 -Model 'C:\...\XYZ - Wireframe LIVE TEST.3dm'
-#   .\Restart-Rhino.ps1 -Model 'C:\...\ABC - Wireframe.3dm'      # start another Rhino
-#   .\Restart-Rhino.ps1 -ProcessId 64724 -CloseOnly              # close one
 param(
     [int] $ProcessId,
     [string] $Model,
@@ -28,7 +19,7 @@ if ($ProcessId) {
             '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $PSScriptRoot 'Watch-Dialogs.ps1'),
             '-ProcessId', $ProcessId, '-Answers', "No|Don't Save|Do not save", '-Log', $log, '-TimeoutSeconds', 90)
         Start-Sleep -Seconds 2
-        [void][RhinoWindow]::PostMessage($process.MainWindowHandle, 0x0010, [IntPtr]::Zero, [IntPtr]::Zero)   # WM_CLOSE
+        [void][RhinoWindow]::PostMessage($process.MainWindowHandle, 0x0010, [IntPtr]::Zero, [IntPtr]::Zero)
         if (-not $process.WaitForExit(90000)) { throw "Rhino $ProcessId did not close; see $log" }
         if (-not $watcher.HasExited) { Stop-Process -Id $watcher.Id }
         "Rhino $ProcessId closed normally"

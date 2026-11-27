@@ -5,14 +5,11 @@ namespace PanelCladdingEditor.Application.Services.PanelCladding;
 
 public sealed class PanelCladdingSpawnPlanningService
 {
-    // Cladding surfaces live on Reference::Surfaces - STEP::Surfaces - <prefix>::<material>,
-    // where <prefix> is the material code's leading letters (GLS-001 -> Surfaces - GLS).
     public const string MaterialSurfaceRootLayer = "Reference::Surfaces - STEP";
     public const string MaterialFamilyLayerPrefix = "Surfaces - ";
     public const string FallbackMaterialFamilyLayer = MaterialFamilyLayerPrefix + "Other";
     public const string PanelIdUserTextKey = "CW_1.01_PID";
     public const string CidUserTextKey = "CW_1.02_CID";
-    // Internal release models are retained; lot is the canonical stored metadata.
     public const string ReleaseUserTextKey = "CW_1.05_LOT";
     public const string WallTypeUserTextKey = "CW_1.07_WALL_TYPE";
 
@@ -225,8 +222,6 @@ public sealed class PanelCladdingSpawnPlanningService
     public static string BuildMaterialLayerPath(string materialCode) =>
         $"{MaterialSurfaceRootLayer}::{ResolveMaterialFamilyLayer(materialCode)}::{materialCode}";
 
-    // Layer names follow the code prefix; the category only drives default colours and
-    // catalogue descriptions. Unrecognised prefixes have no category.
     public static string? ResolveMaterialCategory(string materialCode)
     {
         string code = MaterialCodePrefix(materialCode);

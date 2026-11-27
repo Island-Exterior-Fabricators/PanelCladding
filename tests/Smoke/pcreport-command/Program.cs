@@ -14,9 +14,6 @@ using S = DocumentFormat.OpenXml.Spreadsheet;
 
 namespace PcReportCommandSmoke;
 
-// PCreport (1.3.0): every rule fires on a ABC-like fixture, a compliant panel and its surface and
-// curve raise nothing, not-tracked panels are skipped, export round-trips, and the window shows the
-// counts, rule groups and issues and selects objects for the chosen rows.
 internal static class Program
 {
     private const string DocumentPath = @"C:\Projects\ABC\ABC - Wireframe.3dm";
@@ -129,7 +126,7 @@ internal static class Program
         {
             DocumentPath = DocumentPath,
             LayerPaths = ["Other", "QRS-IEF-Wireframe"]
-        }, DateTime.Now);
+        }, new DateTime(2026, 1, 15, 9, 30, 0));
         PanelCladdingReportIssue missing = report.Issues.Single(issue => issue.Rule == PanelCladdingComplianceService.ProjectRootMissing);
         Require(missing.Detail.Contains("ABC-IEF-Wireframe", StringComparison.Ordinal) &&
                 missing.Rule.Severity == PanelCladdingReportSeverity.Error,

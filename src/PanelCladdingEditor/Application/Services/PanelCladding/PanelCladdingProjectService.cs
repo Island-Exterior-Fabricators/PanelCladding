@@ -1,14 +1,10 @@
 namespace PanelCladdingEditor.Application.Services.PanelCladding;
 
-// The project code comes from the Rhino file name: "ABC - Wireframe.3dm" is project ABC. It
-// names the project root layer ABC-IEF-Wireframe and the Job Code of the naming-convention sheet.
 public static class PanelCladdingProjectService
 {
     public const string RootLayerSuffix = "-IEF-Wireframe";
     public const string MainModelNameSuffix = " - Wireframe";
 
-    // The text before the first " - " (or the whole name), up to its first non-alphanumeric
-    // character, in upper case. Empty for an unsaved document.
     public static string CodeFromDocumentPath(string? documentPath)
     {
         string name = Path.GetFileNameWithoutExtension((documentPath ?? string.Empty).Trim());
@@ -17,8 +13,6 @@ public static class PanelCladdingProjectService
         return new string(head.TakeWhile(char.IsLetterOrDigit).ToArray()).ToUpperInvariant();
     }
 
-    // The project's main model is "<code> - Wireframe.3dm" (any case); only it updates the
-    // naming-convention sheet. "XYZ - Wireframe_STN.3dm" and "ABC_old - Wireframe.3dm" are not.
     public static bool IsMainModelPath(string? documentPath)
     {
         string path = (documentPath ?? string.Empty).Trim();
@@ -32,7 +26,6 @@ public static class PanelCladdingProjectService
 
     public static string RootLayerName(string projectCode) => projectCode.Trim().ToUpperInvariant() + RootLayerSuffix;
 
-    // "<code>-IEF-Wireframe::Surfaces - PNL", or the generic pattern when there is no code.
     public static string PanelLayerScope(string? projectCode) =>
         string.IsNullOrWhiteSpace(projectCode)
             ? PanelCladdingExtrusionPlanningService.PanelSurfaceLayerPattern

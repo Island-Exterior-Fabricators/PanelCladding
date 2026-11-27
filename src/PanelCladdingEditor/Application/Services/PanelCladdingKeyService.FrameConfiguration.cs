@@ -6,8 +6,6 @@ namespace PanelCladdingEditor.Application.Services.PanelCladding;
 
 public sealed partial class PanelCladdingKeyService
 {
-    // The readable configuration is what planners write (UD_FRAME_CONFIG). Live write
-    // paths derive the two-letter CW_1.08_FRAME_CONFIG code from it per document.
     public OperationResponse<string> EncodeFrameConfiguration(
         PanelCladdingTopologyState topology, int horizontalTrackCount, int verticalTrackCount)
     {
@@ -28,8 +26,6 @@ public sealed partial class PanelCladdingKeyService
                 new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { [FrameConfigBackupKey] = encoded.Data });
     }
 
-    // Canonical readable configuration for a panel's stored attributes, converting the former
-    // JSON or mask keys. Returns an empty string when the panel has no frame configuration.
     public OperationResponse<string> ReadCanonicalFrameConfiguration(IReadOnlyDictionary<string, string> userText)
     {
         bool hasConfig = new[] { FrameConfigBackupKey, LegacyUserDefinedFrameConfigKey, FrameConfigKey, SegmentMaskKey, MergeMaskKey, HideMaskKey }
@@ -60,7 +56,6 @@ public sealed partial class PanelCladdingKeyService
         : string.Equals(key, FrameConfigBackupKey, StringComparison.OrdinalIgnoreCase) ? LegacyUserDefinedFrameConfigKey
         : null;
 
-    // A UD_ value, or the CW_9.xx value of a panel not written since the rename.
     public static string ReadUserDefinedValue(IReadOnlyDictionary<string, string> userText, string key)
     {
         string Value(string name) => userText.FirstOrDefault(item =>
@@ -69,8 +64,6 @@ public sealed partial class PanelCladdingKeyService
         return value.Length > 0 || LegacyUserDefinedKey(key) is not string legacy ? value : Value(legacy);
     }
 
-    // Renames CW_9.xx keys to their UD_ keys. A UD_ value already present (written by the same
-    // operation) wins and the legacy key is only deleted.
     public static (IReadOnlyList<string> Deletes, IReadOnlyDictionary<string, string> Writes) PlanUserDefinedKeyMigration(
         IReadOnlyDictionary<string, string> userText)
     {
@@ -129,8 +122,6 @@ public sealed partial class PanelCladdingKeyService
         return OperationResponse.Ok();
     }
 
-    // Readable configuration from UD_FRAME_CONFIG (or legacy CW_9.02, preferred) or CW_1.08; null
-    // when neither holds one.
     private static OperationResponse<PanelFrameConfigFormat.Parsed?> ReadReadableFrameConfiguration(
         IReadOnlyDictionary<string, string> userText)
     {

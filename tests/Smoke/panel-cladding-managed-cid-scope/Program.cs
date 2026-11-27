@@ -55,8 +55,6 @@ internal static class Program
         Console.WriteLine("[OK] managed layer predicates accept only canonical roots and descendants");
     }
 
-    // The spawn commands and their CID-conflict check were removed in 1.3.0; PCbake discovers
-    // existing dependencies with the same geometry-class and managed-root limits.
     private static void VerifyLiveBakeDiscoveryContract()
     {
         string source = File.ReadAllText(Path.Combine(

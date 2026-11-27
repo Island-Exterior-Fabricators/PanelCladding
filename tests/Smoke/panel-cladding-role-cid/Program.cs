@@ -10,7 +10,6 @@ foreach ((string role, string suffix) in new[] { ("L:Parent", "_P"), ("L:Child",
 {
     var text = Text(role);
     if (role.Length > 0) text[PanelCladdingSpawnPlanningService.CidUserTextKey] = "CID-STALE_P";
-    // Conflicting legacy flags must not affect any command path, even when type is absent.
     text["parent"] = "1";
     text["child"] = "1";
     var keySet = Required(keys.CreateKeySet([20d, 40d], [50d], text, 100d, 80d, 0.001d));
@@ -64,7 +63,6 @@ foreach ((string role, string suffix) in new[] { ("L:Parent", "_P"), ("L:Child",
             : create.Panels[0].UserTextWrites[PanelCladdingSpawnPlanningService.CidUserTextKey] == cid + suffix,
         "PCcreate panel CID");
 
-    // Legacy unsuffixed outputs and already migrated outputs must both sync to the same CIDs.
     foreach (string outputSuffix in new[] { "", suffix }.Distinct())
     {
         var layout = Layout(text, keySet);
@@ -73,7 +71,6 @@ foreach ((string role, string suffix) in new[] { ("L:Parent", "_P"), ("L:Child",
             ObjectId = Guid.NewGuid(), PanelObjectId = layout.ObjectId, PanelId = pid,
             Cid = cid + outputSuffix + "_" + cell.ShortLabel,
             LayerPath = "Reference::Surfaces - STEP::Surfaces - GL::GL01", CladdingValue = "GL01"
-            // No coverage payload: exercise legacy CID-to-cell resolution as well.
         }).ToArray();
         var curve = new PanelCladdingSurfaceSyncCurveSnapshot
         {

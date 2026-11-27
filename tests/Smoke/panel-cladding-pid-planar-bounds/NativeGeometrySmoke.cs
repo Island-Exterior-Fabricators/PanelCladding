@@ -5,7 +5,6 @@ using Rhino.Geometry;
 
 internal static class NativeGeometrySmoke
 {
-    // Geometry-only native coverage, without RhinoCore or a document. No file IO.
     public static void Run(PanelPoint3[] points)
     {
         var service = new LivePanelCladdingPidGeometryService();

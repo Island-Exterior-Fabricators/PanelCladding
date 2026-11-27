@@ -8,10 +8,6 @@ using RhinoDoc = rhinocommon::Rhino.RhinoDoc;
 
 namespace PanelCladdingEditor.Infrastructure.Rhino.Live.PanelCladding;
 
-// The project's PNL format for a document. It is read once per session from the naming-convention
-// sheet beside the model and refreshed by every save and by PCtemplatePNL; the document string
-// PanelCladdingEditor.PNLFormat mirrors it for when the sheet cannot be read. Without a recorded
-// format the legacy (ABC) format applies and counts as not recorded.
 internal static class LivePanelNamingFormat
 {
     public const string DocumentKey = PanelNamingFormat.PropertyName;
@@ -22,13 +18,10 @@ internal static class LivePanelNamingFormat
 
     internal static PanelNamingFormat ForDocument(RhinoDoc document) => Load(document).Format;
 
-    // True when the format comes from PCtemplatePNL (the sheet property or its document mirror).
     internal static bool IsRecorded(RhinoDoc document) => Load(document).Recorded;
 
-    // Frame-Config rows of the sheet as last read, so new codes avoid them.
     internal static IReadOnlyDictionary<string, string> SheetFrameConfigs(RhinoDoc document) => Load(document).SheetFrameConfigs;
 
-    // Takes the format and rows of a sheet the caller has just read.
     internal static PanelNamingFormat Remember(RhinoDoc document, PanelNamingConventionSheetContent sheet)
     {
         PanelNamingFormat format = Parse(sheet.RecordedFormat) ?? PanelNamingFormat.Legacy;
@@ -36,7 +29,6 @@ internal static class LivePanelNamingFormat
         return format;
     }
 
-    // Stores the format in the document string; only called while the document is being changed.
     internal static void Mirror(RhinoDoc document)
     {
         State state = Load(document);

@@ -23,7 +23,7 @@ public sealed class PanelCladdingSaveService
         _claddingLogic = new PanelCladdingLogicService();
         _logicalCells = new PanelCladdingLogicalCellService();
         _topologyNormalizer = new PanelCladdingTopologyNormalizationService(_keys);
-        _ = signatureService; // Retain constructor compatibility while type generation is suspended.
+        _ = signatureService;
         _regions = new PanelCladdingRegionService(_keys);
         _frameAssignments = new PanelFrameAssignmentService();
     }
@@ -96,7 +96,6 @@ public sealed class PanelCladdingSaveService
             (horizontalOffsets.Count != layout.HorizontalOffsets.Count ||
              verticalOffsets.Count != layout.VerticalOffsets.Count))
         {
-            // UD_CLADDING_LOGIC names every cell, so a new grid size needs the cladding saved with it.
             return OperationResponse<PanelCladdingSaveResult>.Fail(
                 "PANEL_CLADDING_LOGIC_REQUIRES_SAVE_BOTH: the grid size changed and this panel has saved " +
                 "cladding. Use Save Both so the cladding logic matches the new grid.");

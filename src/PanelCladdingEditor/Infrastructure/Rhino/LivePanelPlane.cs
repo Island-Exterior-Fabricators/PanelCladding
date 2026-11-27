@@ -12,10 +12,6 @@ using Vector3d = rhinocommon::Rhino.Geometry.Vector3d;
 
 namespace PanelCladdingEditor.Infrastructure.Rhino;
 
-// The panel frame shared by every command (UD_PLANE). Reading prefers the stored UD_PLANE of the
-// panel's object user text; otherwise, and for the auto value, the frame comes from the geometry:
-// Z = the outward (front face) normal, Y = world up in the panel plane, X = Y x Z (right seen from
-// outside), origin = lower-left corner of the extent.
 internal static class LivePanelPlane
 {
     internal static string? Stored(ObjectAttributes attributes)
@@ -30,7 +26,6 @@ internal static class LivePanelPlane
         userText.FirstOrDefault(item =>
             string.Equals(item.Key, PanelCladdingKeyService.PlaneKey, StringComparison.OrdinalIgnoreCase)).Value;
 
-    // Throws InvalidOperationException("PANEL_CLADDING_REFERENCE_PLANE_FAILED") as before.
     internal static (Plane Frame, string Diagnostic) Resolve(
         Brep brep, IReadOnlyList<Point3d> samples, double tolerance, string? stored)
     {
@@ -97,7 +92,6 @@ internal static class LivePanelPlane
         return (frame, diagnostic);
     }
 
-    // Gravity-up frame keeping the source's normal axis and X sign (a stored frame's handedness).
     internal static Plane Orient(Plane source)
     {
         Vector3d normal = source.ZAxis;

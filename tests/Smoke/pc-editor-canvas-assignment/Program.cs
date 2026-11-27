@@ -23,7 +23,6 @@ internal static class Program
     [STAThread]
     private static void Main()
     {
-        // Curve assignment is suspended in the editor; keep the dormant UI covered.
         typeof(PanelCladdingEditorWindow)
             .GetField("_extrusionAssignmentEnabled", BindingFlags.Static | BindingFlags.NonPublic)!
             .SetValue(null, true);
@@ -133,7 +132,6 @@ internal static class Program
             "Multi-selection summary or assignments failed.");
         Named<Button>(window, "ClearExtrusionAssignmentsButton").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         Require(cards.Items.Count == 0, "Multi-selection clear failed.");
-        // Use the actual topology ID rather than coupling to its string encoding.
         var intermediate = ((IReadOnlyList<PanelExtrusionSegment>)Invoke(window, "CurrentSegments")!).First(s => !s.IsFrame);
         Select(canvas, intermediate.Id);
         Require(floating.Visibility == Visibility.Visible && Named<TextBlock>(window, "SelectedExtrusionNamesText").Text == intermediate.Code,

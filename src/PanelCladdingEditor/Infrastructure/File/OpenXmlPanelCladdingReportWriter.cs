@@ -7,8 +7,6 @@ using S = DocumentFormat.OpenXml.Spreadsheet;
 
 namespace PanelCladdingEditor.Infrastructure.PanelCladding;
 
-// PCreport export: a "Summary" sheet (model, counts, issues per rule) and an "Issues" sheet with one
-// row per issue. Written to a temporary file first so an open workbook is never left half written.
 public static class OpenXmlPanelCladdingReportWriter
 {
     public const string SummarySheetName = "Summary";

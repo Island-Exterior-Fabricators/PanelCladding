@@ -57,8 +57,6 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
                 "PANEL_CLADDING_UPDATE_PANEL_SELECTION_REQUIRED");
         }
 
-        // A problem of one panel skips that panel whole and marks it with a dot; the others still
-        // bake. Only failures that are not about one panel stop and roll back the whole run.
         var issues = new List<PanelCladdingBakeIssue>();
         IReadOnlyList<PanelCladdingUpdateSource> sources = ReadPanelSources(document, sourcePanelIds, issues);
         return Apply(document, filePath, sourcePanelIds, sources, scope, issues);
@@ -74,9 +72,6 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
         Func<Guid, bool> restoreSource,
         ref bool documentMutationOccurred)
     {
-        // Read again after the CID writes, so selection and generation use the same document state.
-        // Every selected panel with a PID stays an ownership candidate, so dependencies of skipped
-        // panels are protected from another panel's update.
         IReadOnlyList<PanelCladdingUpdateSource> sources = ReadPanelSources(
             document, sourcePanelIds, new List<PanelCladdingBakeIssue>());
         PanelCladdingUpdateSelection selection = PanelCladdingUpdateSelectionService.CreatePlan(sources);
@@ -146,8 +141,6 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
         }
     }
 
-    // Selected panels that carry a PID, for ownership. Missing panels, panels without a PID and
-    // panels that must not be edited are reported as issues.
     private static IReadOnlyList<PanelCladdingUpdateSource> ReadPanelSources(
         RhinoDoc document,
         IReadOnlyList<Guid> panelObjectIds,
@@ -183,8 +176,6 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
         return sources;
     }
 
-    // Generates one panel's surfaces and curves into `prepared`; on any problem nothing of the
-    // panel is kept and the issue is returned.
     private static PanelCladdingBakeIssue? PreparePanelDependencies(
         RhinoDoc document,
         string filePath,
@@ -232,8 +223,6 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
                     PreparedDependency.FromCurve(source, curve)));
             }
 
-            // Checked here, before any write: a layer Rhino cannot create or two objects claiming
-            // one CID would otherwise fail the whole run halfway.
             foreach (PreparedDependency dependency in panel)
             {
                 string stage = dependency.Expected.Kind == PanelCladdingDependencyKind.Surface
@@ -342,8 +331,6 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
             var owners = PanelCladdingUpdateSelectionService.FindDependencyOwners(candidates, panelId, cid);
             if (owners.Count != 1 || !processableIds.Contains(owners[0].ObjectId))
             {
-                // Legacy unsuffixed dependencies cannot be assigned to one of several selected roles.
-                // Including skipped sources here also protects their geometry from another panel's update.
                 if (owners.Count > 1 && owners.Any(owner => processableIds.Contains(owner.ObjectId)))
                 {
                     ambiguousDependencies.Add(rhinoObject.Id);
@@ -415,8 +402,6 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
         }
     }
 
-    // Skipped panels are not changed at all: only the candidates get CID and point-order writes,
-    // and a candidate that fails later has both restored before the run goes on.
     private OperationResponse<PanelCladdingUpdateResult> ApplyPrepared(
         RhinoDoc document,
         string filePath,
@@ -492,7 +477,6 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
                 {
                     if (result.Issues.Count > 0)
                     {
-                        // Skipped panels stay selected for inspection.
                         document.Objects.UnselectAll();
                         foreach (Guid id in result.Issues.Select(issue => issue.PanelObjectId))
                         {
@@ -510,8 +494,6 @@ public sealed class LivePanelCladdingUpdateService : ILivePanelCladdingUpdateSer
         }
         finally
         {
-            // An ambient Rhino command owns its Undo record. Restore our source
-            // geometry/CID changes explicitly without ending or undoing that record.
             if (!ownsUndoRecord && outcome is { Success: false })
             {
                 bool restored = true;

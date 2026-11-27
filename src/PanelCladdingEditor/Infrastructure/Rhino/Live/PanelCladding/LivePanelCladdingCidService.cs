@@ -18,8 +18,6 @@ internal static class LivePanelCladdingCidService
             .ToDictionary(key => key!, key => text![key!] ?? string.Empty, StringComparer.Ordinal);
     }
 
-    // Normalizes UD_ key names, the role case, panel identity (CID, name) and the frame
-    // configuration code on a write.
     internal static bool Normalize(RhinoDoc document, ObjectAttributes attributes)
     {
         bool changed = MigrateUserDefinedKeys(attributes);
@@ -50,7 +48,6 @@ internal static class LivePanelCladdingCidService
         return changed;
     }
 
-    // A role in CW_5.00_DEFINITION_A is stored lowercase (Parent -> parent); other values stay.
     internal static bool NormalizeRole(ObjectAttributes attributes)
     {
         bool changed = false;
@@ -65,7 +62,6 @@ internal static class LivePanelCladdingCidService
         return changed;
     }
 
-    // CW_9.xx keys become UD_ keys on the panel's next write.
     internal static bool MigrateUserDefinedKeys(ObjectAttributes attributes)
     {
         var (deletes, writes) = PanelCladdingKeyService.PlanUserDefinedKeyMigration(Read(attributes));
@@ -131,7 +127,6 @@ internal static class LivePanelCladdingCidService
 
     internal sealed record Change(RhinoObject Panel, ObjectAttributes Original, ObjectAttributes Proposed)
     {
-        // Geometry replacement can invalidate the original RhinoObject wrapper.
         public Guid ObjectId { get; } = Panel.Id;
         public bool Applied { get; set; }
     }

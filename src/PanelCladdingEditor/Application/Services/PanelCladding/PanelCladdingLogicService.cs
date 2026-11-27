@@ -7,7 +7,6 @@ namespace PanelCladdingEditor.Application.Services.PanelCladding;
 
 public sealed class PanelCladdingLogicService
 {
-    // Material codes stay readable in the stored text (no &-style escapes).
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
@@ -37,8 +36,6 @@ public sealed class PanelCladdingLogicService
             }
         }
 
-        // Since 1.2.4 the logic is the cladding read source: a cell label is a parent reference and
-        // any other nonblank value is the owner cell's material (the CW_4.xx value rules).
         var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (PanelCladdingCell cell in orderedCells)
         {
@@ -61,7 +58,6 @@ public sealed class PanelCladdingLogicService
             : OperationResponse<string>.Fail(validated.Message);
     }
 
-    // Ownership graph (label -> parent label, "" for roots); materials read as roots.
     public OperationResponse<IReadOnlyDictionary<string, string>> Decode(string? payload)
     {
         OperationResponse<IReadOnlyDictionary<string, string>> values = DecodeValues(payload);
@@ -70,7 +66,6 @@ public sealed class PanelCladdingLogicService
             : OperationResponse<IReadOnlyDictionary<string, string>>.Ok(ToGraph(values.Data));
     }
 
-    // Stored values (label -> material, parent label or ""), with the graph validated.
     public OperationResponse<IReadOnlyDictionary<string, string>> DecodeValues(string? payload)
     {
         if (string.IsNullOrWhiteSpace(payload))
@@ -117,7 +112,6 @@ public sealed class PanelCladdingLogicService
             : OperationResponse<IReadOnlyDictionary<string, string>>.Fail(validated.Message);
     }
 
-    // Logic written before 1.2.4 holds ownership only; its materials are still in CW_4.xx.
     public static bool HasMaterials(IReadOnlyDictionary<string, string> values) =>
         values.Values.Any(value => value.Length > 0 && !PanelCladdingKeyService.IsCellLabelToken(value));
 

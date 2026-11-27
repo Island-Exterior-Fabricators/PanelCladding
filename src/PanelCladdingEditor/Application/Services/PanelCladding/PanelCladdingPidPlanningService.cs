@@ -81,7 +81,6 @@ public sealed class PanelCladdingPidPlanningService
             var viewRight = new PanelPoint3(-direction.Normal.Y, direction.Normal.X, 0);
             double Left(Measured p) => p.Panel.Bounds.Min(point => Dot(point, viewRight));
             var planes = new List<List<Measured>>();
-            // Geometric ordering makes the representative independent of selection order.
             foreach (var panel in measured.Where(p => facing[p.Panel.ObjectId] == direction.Code)
                 .OrderBy(Left).ThenBy(p => p.Bottom).ThenBy(p => Dot(p.Origin, direction.Normal))
                 .ThenBy(p => p.Panel.ObjectId))
@@ -91,7 +90,6 @@ public sealed class PanelCladdingPidPlanningService
                 if (matches.Length == 1) matches[0].Add(panel);
                 else planes.Add([panel]);
             }
-            // Tolerance-aware left ties are ordered bottom-to-top, then by plane depth.
             var orderedPlanes = Cluster(planes, group => group.Min(Left), tolerance)
                 .SelectMany(column => Cluster(column, group => group.Min(p => p.Bottom), tolerance)
                     .SelectMany(row => row.OrderBy(group => Dot(group[0].Origin, direction.Normal))))
@@ -117,7 +115,6 @@ public sealed class PanelCladdingPidPlanningService
         var duplicate = assignments.GroupBy(p => p.Pid, StringComparer.OrdinalIgnoreCase).FirstOrDefault(g => g.Count() > 1);
         if (duplicate is not null)
             return Fail($"Multiple panels occupy {duplicate.Key}: {string.Join(", ", duplicate.Select(p => p.ObjectId))}. No IDs were assigned.");
-        // This is also the write boundary: context-only objects never enter the plan.
         return OperationResponse<PanelCladdingPidPlan>.Ok(new(assignments.Where(p => ids.Contains(p.ObjectId))
             .OrderBy(p => p.Pid, StringComparer.Ordinal).ToArray()) { ContextPanelCount = panels.Count });
     }
@@ -130,8 +127,6 @@ public sealed class PanelCladdingPidPlanningService
         var selectedIds = plan.Panels.Select(p => p.ObjectId).ToHashSet();
         var byId = sources.ToDictionary(p => p.ObjectId);
         var writes = plan.Panels.ToDictionary(p => p.ObjectId);
-        // Validate the state that will actually remain in Rhino, not hypothetical
-        // assignments to unselected panels. This also catches unselected pairs.
         var duplicate = sources.Select(p => (p.ObjectId, Pid: writes.TryGetValue(p.ObjectId, out var write)
                 ? write.Pid : Get(p.UserText, PanelCladdingSpawnPlanningService.PanelIdUserTextKey)))
             .Where(p => !string.IsNullOrWhiteSpace(p.Pid))
@@ -167,8 +162,6 @@ public sealed class PanelCladdingPidPlanningService
         second.Panel.Bounds.All(p => Math.Abs(Dot(Subtract(p, first.Origin), first.Normal)) <= tolerance) &&
         first.Panel.Bounds.All(p => Math.Abs(Dot(Subtract(p, second.Origin), second.Normal)) <= tolerance);
 
-    // Compare with the first value, not the previous value: near-equal chains must
-    // never merge rows/columns whose endpoints are outside the model tolerance.
     private static List<List<T>> Cluster<T>(IEnumerable<T> items, Func<T, double> coordinate, double tolerance)
     {
         var groups = new List<List<T>>();

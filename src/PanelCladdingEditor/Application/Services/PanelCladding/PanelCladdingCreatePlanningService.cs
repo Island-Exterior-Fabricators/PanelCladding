@@ -191,8 +191,6 @@ public sealed partial class PanelCladdingCreatePlanningService
                 $"PANEL_CLADDING_CREATE_TOPOLOGY_INVALID: {panel.ObjectId:D}: {masks.Message}");
         }
 
-        // PCcreate owns the grid only. CW_4.xx and the cladding logic stay as they are, except a
-        // logic that no longer fits the new grid, which is removed so the panel loads unconfigured.
         bool staleLogic = !LogicFitsGrid(panel.UserText, keySet.Data.Cells);
         string[] deletes = panel.UserText.Keys
             .Where(key => ResetAttributeRegex().IsMatch(key) ||
@@ -384,7 +382,6 @@ public sealed partial class PanelCladdingCreatePlanningService
                 .Where(candidate => candidate.Axis == axis &&
                     Math.Abs(candidate.Position - offsets[track]) <= tolerance)
                 .ToArray();
-            // Guides establish coverage only; new atoms remain segmented until explicitly merged.
             for (int bay = 0; bay < cuts.Count - 1; bay++)
             {
                 if (IsIntervalCovered(guides, cuts[bay], cuts[bay + 1], tolerance))

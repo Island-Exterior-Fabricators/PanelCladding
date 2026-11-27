@@ -17,7 +17,6 @@ using RunMode = rhinocommon::Rhino.Commands.RunMode;
 
 namespace PanelCladdingEditor.UI;
 
-// Checks layer structure and attributes of the active model and shows the issues. Read-only.
 [Guid("2CB10B8E-7C31-478C-8D0A-BE6015F29DF7")]
 public sealed class PanelCladdingReportCommand : RhinoCommand
 {

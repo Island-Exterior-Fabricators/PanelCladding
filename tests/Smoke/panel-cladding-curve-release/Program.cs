@@ -84,7 +84,6 @@ foreach (PanelCladdingObjectScope scope in Enum.GetValues<PanelCladdingObjectSco
                 Curves = [new PanelCladdingSurfaceSyncCurveSnapshot
                 {
                     ObjectId = Guid.NewGuid(), PanelObjectId = panelObjectId, PanelId = pid,
-                    // Already named from its CID, so only the release can differ.
                     ObjectName = PanelCladdingCidService.ShortName(cid + "_" + desiredCode),
                     Cid = cid + "_" + desiredCode, CurveCode = desiredCode, DesiredCode = desiredCode,
                     ReleaseNumber = existingRelease, UsesObjectColor = true

@@ -10,8 +10,6 @@ internal static class Program
     private static void Main()
     {
         Assembly assembly = typeof(PanelCladdingKeyService).Assembly;
-        // Since 1.3.0 PCbake bakes surfaces and/or curves by its Scope option; the scoped spawn
-        // commands are gone. Sync stays split by object family.
         var expected = new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["PanelCladdingBakeCommand"] = "PCbake",

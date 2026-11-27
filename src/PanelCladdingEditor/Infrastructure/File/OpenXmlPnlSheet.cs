@@ -9,8 +9,6 @@ using S = DocumentFormat.OpenXml.Spreadsheet;
 
 namespace PanelCladdingEditor.Infrastructure.PanelCladding;
 
-// Shared access to the PNL sheet of "<PROJECT> - Naming Convention.xlsx": rows 7/8 hold the
-// segment headers and the example code, row 12 the table titles, codes start in row 13.
 internal static class OpenXmlPnlSheet
 {
     public const string SheetName = "PNL";
@@ -30,7 +28,6 @@ internal static class OpenXmlPnlSheet
             : OperationResponse<WorksheetPart>.Fail($"PANEL_NAMING_CONVENTION_SHEET_MISSING: {SheetName}");
     }
 
-    // The PNL format text recorded by PCtemplatePNL (custom property); empty when none.
     public static string ReadFormatProperty(SpreadsheetDocument document) =>
         document.CustomFilePropertiesPart?.Properties?.Elements<CustomDocumentProperty>()
             .FirstOrDefault(item => item.Name?.Value == PanelNamingFormat.PropertyName)?.InnerText.Trim() ?? string.Empty;
@@ -108,8 +105,6 @@ internal static class OpenXmlPnlSheet
         InlineString = new S.InlineString(new S.Text(value) { Space = SpaceProcessingModeValues.Preserve })
     };
 
-    // A number when the text is one exactly as Excel would show it ("5", "12", "1.5"); otherwise
-    // text, so codes such as "01" keep their leading zero.
     public static S.Cell ValueCell(string column, uint rowIndex, string value, uint styleIndex) =>
         IsPlainNumber(value)
             ? new S.Cell
@@ -151,11 +146,6 @@ internal static class OpenXmlPnlSheet
 
     public static string Normalize(string text) => new string(text.Where(char.IsLetterOrDigit).ToArray()).ToUpperInvariant();
 
-    // Edits a copy of the workbook and moves it over the original in one step, as Excel saves.
-    // File.Replace needs a backup file on the project share and a cloud drive (Egnyte) can hold
-    // that backup so it cannot be removed. An open workbook refuses the move and is reported as
-    // locked; a workbook changed meanwhile is left alone. When the edit reports no change the
-    // original is kept and unchangedMessage returned.
     public static OperationResponse ReplaceWorkbook(string path, Func<SpreadsheetDocument, OperationResponse<bool>> edit,
         string lockedAdvice, string unchangedMessage)
     {
@@ -202,14 +192,12 @@ internal static class OpenXmlPnlSheet
         }
     }
 
-    // Temp or backup files of an earlier save (".<name>.naming.<guid>.*.tmp.xlsx") that a sync
-    // client held at the time are removed once they are over a minute old.
-    public static void RemoveStaleOwnFiles(string path)
+    public static void RemoveStaleOwnFiles(string path, DateTime nowUtc)
     {
         try
         {
             string directory = Path.GetDirectoryName(Path.GetFullPath(path)) ?? ".";
-            DateTime cutoff = DateTime.UtcNow.AddMinutes(-1);
+            DateTime cutoff = nowUtc.AddMinutes(-1);
             foreach (string file in Directory.EnumerateFiles(directory, $".{Path.GetFileNameWithoutExtension(path)}.naming.*.tmp.xlsx"))
             {
                 if (File.GetLastWriteTimeUtc(file) < cutoff && File.GetCreationTimeUtc(file) < cutoff) TryDelete(file);
@@ -217,7 +205,6 @@ internal static class OpenXmlPnlSheet
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            // Best effort; the next save tries again.
         }
     }
 
@@ -229,13 +216,10 @@ internal static class OpenXmlPnlSheet
         }
         catch
         {
-            // Best effort for operation-owned temporary files only.
         }
     }
 }
 
-// "Unused" styles are the template style with a struck-through grey font. Equal fonts and
-// formats are reused, so repeated saves do not grow the stylesheet.
 internal sealed class PnlStyleCache(S.Stylesheet? stylesheet)
 {
     private const string GreyRgb = "FF808080";
@@ -246,7 +230,6 @@ internal sealed class PnlStyleCache(S.Stylesheet? stylesheet)
 
     public uint Plain(uint style) => IsStruck(style) ? Derive(style, struck: false, unbold: false) : style;
 
-    // A data style taken from a title cell: plain and not bold.
     public uint Body(uint style) =>
         IsStruck(style) || FontOf(style)?.GetFirstChild<S.Bold>() is not null ? Derive(style, struck: false, unbold: true) : style;
 

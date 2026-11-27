@@ -118,7 +118,6 @@ PanelCladdingSurfaceSyncSnapshot Fixture(string pid, string? release, string exi
     text[PanelCladdingKeyService.CladdingLogicKey] = Required(new PanelCladdingLogicService().Encode(
         grid.Cells, grid.Cells.ToDictionary(cell => cell.UserTextKey, cell => cell.Value)));
     Guid panelId = Guid.NewGuid();
-    // Objects already carry their CID-derived names, so only the release differs.
     var layout = new PanelCladdingLayout
     {
         ObjectId = panelId, ObjectName = PanelCladdingCidService.ShortName(text[PanelCladdingSpawnPlanningService.CidUserTextKey]),

@@ -17,7 +17,7 @@ public sealed class PanelCladdingSurfaceSyncService : IPanelCladdingSurfaceSyncS
         PanelCladdingSurfaceSyncPlanningService planning)
     {
         _liveRepository = liveRepository;
-        _ = signatureService; // Retain constructor compatibility while type generation is suspended.
+        _ = signatureService;
         _regions = new PanelCladdingRegionService(_keys);
         _planning = planning;
     }
@@ -116,7 +116,6 @@ public sealed class PanelCladdingSurfaceSyncService : IPanelCladdingSurfaceSyncS
                 HorizontalOffsets = panel.Layout.HorizontalOffsets,
                 VerticalOffsets = panel.Layout.VerticalOffsets,
                 Topology = panel.Layout.Topology,
-                // Preserve the exact geometry-derived owner/parent graph produced by PCsyncSrf.
                 CellValues = persistedCellValues[panel.ObjectId],
                 CladdingLogic = panel.CladdingLogic,
                 WritesCladding = panel.WritesCladding,

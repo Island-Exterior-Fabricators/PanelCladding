@@ -39,7 +39,6 @@ internal static class Program
             layout.Cells,
             layout.Cells.ToDictionary(cell => cell.UserTextKey, cell => cell.Value)),
             "Encode logic");
-        // Since 1.2.4 the logic is the cladding read source and carries the owner's material.
         Require(encoded == "{\"0A\":\"MPL-001\",\"1A\":\"0A\"}",
             $"Unexpected canonical logic payload: {encoded}");
 
@@ -235,7 +234,6 @@ internal static class Program
                 }
             }
         }), "Create panel grid");
-        // Since 1.2.4 PCcreate leaves an unconfigured panel unconfigured: no placeholder logic.
         Require(!create.Panels.Single().UserTextWrites.ContainsKey(PanelCladdingKeyService.CladdingLogicKey),
             "PCcreate generated cladding logic for an unconfigured panel.");
 

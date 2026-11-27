@@ -6,9 +6,6 @@ public sealed record PanelCladdingPidRequest(
     Guid NorthPanelObjectId,
     Guid FirstFloorPanelObjectId);
 
-// The adapter validates the actual face's planarity, then supplies its oriented
-// plane normal and four in-plane measurement corners of its outer boundary.
-// Box thickness is not surface geometry. No Rhino geometry or temporary IDs enter planning.
 public sealed record PanelCladdingPidPanel(
     Guid ObjectId,
     PanelPoint3 Normal,
@@ -27,7 +24,6 @@ public sealed record PanelCladdingPidAssignment(
     };
 }
 
-// Panels contains selected writes only, even when the context contains the whole building.
 public sealed record PanelCladdingPidPlan(IReadOnlyList<PanelCladdingPidAssignment> Panels)
 {
     public int ContextPanelCount { get; init; }

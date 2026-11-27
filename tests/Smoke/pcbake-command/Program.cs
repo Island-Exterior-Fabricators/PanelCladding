@@ -4,9 +4,6 @@ using PanelCladdingEditor.Domain.Models.PanelCladding;
 
 namespace PcBakeCommandSmoke;
 
-// PCbake: Scope option (Surfaces by default, Curves, All); surfaces and curves alike are overwritten
-// from the panel's current values, created when missing and deleted when obsolete or duplicate.
-// A panel with its own problem is skipped whole and marked with a dot; the other panels still bake.
 internal static class Program
 {
     private static readonly Guid PanelA = Guid.Parse("10000000-0000-0000-0000-00000000000a");

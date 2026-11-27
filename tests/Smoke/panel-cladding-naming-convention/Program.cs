@@ -31,7 +31,6 @@ internal static partial class Program
         Console.WriteLine("PASS: panel cladding naming convention regression");
     }
 
-    // Only "<code> - Wireframe.3dm" writes the sheet on save; other models of the project read it.
     private static void VerifyMainModel()
     {
         foreach (string path in new[]
@@ -345,7 +344,8 @@ internal static partial class Program
         try
         {
             CreateWorkbook(path);
-            var workbook = new OpenXmlPanelNamingConventionWorkbook();
+            var now = new DateTimeOffset(2026, 1, 15, 12, 0, 0, TimeSpan.Zero);
+            var workbook = new OpenXmlPanelNamingConventionWorkbook(new ManualTimeProvider(now));
             PanelNamingConventionSheetContent sheet = Required(workbook.Read(path));
             Require(sheet.FrameConfigs.Count == 3 && sheet.FrameConfigs["AC"] == "1H 1V | hide 0A" && sheet.FrameConfigs["AD"] == "A1" &&
                     !sheet.FrameConfigs.ContainsKey("AB") && sheet.WallTypes.Count == 2 && sheet.WallTypes["C"] == "5" &&
@@ -358,10 +358,16 @@ internal static partial class Program
             Require(tables.JobCode == "ABC", "The job code is the trimmed upper-case project code.");
             string stale = Path.Combine(directory, ".ABC - Naming Convention.naming.0123456789abcdef.bak.tmp.xlsx");
             File.WriteAllText(stale, "left by an earlier save");
-            File.SetCreationTimeUtc(stale, DateTime.UtcNow.AddHours(-1));
-            File.SetLastWriteTimeUtc(stale, DateTime.UtcNow.AddHours(-1));
+            File.SetCreationTimeUtc(stale, now.UtcDateTime.AddHours(-1));
+            File.SetLastWriteTimeUtc(stale, now.UtcDateTime.AddHours(-1));
+            string fresh = Path.Combine(directory, ".ABC - Naming Convention.naming.fedcba9876543210.bak.tmp.xlsx");
+            File.WriteAllText(fresh, "held by a sync client");
+            File.SetCreationTimeUtc(fresh, now.UtcDateTime.AddSeconds(-30));
+            File.SetLastWriteTimeUtc(fresh, now.UtcDateTime.AddSeconds(-30));
             Require(workbook.Write(path, tables).Success, "First write must succeed.");
             Require(!File.Exists(stale), "A temp or backup file left by an earlier save is removed.");
+            Require(File.Exists(fresh), "A temp or backup file younger than a minute is kept.");
+            File.Delete(fresh);
             (int Fonts, int Formats) firstStyleCount = StyleCount(path);
 
             using (SpreadsheetDocument document = SpreadsheetDocument.Open(path, false))

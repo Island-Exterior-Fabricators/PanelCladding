@@ -1,13 +1,7 @@
-﻿# =========================
-# .NET / C# build outputs
-# =========================
 **/bin/
 **/obj/
 **/bin-testhost/
 
-# =========================
-# Test results & coverage
-# =========================
 TestResults/
 **/TestResults/
 coverage/
@@ -15,9 +9,6 @@ coverage-results/
 *.coverage
 *.coveragexml
 
-# =========================
-# Visual Studio / VS Code
-# =========================
 .vs/
 .vscode/
 *.user
@@ -26,15 +17,9 @@ coverage-results/
 *.userosscache
 *.sln.docstates
 
-# =========================
-# Rider / ReSharper
-# =========================
 _ReSharper*/
 *.DotSettings.user
 
-# =========================
-# NuGet / package restore caches
-# =========================
 packages/
 *.nupkg
 *.snupkg
@@ -42,20 +27,13 @@ project.assets.json
 project.nuget.cache
 *.nuget.dgspec.json
 
-# =========================
-# Logs / temp / local caches
-# =========================
 *.log
 *.tmp
 *.temp
 *.cache
 
-# Machine-specific registry exports retained only for local install rollback.
 **/activation-prior-registry.reg
 
-# =========================
-# Project-specific generated artifacts
-# =========================
 /.codex_tmp/
 /outputs/
 /Runtime_Output/
@@ -82,9 +60,7 @@ _tmp*.csx
 .cline/
 .mcp.json
 
-# Local models, runtime history, and machine-specific client configuration
 *.3dm
-# Project models, drawings and exports never belong in the public repository
 *.dwg
 *.dxf
 *.rvt
@@ -94,7 +70,6 @@ _tmp*.csx
 *.pdf
 Runtime_Log/*.json
 Runtime_Test/Runtime_Log/*.json
-# Raw output of live runs (results, dumps, captures) stays outside the repository
 Project_Test/**/results*/
 Project_Test/**/live*/
 Project_Archive/**/results*/
@@ -103,15 +78,9 @@ Project_Archive/**/live*/
 .claude/scheduled_tasks.lock
 .codex/config.toml
 
-# =========================
-# OS-generated files
-# =========================
 .DS_Store
 Thumbs.db
 Desktop.ini
 
-# =========================
-# Keep repository assets under version control
-# =========================
 !Project_Plan/
 !Runtime_Test/

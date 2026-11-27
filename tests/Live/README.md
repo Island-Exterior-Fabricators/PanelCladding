@@ -11,7 +11,7 @@ and an interactive desktop session. They send no keyboard or mouse input, so the
 | `Hold-Workbook.ps1` | Opens the exported workbook in Excel through COM (`Visible = false`), records its sheets and holds it open for the export-while-open check. |
 | `New-NamingSheet.ps1` | Writes a minimal `<CODE> - Naming Convention.xlsx` for the naming-convention check. |
 | `Restart-Rhino.ps1` | Closes Rhino normally (`WM_CLOSE`, "Don't Save") and/or starts it on a model, then waits for the MCP_Rhino route. |
-| `Show-Results.py` | Prints a suite's results file, one line per check. |
+| `Show-Results.ps1` | Prints a suite's results file, one line per check. |
 | `SaveProbe.cs` | Saves the open model on the next idle tick and logs its read-only and lock state around the save (`SaveProbe.Queue(doc, tag)`, `SaveProbe.Read()`); used to find why Rhino stopped saving after PCweb. |
 
 ## Suites
@@ -59,7 +59,7 @@ folder inside a git working tree. Report only sanitized conclusions (step names,
 for example in the pull request description; delete the raw folder after the run.
 
 ```powershell
-python .\tests\Live\Show-Results.py "$env:LOCALAPPDATA\PanelCladding\LiveEvidence\<yyMMdd>\bake.json" --commands
+.\tests\Live\Show-Results.ps1 -Path "$env:LOCALAPPDATA\PanelCladding\LiveEvidence\<yyMMdd>\bake.json" -Commands
 ```
 
 For `export` and `editor`, start the helpers first from a normal user shell (Rhino's process id is in

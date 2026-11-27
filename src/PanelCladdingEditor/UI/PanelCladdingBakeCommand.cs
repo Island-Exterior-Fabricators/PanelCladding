@@ -19,12 +19,9 @@ using RunMode = rhinocommon::Rhino.Commands.RunMode;
 
 namespace PanelCladdingEditor.UI;
 
-// Bakes the selected panels' saved attributes into managed cladding surfaces and extrusion
-// curves (PCsyncSrf/PCsyncCrv go the other way). Formerly PCupdate; same command GUID.
 [Guid("F2C41D75-2F88-4CB4-9D1C-CF6BD1D6208A")]
 public sealed class PanelCladdingBakeCommand : RhinoCommand
 {
-    // Option list order matches PanelCladdingBakeScope; index 0 (Surfaces) is the default of every run.
     private static readonly string[] ScopeNames = Enum.GetNames<PanelCladdingBakeScope>();
 
     public override string EnglishName => "PCbake";
@@ -129,7 +126,6 @@ public sealed class PanelCladdingBakeCommand : RhinoCommand
                 $"PANEL_CLADDING_MATERIAL_COLORS_INVALID: {colors.Message}");
     }
 
-    // Preselected panels stay selected and the prompt still offers Scope; Enter accepts.
     private static TargetSelection ResolveTarget(RhinoDoc document)
     {
         int scopeIndex = 0;
@@ -168,7 +164,6 @@ public sealed class PanelCladdingBakeCommand : RhinoCommand
             }
             if (getter.ObjectsWerePreselected && !hadPreselectedObjects)
             {
-                // Offer the option once before running on a preselection.
                 hadPreselectedObjects = true;
                 getter.EnablePreSelect(enable: false, ignoreUnacceptablePreselectedObjects: true);
                 continue;
@@ -184,7 +179,6 @@ public sealed class PanelCladdingBakeCommand : RhinoCommand
             .ToArray();
         if (!hadPreselectedObjects)
         {
-            // As before: a preselection stays selected, panels picked at the prompt do not.
             foreach (Guid objectId in objectIds) document.Objects.Select(objectId, false);
         }
         return objectIds.Length == 0

@@ -103,7 +103,6 @@ internal static class Program
             ready.SelectedItem = selected;
             Named<TextBox>("QuantityText").Text = "7";
             FrameworkElement root = (FrameworkElement)dialog.Content;
-            // The detached content render needs the background normally supplied by its Window.
             ((System.Windows.Controls.Panel)root).Background = dialog.Background;
             foreach ((int width, int height) in new[] { (1220, 820), (1040, 700) })
             {
@@ -480,7 +479,6 @@ internal static class Program
         string workbookPath,
         string outputDirectory)
     {
-        // Curve assignment is suspended in the editor; keep the dormant UI covered.
         typeof(PanelCladdingEditorWindow)
             .GetField("_extrusionAssignmentEnabled",
                 System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)!

@@ -343,8 +343,6 @@ internal static class Program
         element.UpdateLayout();
     }
 
-    // With UseLayoutRounding, WPF snaps arranged sizes to whole device pixels, so a DIP width
-    // survives layout exactly only at 100% scaling. Mirror WPF's rounding at the element's DPI.
     private static double LayoutRounded(double value, FrameworkElement element)
     {
         if (!element.UseLayoutRounding)

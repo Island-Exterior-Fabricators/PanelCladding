@@ -19,7 +19,6 @@ internal static class Program
 
     private static void VerifyPanelIds()
     {
-        // The user's reference example: CID_ABC_N2_05_05-C becomes CID-ABC-N2-05-05_C.
         Require(PanelCladdingCidService.ResolvePanelCid("PID-ABC-N2-05-05", Text("L", "Child")) == "CID-ABC-N2-05-05_C",
             "Corner child CID must be CID-ABC-N2-05-05_C.");
         Require(PanelCladdingCidService.ResolvePanelCid("PID-ABC-N2-05-05", Text("L", "Parent")) == "CID-ABC-N2-05-05_P" &&
