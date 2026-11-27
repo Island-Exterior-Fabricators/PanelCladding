@@ -22,6 +22,6 @@ public static class TimingRules
     public static IEnumerable<Finding> Find(string path, string text) =>
         from line in CommentRules.Lines(text)
         from rule in PowerShellPatterns
-        where rule.Pattern.IsMatch(line.Text)
+        where rule.Pattern.IsMatch(CommentRules.WithoutQuotedText(line.Text))
         select new Finding(path, line.Number, Rule, rule.Advice + ": " + line.Text.Trim());
 }

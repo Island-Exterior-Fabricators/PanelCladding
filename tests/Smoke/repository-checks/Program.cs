@@ -115,7 +115,8 @@ internal static class Program
             "$process.WaitForExit(1000)",
             "$event.WaitOne()",
             "$event.WaitOne($limit)",
-            "Wait-Process -Id 1 -Timeout 5");
+            "Wait-Process -Id 1 -Timeout 5",
+            "$names = @('Process.WaitForExit(int)', \"Start-Sleep\")");
         Require(Lines(TimingRules.Find("tests/a.ps1", script)).SequenceEqual([1, 3, 5, 6]),
             "Sleeps and waits with a time limit are found; waits without one are not.");
         Console.WriteLine("[OK] timing: test scripts neither sleep nor wait with a time limit");

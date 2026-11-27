@@ -83,7 +83,7 @@ public static class CommentRules
     public static IEnumerable<Finding> HashCommentLines(string path, string text, bool skipShebang) =>
         Lines(text)
             .Where(line => !(skipShebang && line.Number == 1 && line.Text.StartsWith("#!", StringComparison.Ordinal)))
-            .Where(line => HashComment.IsMatch(QuotedText.Replace(line.Text, "''")))
+            .Where(line => HashComment.IsMatch(WithoutQuotedText(line.Text)))
             .Select(line => At(path, line.Number, line.Text));
 
     public static IEnumerable<Finding> LinesStartingWithHash(string path, string text) =>
@@ -152,6 +152,8 @@ public static class CommentRules
         }
         return findings;
     }
+
+    public static string WithoutQuotedText(string line) => QuotedText.Replace(line, "''");
 
     internal static IEnumerable<(int Number, string Text)> Lines(string text) =>
         text.Split('\n').Select((line, index) => (index + 1, line.TrimEnd('\r')));
