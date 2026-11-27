@@ -50,12 +50,7 @@ dotnet build .\src\PanelCladdingEditor\PanelCladdingEditor.csproj -c Release -t:
 .\tests\Run-Regression.ps1 -List                            # also -NoBuild, -TimeoutSeconds (default 900)
 ```
 
-- It first runs `tools/install-hooks.ps1`, which makes git run this checkout's own `.githooks`: it sets `core.hooksPath = .githooks` when
-  unset, and in a linked worktree whose `config.worktree` points `core.hooksPath` at another
-  checkout's `.githooks` (the Claude desktop app writes the main checkout's absolute path into each
-  worktree it creates) it runs `git config --worktree core.hooksPath .githooks`. Any other hooks
-  folder only gets a warning, and the `repository-content-guard` smoke then fails. Run it once per
-  clone and in each new app worktree. It then builds each smoke serially into `artifacts/tests/bin/<Configuration>/`,
+- It builds each smoke serially into `artifacts/tests/bin/<Configuration>/`,
   runs it from the repository root with stdin closed, logs to `artifacts/tests/logs/<Configuration>/`,
   writes `artifacts/tests/regression-<Configuration>.json`, and exits 1 on any failure (no accepted
   failures). Rhino-native parts print `[SKIP]`; a managed pass is not live acceptance.
@@ -320,6 +315,9 @@ See `tests/Live/README.md` for the full procedure. In short:
 - **Branches and records.** Construction branches are named `feature/<capability-name>`. The
   development records up to 2026-11-06 are kept at tag `records-2026-11-06`.
 - **Check on push.** `pre-push` runs the content guard and then the check command `tools/check.ps1`.
+- **Enabling the hooks.** `tools/install-hooks.ps1` sets `core.hooksPath = .githooks` when it is unset, and in a linked worktree whose `config.worktree` points `core.hooksPath` at another checkout's `.githooks` (the Claude desktop app writes the main checkout's absolute path into each worktree it creates) it runs `git config --worktree core.hooksPath .githooks`.
+  For any other hooks folder it changes nothing, warns and exits 1, so it doubles as the check that a developer clone runs its own hooks.
+  The check command does not run it and does not depend on how a clone's hooks are configured, since CI and verification checkouts set their own `core.hooksPath`; the content guard runs in the check on every tracked file instead.
 - **Content guard**: `pre-commit`, `commit-msg` and `pre-push` (LF sh wrappers) run
   `.githooks/Test-RepositoryContent.ps1` with `.githooks/content-rules.json` (project data file
   types, raw live-output folders, new evidence images, company project-folder paths) plus a private
@@ -327,7 +325,7 @@ See `tests/Live/README.md` for the full procedure. In short:
   `PANELCLADDING_CONTENT_DENYLIST`; add every new client project; without it the guard warns and
   applies the other rules). Exit 0 clean, 1 blocked, 2 guard failure; check by hand with
   `-Mode Tracked` or `-Mode Commit -Rev <rev>`. Never bypass (`--no-verify`). Git must run the
-  checkout's own `.githooks`, so each clone and each new app worktree needs `tools/install-hooks.ps1` (or one regression run), and
+  checkout's own `.githooks`, so each clone and each new app worktree needs one run of `tools/install-hooks.ps1`, and
   each machine its own copy of the list. The `repository-content-guard` smoke checks
   rules, wiring and hook behaviour.
 

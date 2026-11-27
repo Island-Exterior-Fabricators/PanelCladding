@@ -44,3 +44,4 @@ if ($scope -eq 'worktree' -and $checkoutHooks -contains $hooksFolder) {
 }
 
 Write-Warning "core.hooksPath is '$hooksPath', so this checkout's hooks in .githooks do not run. Set it with: git config core.hooksPath .githooks"
+exit 1

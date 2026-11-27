@@ -13,8 +13,6 @@ $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $artifacts = Join-Path $repo 'artifacts\tests'
 
-& (Join-Path $repo 'tools\install-hooks.ps1')
-
 $smokes = @(Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'Smoke') -Directory | Sort-Object Name | Where-Object {
     $folder = $_.Name
     @($Name | Where-Object { $folder -like $_ }).Count -gt 0

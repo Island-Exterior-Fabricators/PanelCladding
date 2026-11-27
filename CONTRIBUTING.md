@@ -35,7 +35,7 @@ The [operations guide](docs/operations.md) says when each one is needed.
 
 1. Run `powershell -NoProfile -ExecutionPolicy Bypass -File tools/install-hooks.ps1` once in each clone and worktree.
    It points `core.hooksPath` at `.githooks`, so the pre-commit and commit-msg hooks run the client data guard and the pre-push hook runs the guard and then the check command.
-   `tests/Run-Regression.ps1` runs it too.
+   It exits 1 with a warning when the clone uses another hooks folder; run it again whenever you want to confirm that your clone runs its own hooks.
 2. If you work on client models, keep the private client list at `%APPDATA%\PanelCladding\content-denylist.txt` (see [Public repository and client data](#public-repository-and-client-data)).
 3. After adding or changing a NuGet package reference, build once without `RestoreLockedMode` (a normal `dotnet build` or Visual Studio build) so the lock files are updated, and commit the changed `packages.lock.json` files.
 

@@ -439,7 +439,7 @@ It writes when Rhino is idle, outside Undo, only for keys that changed, and neve
 
 ### 2026-11-05 — Client-data guard in local hooks with a private denylist
 
-**Decision:** The hooks in `.githooks` (`pre-commit`, `commit-msg`, `pre-push`), enabled by `tests/Run-Regression.ps1`, run `Test-RepositoryContent.ps1`. It checks against `content-rules.json` and against a list of real client names kept on each machine outside the repository (`%APPDATA%\PanelCladding\content-denylist.txt`). Reports give the file, line and rule but never the matched text. Live evidence goes to `%LOCALAPPDATA%\PanelCladding\LiveEvidence`, and `PcLive` refuses any folder inside a git working tree.
+**Decision:** The hooks in `.githooks` (`pre-commit`, `commit-msg`, `pre-push`), enabled by `tools/install-hooks.ps1`, run `Test-RepositoryContent.ps1`. It checks against `content-rules.json` and against a list of real client names kept on each machine outside the repository (`%APPDATA%\PanelCladding\content-denylist.txt`). Reports give the file, line and rule but never the matched text. Live evidence goes to `%LOCALAPPDATA%\PanelCladding\LiveEvidence`, and `PcLive` refuses any folder inside a git working tree.
 
 **Why:** Most leaked files were dumps from live runs written into tracked folders. A smoke test over committed files catches leaks too late. A list of real clients inside a public repository would itself be a leak.
 
