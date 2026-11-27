@@ -1,0 +1,6 @@
+{
+  "version": "8.0.101",
+  "url": "https://builds.dotnet.microsoft.com/dotnet/Sdk/8.0.101/dotnet-sdk-8.0.101-win-x64.zip",
+  "sha512": "e05953b32429ddaa60dc27fb5f5077d7523fc9f9706d30f42cd1855e2469eb003d5250587468062df4e331817059f2f46a44d5ed10ce2eb599710897e6659d83",
+  "checksumSource": "https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/8.0/releases.json"
+}

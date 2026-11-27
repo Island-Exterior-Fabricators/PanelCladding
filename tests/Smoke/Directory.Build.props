@@ -1,6 +1,5 @@
 <Project>
-  <!-- All smokes build into one folder so shared dependencies are copied once.
-       Build them serially (Run-Regression.ps1 uses -m:1). -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)..'))" />
   <PropertyGroup>
     <BaseOutputPath>$(MSBuildThisFileDirectory)..\..\artifacts\tests\bin\</BaseOutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>

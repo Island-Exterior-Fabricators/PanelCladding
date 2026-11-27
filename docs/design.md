@@ -1,10 +1,11 @@
-# PanelCladding architecture
+# PanelCladding design
 
 The current internal model of `PanelCladdingEditor`: its layers, the data it keeps in Rhino
 documents, and the invariants a change must preserve. User-facing command behaviour and the full
 attribute reference for users are in the [package README](../Packaging/PanelCladdingEditor/README.md);
-build, packaging, installation and release are in [Operations](PanelCladding%20Operations.md); the
-reasons behind deliberate choices are in [Decisions](PanelCladding%20Decisions.md).
+build, packaging, installation and release are in [Operations](operations.md); the
+reasons behind deliberate choices are in [Decisions](decisions.md).
+The rules the check command enforces are listed under [Enforced rules](#enforced-rules).
 
 Paths are relative to `src/PanelCladdingEditor/`. `Svc/` stands for
 `Application/Services/PanelCladding/` and `Live/` for `Infrastructure/Rhino/Live/PanelCladding/`.
@@ -19,7 +20,9 @@ these codes, so keep them when changing a message.
 | `tests/` | All rerunnable test code: managed smokes, package checks, static checks, live suites and `Run-Regression.ps1` ([tests/README.md](../tests/README.md)). |
 | `Packaging/PanelCladdingEditor/` | Package, install, repair and uninstall scripts, the package README and release notes. |
 | `Design/PanelCladdingEditor/` | Design references for the editor UI. |
-| `Project_Guides/` | This guide, [Workflow](PanelCladding%20Workflow.md), [Operations](PanelCladding%20Operations.md) and [Decisions](PanelCladding%20Decisions.md). |
+| `docs/` | This design document, [Operations](operations.md) and [Decisions](decisions.md). |
+| `tools/` | The check command `check.ps1`, the pinned .NET SDK installer and the hook installer. |
+| `.github/workflows/` | The CI workflow that runs the check command. |
 
 ## Product boundaries
 
@@ -379,4 +382,19 @@ agree; add a rule there when you add a document invariant.
   every mutating command plans the whole batch first and applies it in one named Undo record
   (see Command pipeline).
 - Update the package README, this guide and the smokes the change affects (see the
-  [workflow](PanelCladding%20Workflow.md)).
+  [contributing guide](../CONTRIBUTING.md)).
+
+## Enforced rules
+
+This is the closed list of rules the repository enforces in code.
+Each one fails the check command `tools/check.ps1` when it is broken; anything not listed here is advice.
+
+1. One command checks the repository and exits non-zero on any failure: `tools/check.ps1`, run the same way by the pre-push hook, CI (`.github/workflows/check.yml`) and Super Agent (`.superagent2/check.json`).
+2. The build uses the .NET SDK pinned in `global.json`, and a downloaded SDK must match the SHA-512 pinned in `tools/dotnet-sdk.json`.
+3. NuGet packages restore only from the committed `packages.lock.json` files.
+4. Every project builds in Debug and Release with nullable reference types on and warnings as errors.
+5. Every managed smoke in `tests/Smoke/` passes in Debug and Release, with no list of accepted failures.
+6. No tracked file carries client project data: the content guard checks file types, raw live-output folders, company project-folder paths and the private client list.
+7. The compiled RHP carries an assembly-level GUID equal to the plug-in class GUID and the package manifest `pluginId`, and its version equals the manifest version.
+8. No project references code outside the repository or MCP_Rhino.
+9. Text files are checked out with LF line endings (`.gitattributes`), except `.cmd` files.

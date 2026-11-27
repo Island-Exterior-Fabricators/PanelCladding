@@ -7,7 +7,7 @@ namespace RepositoryContentGuardSmoke;
 // The repository is public. The hooks in .githooks run .githooks/Test-RepositoryContent.ps1 on every
 // commit and push so that client project data (real project names, codes, numbers, file-server paths,
 // model exports, raw live-run output) never reaches it (AGENTS.md). This smoke checks that the rules
-// catch what they are meant for, that the hooks are enabled, that the tracked files pass the guard,
+// catch what they are meant for, that the hook scripts run it, that the tracked files pass the guard,
 // and that the hooks refuse and allow the right commits and pushes in a scratch repository.
 internal static class Program
 {
@@ -21,7 +21,7 @@ internal static class Program
         {
             string repo = RegressionPaths.RepositoryRoot;
             VerifyRules(repo);
-            VerifyHooksEnabled(repo);
+            VerifyHookFiles(repo);
             VerifyTrackedFiles(repo);
             VerifyIgnoredOutput(repo);
             VerifyHookBehaviour(repo);
@@ -81,33 +81,20 @@ internal static class Program
         Console.WriteLine("[OK] rules catch project-folder paths, raw output folders and evidence images, and leave fixtures alone");
     }
 
-    // Run-Regression.ps1 enables the hooks; each one hands its arguments to the guard script under sh.
-    // Git must take them from this checkout's own .githooks (spelt .githooks, ./.githooks or as an
-    // absolute path), so a branch is checked by its own rules; another checkout's folder is refused.
-    private static void VerifyHooksEnabled(string repo)
+    private static void VerifyHookFiles(string repo)
     {
-        (int code, string output) = Run(repo, "git", null, "config", "--get", "core.hooksPath");
-        string configured = output.Trim();
-        (int pathCode, string pathOutput) = Run(repo, "git", null, "rev-parse", "--git-path", "hooks");
-        string own = RepoFullPath(repo, ".githooks");
-        string used = pathCode == 0 && pathOutput.Trim().Length > 0 ? RepoFullPath(repo, pathOutput.Trim()) : "(unknown)";
-        Require(code == 0 && string.Equals(used, own, StringComparison.OrdinalIgnoreCase),
-            $"core.hooksPath is '{configured}', so git runs the hooks in '{used}', not this checkout's {own}: run tests/Run-Regression.ps1, " +
-            "or set core.hooksPath to .githooks (git config --worktree core.hooksPath .githooks in a linked worktree).");
         foreach (string hook in Hooks)
         {
             string text = File.ReadAllText(Path.Combine(repo, ".githooks", hook));
             Require(text.StartsWith("#!/bin/sh\n", StringComparison.Ordinal) && !text.Contains('\r') && text.Contains("Test-RepositoryContent.ps1"),
                 $".githooks/{hook} must be an LF sh script that runs the guard.");
-            (code, output) = Run(repo, "git", null, "check-attr", "eol", "--", ".githooks/" + hook);
-            Require(output.Trim().EndsWith("eol: lf", StringComparison.Ordinal), $".githooks/{hook} must check out with LF (.gitattributes).");
+            (int code, string output) = Run(repo, "git", null, "check-attr", "eol", "--", ".githooks/" + hook);
+            Require(code == 0 && output.Trim().EndsWith("eol: lf", StringComparison.Ordinal), $".githooks/{hook} must check out with LF (.gitattributes).");
         }
-        Console.WriteLine("[OK] git runs this checkout's .githooks; pre-commit, commit-msg and pre-push are LF sh scripts");
+        Require(File.ReadAllText(Path.Combine(repo, ".githooks", "pre-push")).Contains("tools/check.ps1", StringComparison.Ordinal),
+            ".githooks/pre-push must run the check command tools/check.ps1.");
+        Console.WriteLine("[OK] pre-commit, commit-msg and pre-push are LF sh scripts that run the guard; pre-push also runs tools/check.ps1");
     }
-
-    // A path as git uses it in this checkout: relative paths are relative to the working tree root.
-    private static string RepoFullPath(string repo, string path) =>
-        Path.TrimEndingDirectorySeparator(Path.GetFullPath(path, repo));
 
     // The tracked files pass the same guard the hooks use, with this machine's private list if it has one.
     private static void VerifyTrackedFiles(string repo)
@@ -147,11 +134,20 @@ internal static class Program
                 File.Copy(file, Path.Combine(work, ".githooks", Path.GetFileName(file)));
             File.Copy(Path.Combine(repo, ".gitattributes"), Path.Combine(work, ".gitattributes"));
             File.Copy(Path.Combine(repo, ".gitignore"), Path.Combine(work, ".gitignore"));
+            Write(work, "tools/check.ps1",
+                "if (Test-Path -LiteralPath (Join-Path $PSScriptRoot '..\\check-fails.flag')) { [Console]::Error.WriteLine('stub check failed'); exit 1 }\nexit 0\n");
             Git(root, withList, "init", "-q", "--bare", remote);
             Git(work, withList, "remote", "add", "origin", remote);
 
             Commit(work, withList, "the hooks themselves", true, null);
             Require(Run(work, "git", withList, "push", "-q", "origin", "main").Code == 0, "A clean push was refused.");
+
+            Commit(work, withList, "a note pushed while the check fails", true, null, ("check.md", "fine"));
+            Write(work, "check-fails.flag", "x");
+            (int checkCode, string checkOutput) = Run(work, "git", withList, "push", "-q", "origin", "main");
+            Require(checkCode != 0 && checkOutput.Contains("stub check failed", StringComparison.Ordinal), "A push was not refused when tools/check.ps1 failed:\n" + checkOutput);
+            File.Delete(Path.Combine(work, "check-fails.flag"));
+            Require(Run(work, "git", withList, "push", "-q", "origin", "main").Code == 0, "A push was refused after tools/check.ps1 passed.");
 
             Commit(work, withList, "a fictional note", true, null, ("notes.md", "ABC - Wireframe.3dm opened at C:\\Projects\\ABC"));
             Commit(work, withList, "a workbook", false, "project data file type", ("ABC - Report.xlsx", "x"));
@@ -185,6 +181,7 @@ internal static class Program
             Require(output.Contains("no private client list", StringComparison.Ordinal), "The guard did not report the missing private list.");
             Commit(work, withoutList, "a workbook without a private list", false, "project data file type", ("Other.xlsm", "x"));
 
+            Console.WriteLine("[OK] pre-push runs tools/check.ps1 and refuses the push when it fails");
             Console.WriteLine("[OK] hooks refuse workbooks, private list names (files, file names, messages, bypassed commits),");
             Console.WriteLine("     company folders, raw live output and new evidence images; they allow clean work and archive moves");
         }
