@@ -40,7 +40,9 @@ if (-not $ForceDownload) {
 }
 
 if (-not $InstallRoot) {
-    $InstallRoot = if ($env:PANELCLADDING_TOOLCHAIN_ROOT) { $env:PANELCLADDING_TOOLCHAIN_ROOT } else { Join-Path $env:LOCALAPPDATA 'PanelCladding\toolchain' }
+    $InstallRoot = if ($env:PANELCLADDING_TOOLCHAIN_ROOT) { $env:PANELCLADDING_TOOLCHAIN_ROOT }
+    elseif ($env:LOCALAPPDATA) { Join-Path $env:LOCALAPPDATA 'PanelCladding\toolchain' }
+    else { Join-Path $repo 'artifacts\toolchain' }
 }
 $target = Join-Path $InstallRoot "dotnet-sdk-$version"
 $dotnet = Join-Path $target 'dotnet.exe'

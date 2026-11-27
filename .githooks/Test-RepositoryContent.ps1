@@ -148,7 +148,8 @@ try {
     $script:textRules = @($rules.blockedText | ForEach-Object { New-Rule $_.pattern ([bool]$_.ignoreCase) $_.reason })
 
     $listPath = $env:PANELCLADDING_CONTENT_DENYLIST
-    if (-not $listPath) { $listPath = Join-Path $env:APPDATA 'PanelCladding\content-denylist.txt' }
+    if (-not $listPath -and $env:APPDATA) { $listPath = Join-Path $env:APPDATA 'PanelCladding\content-denylist.txt' }
+    if (-not $listPath) { $listPath = '%APPDATA%\PanelCladding\content-denylist.txt (APPDATA is not set)' }
     $script:privateRules = @()
     if (Test-Path -LiteralPath $listPath -PathType Leaf) {
         $number = 0

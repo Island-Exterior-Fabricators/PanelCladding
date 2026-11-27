@@ -65,6 +65,7 @@ project.nuget.cache
 .tmp-install*/
 .tmp-package*/
 artifacts/
+/Microsoft/
 .validation/
 _validation/
 _validation/file-safeguard-build/

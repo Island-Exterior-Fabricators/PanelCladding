@@ -43,6 +43,16 @@ function Complete-Check {
     exit 0
 }
 
+$checkHome = Join-Path $repo 'artifacts\check-home'
+foreach ($folder in @(@('LOCALAPPDATA', 'LocalAppData'), @('APPDATA', 'AppData'))) {
+    if (-not [Environment]::GetEnvironmentVariable($folder[0])) {
+        $path = Join-Path $checkHome $folder[1]
+        New-Item -ItemType Directory -Force -Path $path | Out-Null
+        [Environment]::SetEnvironmentVariable($folder[0], $path)
+        Write-Host "$($folder[0]) is not set; using $path"
+    }
+}
+
 $env:RestoreLockedMode = 'true'
 $env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
 $env:DOTNET_NOLOGO = '1'
