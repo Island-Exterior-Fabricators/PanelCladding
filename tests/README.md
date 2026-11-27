@@ -8,10 +8,13 @@ project data, and renders and raw live-run output stay out of the repository (se
 | `Smoke/<name>/` | Managed smoke projects, one per capability, with their input fixtures. `<name>` is the capability name of the change that introduced it. |
 | `Shared/` | Code compiled into smokes: `RegressionPaths.cs` (all smokes) and `CladdingLogicFixture.cs` (linked by the projects that need it). |
 | `Package/` | Package, installer, registration, identity and Yak checks against a built bundle. |
-| `Checks/` | Static checks that need no build. |
-| `Probes/` | Manual probes that take arguments, such as an installed bundle path. |
+| `Checks/` | Static checks that need no build; the check command runs them. |
+| `Probes/` | Manual probes that take arguments, such as an installed bundle path. Not run by the check command. |
 | `Live/` | Live acceptance checks of a release's manual test list, run inside Rhino against the installed plug-in on a test model, with helpers that answer its dialogs and hold Excel workbooks. Not run by `Run-Regression.ps1`: they need the installed RHP, Rhino and a desktop session. See [`Live/README.md`](Live/README.md). |
 | `Run-Regression.ps1` | Builds and runs the smokes. |
+
+The check command `tools/check.ps1` runs the static checks, the assembly identity check and `Run-Regression.ps1` for both configurations ([CONTRIBUTING.md](../CONTRIBUTING.md#the-check-command)).
+The other scripts in `Package/`, the probes and the live suites need a built bundle, a user session or a running Rhino, so they are run by hand.
 
 ## Running
 

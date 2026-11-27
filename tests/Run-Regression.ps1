@@ -13,36 +13,7 @@ $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $artifacts = Join-Path $repo 'artifacts\tests'
 
-# The repository is public: the hooks in .githooks refuse commits and pushes that carry client
-# project data. Git must run them from this checkout's own .githooks folder, so that a branch is
-# checked by its own rules. Enable them for this clone and its worktrees when unset. The Claude
-# desktop app sets core.hooksPath in each worktree's config.worktree to the main checkout's absolute
-# .githooks path; point such a worktree back at its own folder. Leave any other hooks folder alone.
-function Get-RepoFullPath([string] $Path) {
-    [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($repo, $Path)).TrimEnd('\', '/')
-}
-$hooksPath = & git -C $repo config --get core.hooksPath
-if (-not $hooksPath) {
-    & git -C $repo config core.hooksPath .githooks
-    Write-Output 'Enabled the repository hooks (core.hooksPath = .githooks).'
-}
-else {
-    # The folder git really uses; a relative path is relative to the working tree root.
-    $hooksFolder = Get-RepoFullPath (& git -C $repo rev-parse --git-path hooks)
-    if ($hooksFolder -ne (Get-RepoFullPath '.githooks')) {
-        $scope = ((& git -C $repo config --show-scope --get core.hooksPath) -split "`t")[0]
-        $checkoutHooks = @(& git -C $repo worktree list --porcelain | Where-Object { $_ -like 'worktree *' } |
-            ForEach-Object { Get-RepoFullPath ($_.Substring(9) + '/.githooks') })
-        if ($scope -eq 'worktree' -and $checkoutHooks -contains $hooksFolder) {
-            & git -C $repo config --worktree core.hooksPath .githooks
-            if ($LASTEXITCODE -ne 0) { throw "Could not set core.hooksPath for this worktree." }
-            Write-Output "Pointed this worktree's hooks at its own .githooks (core.hooksPath was '$hooksPath')."
-        }
-        else {
-            Write-Warning "core.hooksPath is '$hooksPath', so this checkout's client data hooks in .githooks do not run."
-        }
-    }
-}
+& (Join-Path $repo 'tools\install-hooks.ps1')
 
 $smokes = @(Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'Smoke') -Directory | Sort-Object Name | Where-Object {
     $folder = $_.Name
@@ -99,6 +70,11 @@ foreach ($config in $Configuration) {
         $seconds = [math]::Round(((Get-Date) - $started).TotalSeconds, 1)
         $results += [pscustomobject]@{ name = $smoke.Name; status = $status; exitCode = $exitCode; seconds = $seconds }
         Write-Output ('{0,-8} {1,-12} {2}' -f $config, $status.ToUpperInvariant(), $smoke.Name)
+        if ($status -ne 'pass') {
+            $shown = if ($status -eq 'build-failed') { "$log.build" } else { $log }
+            Write-Output "         log: $shown"
+            if (Test-Path -LiteralPath $shown -PathType Leaf) { Get-Content -LiteralPath $shown -Tail 40 | ForEach-Object { "         | $_" } }
+        }
     }
     $results | ConvertTo-Json -Depth 3 | Set-Content -LiteralPath (Join-Path $artifacts "regression-$config.json") -Encoding utf8
     $configFailed = @($results | Where-Object { $_.status -ne 'pass' }).Count

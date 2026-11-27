@@ -1,6 +1,13 @@
 # PanelCladding decision log
 
-This log records why PanelCladdingEditor works the way it does where the code alone does not say. Many of these choices were made after a live failure or at the user's explicit request, and several look odd or redundant until you know the reason. Read the entry before you reverse one of them. If you still change it, add a new entry and mark the old one superseded rather than rewriting it. Entries are in chronological order by the date each decision was first taken, and later refinements of the same decision are folded into its entry. Key, command and file names are today's names unless an entry says otherwise. The original development records are kept at git tag `records-2026-11-06`.
+This log records why PanelCladdingEditor works the way it does where the code alone does not say.
+Many of these choices were made after a live failure or at the user's explicit request, and several look odd or redundant until you know the reason.
+Read the entry before you reverse one of them.
+If you still change it, add a new entry at the end and mark the old one superseded rather than rewriting it.
+Entries are in chronological order by the date each decision was first taken, newest last, and later refinements of the same decision are folded into its entry.
+Each new entry gives the date and a title, then what was chosen, why, and what the other options were.
+Key, command and file names are today's names unless an entry says otherwise.
+The original development records are kept at git tag `records-2026-11-06`.
 
 ### 2026-08-04 — Standalone plug-in with a fixed identity
 
@@ -502,5 +509,63 @@ user asked that a problem panel be left with a dot explaining the problem while 
 bake normally. Duplicate-CID panels were already skipped and
 `PCcrvTemplate` and `PCsyncSrf`/`PCsyncCrv` already skip problem panels; a dot shows where each
 skipped panel is and why.
+
+**Status:** current
+
+### 2026-11-27 — One check command, run the same way locally, in CI and by Super Agent
+
+**Chosen:** The repository follows the Super Agent development standard.
+`tools/check.ps1` is the one command that checks the repository: the pinned SDK, the client data guard, the static checks, the Debug and Release solution builds with warnings as errors and locked restore, the plug-in identity check and every managed smoke in both configurations.
+The pre-push hook (`tools/install-hooks.ps1` enables it), the CI workflow and `.superagent2/check.json` all run that command.
+The live suites, the probes and the package, installer, registration and Yak checks stay outside it and are run by hand.
+`tests/Checks/Verify-Migration.py` became the PowerShell script `tests/Checks/Test-StandaloneReferences.ps1`, so the check needs no Python.
+
+**Why:** The owner chose full adoption of the standard, and other people also contribute, so every pull request must get the same objective checks.
+The excluded tests need a running Rhino, an installed plug-in or an interactive user session, which a CI runner does not have.
+Windows PowerShell is on every Windows machine, while Python would be one more tool chain to pin and verify.
+
+**Other options:** A `make` or `pnpm` entry point, which would add a tool chain the repository does not otherwise need; keeping the Python check and pinning Python on the runner; running the package installation tests in CI against throwaway registry roots, which writes to the runner account's HKCU.
+
+**Status:** current
+
+### 2026-11-27 — CI on GitHub Actions with a self-hosted Windows runner that has Rhino 8
+
+**Chosen:** `.github/workflows/check.yml` runs `tools/check.ps1` on pull requests, on pushes to `master` and on manual start, on a runner labelled `self-hosted`, `windows` and `rhino`, with one overall job timeout.
+Pull requests from forks are skipped, so outside code never runs on the self-hosted runner.
+`actions/checkout` is pinned to a commit.
+
+**Why:** The owner chose GitHub Actions with a self-hosted Windows runner.
+Every project references RhinoCommon from the Rhino 8 installation, and Rhino cannot be downloaded in a workflow, so the build needs a machine with Rhino 8 installed and the `rhino` label says so.
+The standard asks for pushes to the default branch, which here is `master`, not `main`.
+
+**Other options:** GitHub-hosted runners, which have no Rhino; Woodpecker; compiling against the RhinoCommon NuGet package instead of the installed Rhino, which would change what every project builds against and could differ from the Rhino the plug-in runs in.
+
+**Status:** current
+
+### 2026-11-27 — Pinned .NET SDK and locked NuGet restore
+
+**Chosen:** `global.json` pins .NET SDK 8.0.101 with `rollForward` set to `disable`.
+`tools/use-dotnet-sdk.ps1` uses an installed copy, or downloads the official zip and checks it against the SHA-512 pinned in `tools/dotnet-sdk.json`, which is copied from Microsoft's published release metadata.
+Every project has a committed `packages.lock.json`, and the check command restores in locked mode.
+
+**Why:** The standard pins tool chains in the repository and installs dependencies from lock files only.
+8.0.101 is the SDK already installed on the owner's machines, so their builds need no download, and `disable` makes every machine build with exactly that SDK.
+
+**Other options:** A newer 8.0 SDK, which every machine would first have to download; `rollForward` `latestPatch` or `latestFeature`, which would let each machine build with whatever newer SDK it has; Microsoft's `dotnet-install.ps1`, which is itself an unpinned download.
+
+**Status:** current
+
+### 2026-11-27 — Documents under docs/, contributor flow in CONTRIBUTING.md
+
+**Chosen:** The guides moved from `Project_Guides/` to `docs/`: the architecture guide is `docs/design.md`, which also lists the enforced rules, the decision log is `docs/decisions.md` and the operations guide is `docs/operations.md`.
+The workflow guide became `CONTRIBUTING.md`, and `AGENTS.md` became a short page of advice that names the check command and links to these documents.
+`.gitattributes` makes every text file LF, except `.cmd` files, which stay CRLF for `cmd.exe`.
+
+**Why:** The standard keeps decisions in `docs/decisions.md` and the enforced rules in one closed list in the design document, and asks for a short, advisory `AGENTS.md`.
+One decision log is easier to keep current than two.
+Other contributors look for `CONTRIBUTING.md`.
+`cmd.exe` can misread labels and `goto` targets in batch files with LF line endings.
+
+**Other options:** Keeping `Project_Guides/` and adding a second, new decision log beside the old one; keeping the hard rules in `AGENTS.md`, which the standard reserves for advice.
 
 **Status:** current

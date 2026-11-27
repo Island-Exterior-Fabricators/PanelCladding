@@ -1,4 +1,19 @@
-# Git hooks run under sh, which needs LF line endings.
-.githooks/pre-commit text eol=lf
-.githooks/commit-msg text eol=lf
-.githooks/pre-push text eol=lf
+* text=auto eol=lf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.zip binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.dll binary
+*.exe binary
+*.rhp binary
+*.3dm binary
+*.pdf binary
+*.xlsx binary
+*.xls binary
+*.xlsm binary
+*.dwg binary
+*.dxf binary

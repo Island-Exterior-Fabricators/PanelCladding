@@ -151,25 +151,22 @@ Never install both the zip and the Package Manager versions; Rhino reports `ID a
 
 ## Build from source
 
-Requires the .NET 8 SDK and Rhino 8 at `C:\Program Files\Rhino 8` (otherwise update the
-RhinoCommon `HintPath` in the project).
+Requires Rhino 8 at `C:\Program Files\Rhino 8` (the RhinoCommon `HintPath` in the projects).
+The .NET SDK version is pinned in `global.json`; `tools/check.ps1` downloads and verifies it when it is missing.
 
 ```powershell
-dotnet build .\PanelCladding.sln -c Release -m:1
-.\tests\Run-Regression.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/check.ps1
 .\Packaging\PanelCladdingEditor\Build-PanelCladdingEditorPackage.ps1
 ```
 
-Packages are written to `Packaging/PanelCladdingEditor/artifacts/` (not tracked). Contributors
-should read [AGENTS.md](AGENTS.md) and the [architecture guide](Project_Guides/PanelCladding%20Architecture.md)
-first.
+Packages are written to `Packaging/PanelCladdingEditor/artifacts/` (not tracked).
+Contributors should read [CONTRIBUTING.md](CONTRIBUTING.md) and the [design document](docs/design.md) first.
 
 ## Repository
 
 - `src/PanelCladdingEditor/` - plug-in source: application logic, Rhino adapters and WPF UI.
 - `Packaging/PanelCladdingEditor/` - package and installer scripts, release notes.
 - `tests/` - regression smokes and package checks ([test runner](tests/README.md)).
-- `Project_Guides/` - contributor guides: [architecture](Project_Guides/PanelCladding%20Architecture.md),
-  [workflow](Project_Guides/PanelCladding%20Workflow.md),
-  [operations](Project_Guides/PanelCladding%20Operations.md) and
-  [decisions](Project_Guides/PanelCladding%20Decisions.md).
+- `docs/` - [design](docs/design.md), [operations](docs/operations.md) and [decisions](docs/decisions.md).
+- `tools/` - the check command `tools/check.ps1` and its helpers.
+- [CONTRIBUTING.md](CONTRIBUTING.md) - how to make and check a change.

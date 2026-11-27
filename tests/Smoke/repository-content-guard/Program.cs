@@ -102,6 +102,8 @@ internal static class Program
             (code, output) = Run(repo, "git", null, "check-attr", "eol", "--", ".githooks/" + hook);
             Require(output.Trim().EndsWith("eol: lf", StringComparison.Ordinal), $".githooks/{hook} must check out with LF (.gitattributes).");
         }
+        Require(File.ReadAllText(Path.Combine(repo, ".githooks", "pre-push")).Contains("tools/check.ps1", StringComparison.Ordinal),
+            ".githooks/pre-push must run the check command tools/check.ps1.");
         Console.WriteLine("[OK] git runs this checkout's .githooks; pre-commit, commit-msg and pre-push are LF sh scripts");
     }
 
@@ -147,11 +149,20 @@ internal static class Program
                 File.Copy(file, Path.Combine(work, ".githooks", Path.GetFileName(file)));
             File.Copy(Path.Combine(repo, ".gitattributes"), Path.Combine(work, ".gitattributes"));
             File.Copy(Path.Combine(repo, ".gitignore"), Path.Combine(work, ".gitignore"));
+            Write(work, "tools/check.ps1",
+                "if (Test-Path -LiteralPath (Join-Path $PSScriptRoot '..\\check-fails.flag')) { [Console]::Error.WriteLine('stub check failed'); exit 1 }\nexit 0\n");
             Git(root, withList, "init", "-q", "--bare", remote);
             Git(work, withList, "remote", "add", "origin", remote);
 
             Commit(work, withList, "the hooks themselves", true, null);
             Require(Run(work, "git", withList, "push", "-q", "origin", "main").Code == 0, "A clean push was refused.");
+
+            Commit(work, withList, "a note pushed while the check fails", true, null, ("check.md", "fine"));
+            Write(work, "check-fails.flag", "x");
+            (int checkCode, string checkOutput) = Run(work, "git", withList, "push", "-q", "origin", "main");
+            Require(checkCode != 0 && checkOutput.Contains("stub check failed", StringComparison.Ordinal), "A push was not refused when tools/check.ps1 failed:\n" + checkOutput);
+            File.Delete(Path.Combine(work, "check-fails.flag"));
+            Require(Run(work, "git", withList, "push", "-q", "origin", "main").Code == 0, "A push was refused after tools/check.ps1 passed.");
 
             Commit(work, withList, "a fictional note", true, null, ("notes.md", "ABC - Wireframe.3dm opened at C:\\Projects\\ABC"));
             Commit(work, withList, "a workbook", false, "project data file type", ("ABC - Report.xlsx", "x"));
@@ -185,6 +196,7 @@ internal static class Program
             Require(output.Contains("no private client list", StringComparison.Ordinal), "The guard did not report the missing private list.");
             Commit(work, withoutList, "a workbook without a private list", false, "project data file type", ("Other.xlsm", "x"));
 
+            Console.WriteLine("[OK] pre-push runs tools/check.ps1 and refuses the push when it fails");
             Console.WriteLine("[OK] hooks refuse workbooks, private list names (files, file names, messages, bypassed commits),");
             Console.WriteLine("     company folders, raw live output and new evidence images; they allow clean work and archive moves");
         }

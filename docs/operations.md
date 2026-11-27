@@ -19,8 +19,15 @@ named here are the source of truth: when this page and a script disagree, the sc
 
 ## Build
 
-Requires the .NET 8 SDK and Rhino 8 at `C:\Program Files\Rhino 8` (the RhinoCommon `HintPath`;
-RhinoCommon is never shipped). Warnings are errors.
+The check command `tools/check.ps1` builds and tests everything that runs without a Rhino session ([CONTRIBUTING.md](../CONTRIBUTING.md#the-check-command)).
+It needs Rhino 8 at `C:\Program Files\Rhino 8` (the RhinoCommon `HintPath`; RhinoCommon is never shipped) and the .NET SDK pinned in `global.json`.
+Warnings are errors.
+
+- `tools/use-dotnet-sdk.ps1` uses an installed copy of the pinned SDK.
+  Otherwise it downloads the official zip named in `tools/dotnet-sdk.json`, checks its SHA-512 against the value pinned there (copied from Microsoft's release metadata, `checksumSource`) and extracts it under `%LOCALAPPDATA%\PanelCladding\toolchain` (or `PANELCLADDING_TOOLCHAIN_ROOT`).
+  To move to another SDK, change `global.json` and `tools/dotnet-sdk.json` together, taking the URL and `hash` of the `win-x64` zip from the release metadata.
+- Every project has a committed `packages.lock.json` (`RestorePackagesWithLockFile` in `Directory.Build.props`), and the check command restores with `RestoreLockedMode=true`, so packages come only from the lock files.
+  After adding or changing a package reference, build once without locked mode and commit the updated lock files.
 
 - A normal build produces `PanelCladdingEditor.rhp`, the file Rhino loads. With
   `PanelCladdingTestHost=true` the same project builds `PanelCladdingEditor.dll`, which every smoke
@@ -43,7 +50,7 @@ dotnet build .\src\PanelCladdingEditor\PanelCladdingEditor.csproj -c Release -t:
 .\tests\Run-Regression.ps1 -List                            # also -NoBuild, -TimeoutSeconds (default 900)
 ```
 
-- It first makes git run this checkout's own `.githooks`: it sets `core.hooksPath = .githooks` when
+- It first runs `tools/install-hooks.ps1`, which makes git run this checkout's own `.githooks`: it sets `core.hooksPath = .githooks` when
   unset, and in a linked worktree whose `config.worktree` points `core.hooksPath` at another
   checkout's `.githooks` (the Claude desktop app writes the main checkout's absolute path into each
   worktree it creates) it runs `git config --worktree core.hooksPath .githooks`. Any other hooks
@@ -52,10 +59,9 @@ dotnet build .\src\PanelCladdingEditor\PanelCladdingEditor.csproj -c Release -t:
   runs it from the repository root with stdin closed, logs to `artifacts/tests/logs/<Configuration>/`,
   writes `artifacts/tests/regression-<Configuration>.json`, and exits 1 on any failure (no accepted
   failures). Rhino-native parts print `[SKIP]`; a managed pass is not live acceptance.
-- No suite runs `tests/Package/PanelRegistryOnlyInstallationSmoke.ps1` or
-  `tests/Package/Verify-YakPackage.ps1`; run them by hand after changing the installer or the Yak
-  script. Static checks: `tests/Checks/Test-ViewportHighlightDrawing.ps1` and
-  `tests/Checks/Verify-Migration.py` (GUID text, no external or MCP_Rhino project references).
+- The check command does not run the package, installer, registration and Yak checks in `tests/Package/` (apart from the assembly identity check), the probes in `tests/Probes/` or the live suites; run them by hand after changing what they cover.
+  `tests/Package/Verify-Release.ps1` runs the package and registration checks before a release.
+- Static checks, run by the check command: `tests/Checks/Test-ViewportHighlightDrawing.ps1` and `tests/Checks/Test-StandaloneReferences.ps1` (GUID text, no external or MCP_Rhino project references; `-Bundle <folder>` also checks a built bundle's hashes).
 
 ## Assembly identity
 
@@ -313,6 +319,7 @@ See `tests/Live/README.md` for the full procedure. In short:
   the old objects; purging them needs an organization owner and GitHub Support.
 - **Branches and records.** Construction branches are named `feature/<capability-name>`. The
   development records up to 2026-11-06 are kept at tag `records-2026-11-06`.
+- **Check on push.** `pre-push` runs the content guard and then the check command `tools/check.ps1`.
 - **Content guard**: `pre-commit`, `commit-msg` and `pre-push` (LF sh wrappers) run
   `.githooks/Test-RepositoryContent.ps1` with `.githooks/content-rules.json` (project data file
   types, raw live-output folders, new evidence images, company project-folder paths) plus a private
@@ -320,7 +327,7 @@ See `tests/Live/README.md` for the full procedure. In short:
   `PANELCLADDING_CONTENT_DENYLIST`; add every new client project; without it the guard warns and
   applies the other rules). Exit 0 clean, 1 blocked, 2 guard failure; check by hand with
   `-Mode Tracked` or `-Mode Commit -Rev <rev>`. Never bypass (`--no-verify`). Git must run the
-  checkout's own `.githooks`, so each clone and each new app worktree needs one regression run, and
+  checkout's own `.githooks`, so each clone and each new app worktree needs `tools/install-hooks.ps1` (or one regression run), and
   each machine its own copy of the list. The `repository-content-guard` smoke checks
   rules, wiring and hook behaviour.
 
