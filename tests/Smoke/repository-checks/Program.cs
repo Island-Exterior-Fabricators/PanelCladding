@@ -133,6 +133,10 @@ internal static class Program
         File.WriteAllText(Path.Combine(root, "tests", "Run.ps1"), "Write-Output 'ok'\n");
         Directory.CreateDirectory(Path.Combine(root, "ignored"));
         File.WriteAllText(Path.Combine(root, "ignored", "Skipped.cs"), "/" + "/ ignored by git\n");
+        Require(Run(root, "git", "add", "-A").Code == 0, "git add failed.");
+        Directory.CreateDirectory(Path.Combine(root, "NuGet", "Migrations"));
+        File.WriteAllText(Path.Combine(root, "NuGet", "Migrations", "1"), "untracked tool output of an unknown type\n");
+        File.WriteAllText(Path.Combine(root, "Untracked.cs"), "/" + "/ not tracked\n");
         (int cleanCode, string cleanOutput) = RunCheck(root);
         Require(cleanCode == 0, "A clean repository passes:\n" + cleanOutput);
 
@@ -145,9 +149,11 @@ internal static class Program
                 output.Contains("README.md:3: two sentences on one line", StringComparison.Ordinal) &&
                 output.Contains("tests/Run.ps1:1: comment:", StringComparison.Ordinal) &&
                 output.Contains("tests/Run.ps1:1: test waits for a duration", StringComparison.Ordinal) &&
-                !output.Contains("Skipped.cs", StringComparison.Ordinal),
-            "Findings name the file and line and the check exits 1; git-ignored files are not scanned:\n" + output);
-        Console.WriteLine("[OK] whole repository: git-listed files only, findings as file:line, exit 1 on any finding");
+                !output.Contains("Skipped.cs", StringComparison.Ordinal) &&
+                !output.Contains("Untracked.cs", StringComparison.Ordinal) &&
+                !output.Contains("Migrations", StringComparison.Ordinal),
+            "Findings name the file and line and the check exits 1; untracked and ignored files are not scanned:\n" + output);
+        Console.WriteLine("[OK] whole repository: tracked files only, findings as file:line, exit 1 on any finding");
     }
 
     private static (int Code, string Output) RunCheck(string root)

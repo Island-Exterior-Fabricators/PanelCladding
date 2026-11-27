@@ -53,7 +53,7 @@ dotnet build .\src\PanelCladdingEditor\PanelCladdingEditor.csproj -c Release -t:
   Rhino-native parts print `[SKIP]`; a managed pass is not live acceptance.
 - The check command does not run the package, installer, registration and Yak checks in `tests/Package/` (apart from the assembly identity check), the probes in `tests/Probes/` or the live suites; run them by hand after changing what they cover.
   `tests/Package/Verify-Release.ps1` runs the package and registration checks before a release.
-- `tools/RepoCheck` scans every file git lists (tracked, or new and not ignored) for comments, prose that breaks the one-sentence-per-line rule, and test scripts that sleep or wait with a time limit, and prints each finding as `path:line: rule: detail`.
+- `tools/RepoCheck` scans every file git tracks (`git ls-files`, so new files count once they are added) for comments, prose that breaks the one-sentence-per-line rule, and test scripts that sleep or wait with a time limit, and prints each finding as `path:line: rule: detail`.
   Run it alone with `dotnet build tools/RepoCheck -c Release` and `dotnet tools/RepoCheck/bin/Release/net8.0/RepoCheck.dll .`; its own tests are the `repository-checks` smoke.
 - Static checks, run by the check command: `tests/Checks/Test-BannedTestApis.ps1` (the fixture in `tests/Checks/banned-api-fixture/` must fail to build on every banned time API), `tests/Checks/Test-ViewportHighlightDrawing.ps1` and `tests/Checks/Test-StandaloneReferences.ps1` (GUID text, no external or MCP_Rhino project references; `-Bundle <folder>` also checks a built bundle's hashes).
 

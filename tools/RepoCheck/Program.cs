@@ -68,7 +68,7 @@ public static class Program
             RedirectStandardError = true,
             StandardOutputEncoding = Encoding.UTF8,
         };
-        foreach (string argument in new[] { "-C", root, "ls-files", "-z", "--cached", "--others", "--exclude-standard" })
+        foreach (string argument in new[] { "-C", root, "ls-files", "-z", "--cached" })
             info.ArgumentList.Add(argument);
         using Process process = Process.Start(info) ?? throw new InvalidOperationException("git could not start.");
         Task<string> error = process.StandardError.ReadToEndAsync();

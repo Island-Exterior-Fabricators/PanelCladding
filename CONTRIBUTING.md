@@ -26,7 +26,8 @@ Run it before you open a pull request.
 
 It needs Windows, Rhino 8 at `C:\Program Files\Rhino 8` (the projects reference its RhinoCommon) and network access the first time the pinned SDK is missing.
 The SDK download is kept under `%LOCALAPPDATA%\PanelCladding\toolchain`, or under `PANELCLADDING_TOOLCHAIN_ROOT` when that is set.
-When `LOCALAPPDATA` or `APPDATA` is not set, as in a fresh verification checkout, the check uses folders under the git-ignored `artifacts/check-home` instead.
+When `LOCALAPPDATA` or `APPDATA` is not set, as in a fresh verification checkout, the check uses folders under the git-ignored `artifacts/check-home` instead, and so it does for `DOTNET_CLI_HOME` and `NUGET_PACKAGES` when `USERPROFILE` is not set.
+When Windows reports no local application data folder, NuGet writes its `NuGet/Migrations` marker into the working directory; `.gitignore` ignores it, and RepoCheck scans only tracked files.
 
 Some tests need a running Rhino, an installed plug-in or a user session, so the check command leaves them out.
 Run them by hand when a change touches what they cover: the live suites in `tests/Live/`, the probes in `tests/Probes/`, and the package, installer, registration and Yak checks in `tests/Package/`.

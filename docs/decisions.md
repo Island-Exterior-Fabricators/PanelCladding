@@ -721,7 +721,7 @@ Other contributors look for `CONTRIBUTING.md`.
 
 ### 2026-11-27 — Zero comments, one sentence per line and deterministic tests, checked by tools/RepoCheck
 
-**Chosen:** `tools/RepoCheck`, a .NET tool run by the check command, fails on any comment in a file git lists, on any document line with two sentences or a wrapped sentence, and on test scripts that sleep or wait with a time limit.
+**Chosen:** `tools/RepoCheck`, a .NET tool run by the check command, fails on any comment in a file git tracks, on any document line with two sentences or a wrapped sentence, and on test scripts that sleep or wait with a time limit.
 C# comments come from Roslyn and PowerShell comments from the PowerShell parser; XML, YAML, shell, git, solution, batch and JSON files have their own rules, Markdown comments are HTML comments, and a file type without a rule fails the check.
 Code examples inside fenced Markdown blocks are content, not comments, and are not checked.
 `tests/BannedSymbols.txt` (Microsoft's banned API analyzer) keeps the system clock, `Stopwatch`, sleeps, delays, timers and timed waits out of every C# test project.

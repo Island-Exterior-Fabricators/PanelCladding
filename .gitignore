@@ -44,6 +44,7 @@ project.nuget.cache
 .tmp-package*/
 artifacts/
 /Microsoft/
+NuGet/Migrations/
 .validation/
 _validation/
 _validation/file-safeguard-build/

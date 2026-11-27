@@ -52,6 +52,17 @@ foreach ($folder in @(@('LOCALAPPDATA', 'LocalAppData'), @('APPDATA', 'AppData')
         Write-Host "$($folder[0]) is not set; using $path"
     }
 }
+if (-not $env:USERPROFILE) {
+    foreach ($folder in @(@('DOTNET_CLI_HOME', 'DotnetHome'), @('NUGET_PACKAGES', 'NuGetPackages'))) {
+        if (-not [Environment]::GetEnvironmentVariable($folder[0])) {
+            $path = Join-Path $checkHome $folder[1]
+            New-Item -ItemType Directory -Force -Path $path | Out-Null
+            [Environment]::SetEnvironmentVariable($folder[0], $path)
+            Write-Host "USERPROFILE is not set; $($folder[0]) is $path"
+        }
+    }
+}
+$env:DOTNET_GENERATE_ASPNET_CERTIFICATE = 'false'
 
 $env:RestoreLockedMode = 'true'
 $env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
