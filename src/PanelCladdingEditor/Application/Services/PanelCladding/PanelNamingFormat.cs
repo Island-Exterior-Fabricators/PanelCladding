@@ -3,23 +3,16 @@ using PanelCladdingEditor.Contracts.Responses;
 
 namespace PanelCladdingEditor.Application.Services.PanelCladding;
 
-// Per-project PNL code format recorded by PCtemplatePNL in the naming-convention workbook
-// (custom property PanelCladdingEditor.PNLFormat), so every model of a project shares it.
-// Each segment uses one token: A (one letter), AA (two letters), A1 (letter + digit),
-// 01 (two digits) or 001 (three digits). Letters I and O are never used. Definition is
-// always 01 and, like every two-digit segment, continues 01..99, A1..Z9, AA..ZZ.
 public sealed record PanelNamingFormat(string WallType, string FrameConfig, string FrameType, string Cladding, string Definition)
 {
     public const string PropertyName = "PanelCladdingEditor.PNLFormat";
     public const string Letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
     public const string DefinitionToken = "01";
-    // Placeholder rows PCtemplatePNL keeps under each table: as many as one-letter codes.
     public const int PlaceholderCount = 24;
 
     public static readonly IReadOnlyList<string> Tokens = ["AA", "A", "A1", "01", "001"];
     public static readonly IReadOnlyList<string> SegmentTitles = ["Wall-Type", "Frame-Config", "Frame-Type", "Cladding", "Definition"];
 
-    // ABC's format; a sheet without a recorded format keeps using it.
     public static PanelNamingFormat Legacy { get; } = new("A", "AA", "01", "01", DefinitionToken);
 
     public IReadOnlyList<(string Title, string Token)> Segments =>
@@ -51,18 +44,14 @@ public sealed record PanelNamingFormat(string WallType, string FrameConfig, stri
 
     public static bool IsToken(string? token) => token is not null && Tokens.Contains(token);
 
-    // User input ("a1", " 001 ") as a token, or null.
     public static string? ReadToken(string? input)
     {
         string token = (input ?? string.Empty).Trim().ToUpperInvariant();
         return IsToken(token) ? token : null;
     }
 
-    // AA and A1 frame configuration codes are grouped: the first letter is the H/V class.
     public static bool IsGrouped(string token) => token is "AA" or "A1";
 
-    // Codes in assignment order. Two-character tokens overflow without changing width:
-    // 01..99, then A1..Z9, then AA..ZZ.
     public static IEnumerable<string> Sequence(string token) => token switch
     {
         "A" => Letters.Select(letter => letter.ToString()),
@@ -84,7 +73,6 @@ public sealed record PanelNamingFormat(string WallType, string FrameConfig, stri
         _ => false
     };
 
-    // A code written under any format; used to leave codes of another format alone.
     public static bool LooksLikeCode(string? value) => Tokens.Any(token => Fits(token, value));
 
     public static int SequenceIndex(string token, string code)

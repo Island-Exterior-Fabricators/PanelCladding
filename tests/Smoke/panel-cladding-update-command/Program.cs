@@ -215,7 +215,6 @@ internal static class Program
         Type commandType = assembly.GetType("PanelCladdingEditor.UI.PanelCladdingBakeCommand") ??
             throw new InvalidOperationException("PanelCladdingBakeCommand is missing.");
         Require(typeof(Command).IsAssignableFrom(commandType), "PCbake is not a Rhino command.");
-        // PCbake keeps the GUID of the former PCupdate command.
         Require(commandType.GUID == Guid.Parse("F2C41D75-2F88-4CB4-9D1C-CF6BD1D6208A"),
             "PCbake must keep the former PCupdate command GUID.");
         object command = RuntimeHelpers.GetUninitializedObject(commandType);
@@ -321,7 +320,6 @@ internal static class Program
         PanelCladdingDependencyKind kind) => new()
         {
             ObjectId = objectId,
-            // The live service records the single selected owner, as Expected uses PanelId.
             SourcePanelObjectId = PanelId,
             PanelId = panelId,
             Cid = cid,

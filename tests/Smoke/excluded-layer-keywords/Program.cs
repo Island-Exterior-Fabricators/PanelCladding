@@ -3,8 +3,6 @@ using PanelCladdingEditor.Contracts.Responses;
 
 namespace ExcludedLayerKeywordsSmoke;
 
-// Since 1.3.0 layers named "Not in Scope" or "By Others" are not tracked by any panel or curve scope;
-// after 1.3.0 the auto attributes still refresh panels on them.
 internal static class Program
 {
     private const string PanelBranch = "ABC-IEF-Wireframe::Surfaces - PNL";
@@ -58,7 +56,6 @@ internal static class Program
                 !PanelCladdingExtrusionPlanningService.IsPanelLayerPath(PanelBranch + "::Surfaces - By Others::WT_01", "ABC") &&
                 PanelCladdingPidPlanningService.IsPanelLayerPath(PanelBranch + "::Surfaces - WT_01"),
             "Panel scope (PCpid, naming sync, report) must skip excluded layers only.");
-        // Auto attributes keep excluded panels' sizes and UD_PLANE current (after 1.3.0).
         Require(PanelCladdingExtrusionPlanningService.IsPanelBranchPath(PanelBranch + "::Surfaces - Not in Scope", "ABC") &&
                 PanelCladdingExtrusionPlanningService.IsPanelBranchPath(PanelBranch + "::Surfaces - By Others::WT_01", "ABC") &&
                 PanelCladdingExtrusionPlanningService.IsPanelBranchPath(PanelBranch + "::Surfaces - WT_01", "ABC") &&

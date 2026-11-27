@@ -87,8 +87,6 @@ internal static class Program
         Require(Named<Border>(window, "MaterialLegendSection").Visibility == Visibility.Visible &&
                 Named<Border>(window, "CladdingAssignmentSection").Visibility == Visibility.Visible,
             "Cladding view changed.");
-        // Closing a dirty editor shows a real "Discard unsaved edits?" message box that blocks the
-        // run until someone answers it; the edits under test are already verified.
         Invoke(window, "SetDirty", false);
         window.Close();
 

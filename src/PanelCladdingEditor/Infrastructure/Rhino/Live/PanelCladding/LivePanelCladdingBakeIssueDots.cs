@@ -14,7 +14,6 @@ using TextDot = rhinocommon::Rhino.Geometry.TextDot;
 
 namespace PanelCladdingEditor.Infrastructure.Rhino.Live.PanelCladding;
 
-// Writes PCbake's issue dots inside the bake's Undo record (PanelCladdingBakeIssueService has the rules).
 internal static class LivePanelCladdingBakeIssueDots
 {
     internal static OperationResponse Mark(
@@ -76,7 +75,6 @@ internal static class LivePanelCladdingBakeIssueDots
         return OperationResponse.Ok();
     }
 
-    // A layer the user already has keeps its colour and state.
     private static int EnsureIssueLayer(RhinoDoc document, ref bool documentMutationOccurred)
     {
         int index = document.Layers.FindByFullPath(PanelCladdingBakeIssueService.IssueLayerPath, -1);

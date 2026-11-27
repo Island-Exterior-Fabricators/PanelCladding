@@ -5,8 +5,6 @@ param(
 
 $ErrorActionPreference = 'Stop'
 function Get-InstalledFileHash([string] $Path) {
-    # Hash directly: Windows PowerShell 5.1's Get-FileHash can suppress its
-    # internal ProviderPath read when the script is launched with -WhatIf.
     $algorithm = [Security.Cryptography.SHA256]::Create()
     try {
         $stream = [IO.File]::OpenRead($Path)

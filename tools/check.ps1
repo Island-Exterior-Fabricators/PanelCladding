@@ -52,6 +52,17 @@ foreach ($folder in @(@('LOCALAPPDATA', 'LocalAppData'), @('APPDATA', 'AppData')
         Write-Host "$($folder[0]) is not set; using $path"
     }
 }
+if (-not $env:USERPROFILE) {
+    foreach ($folder in @(@('DOTNET_CLI_HOME', 'DotnetHome'), @('NUGET_PACKAGES', 'NuGetPackages'))) {
+        if (-not [Environment]::GetEnvironmentVariable($folder[0])) {
+            $path = Join-Path $checkHome $folder[1]
+            New-Item -ItemType Directory -Force -Path $path | Out-Null
+            [Environment]::SetEnvironmentVariable($folder[0], $path)
+            Write-Host "USERPROFILE is not set; $($folder[0]) is $path"
+        }
+    }
+}
+$env:DOTNET_GENERATE_ASPNET_CERTIFICATE = 'false'
 
 $env:RestoreLockedMode = 'true'
 $env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
@@ -80,6 +91,16 @@ if (-not ($toolchain -and $rhino)) {
     Write-Host 'Skipping the builds and smokes: the tool chain or Rhino 8 is missing.'
     Complete-Check
 }
+
+Invoke-Step 'No comments, one sentence per line, no timed waits in tests (tools/RepoCheck)' {
+    & dotnet build tools/RepoCheck/RepoCheck.csproj -c Release -warnaserror --nologo -v:q
+    if ($LASTEXITCODE -ne 0) { return }
+    & dotnet (Join-Path $repo 'tools\RepoCheck\bin\Release\net8.0\RepoCheck.dll') $repo
+} | Out-Null
+
+Invoke-Step 'Banned time APIs fail a test build (tests/Checks/Test-BannedTestApis.ps1)' {
+    Invoke-Script (Join-Path $repo 'tests\Checks\Test-BannedTestApis.ps1') @()
+} | Out-Null
 
 foreach ($configuration in 'Debug', 'Release') {
     Invoke-Step "Build PanelCladding.sln ($configuration, warnings as errors, locked restore)" {

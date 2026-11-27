@@ -24,12 +24,6 @@ using UnitSystem = rhinocommon::Rhino.UnitSystem;
 
 namespace PanelCladdingEditor.Infrastructure.Rhino.Live.PanelCladding;
 
-// Always-on refresh of unit dimension, width, height, area, weight and the panel frame (UD_PLANE,
-// computed from the geometry) on every panel of <PROJECT>-IEF-Wireframe::Surfaces - PNL and its
-// sublayers, Not in Scope and By Others ones included (replaces the AutoATT script and its
-// AUTO_panel=1 mark). Events only queue object ids; values are written on idle outside a command,
-// because changing the document inside object events is unsafe. Undo is left alone: it restores
-// the values recorded with the previous geometry.
 internal static class LivePanelAutoAttributes
 {
     private static readonly Dictionary<uint, HashSet<Guid>> Pending = new();
@@ -66,7 +60,6 @@ internal static class LivePanelAutoAttributes
         }
     }
 
-    // Renaming or moving a layer can bring panels into, or take them out of, the branch.
     private static void OnLayerTableEvent(object? sender, LayerTableEventArgs args)
     {
         if (_writing || args.EventType != LayerTableEventType.Modified || args.Document is not RhinoDoc document ||
@@ -155,7 +148,6 @@ internal static class LivePanelAutoAttributes
         }
     }
 
-    // True when the panel's values changed.
     private static bool Refresh(RhinoDoc document, RhinoObject panel)
     {
         if (panel.IsDeleted || panel.IsReference || panel.IsInstanceDefinitionGeometry) return false;

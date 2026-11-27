@@ -14,7 +14,6 @@ namespace PanelCladdingEditor.Infrastructure.Rhino.Live.PanelCladding;
 
 public sealed class LivePanelCladdingPointOrderService
 {
-    // Prepare only. Each owning command combines geometry with its own Undo/rollback.
     public OperationResponse<PreparedGeometry> Prepare(Brep source, double tolerance)
     {
         if (!source.IsValid || source.Faces.Count != 1 || source.Faces[0].Loops.Count != 1 ||
@@ -34,8 +33,6 @@ public sealed class LivePanelCladdingPointOrderService
         if (surface is null) return Fail("four-point surface creation failed");
         Brep? replacement = Brep.CreateFromSurface(surface);
         if (replacement is null) return Fail("four-point Brep creation failed");
-        // Exact current StandardFourPointSurfaceRebuildSkill sequence: clockwise
-        // rebuild, Brep front/back flip, then the default SwapUV operation.
         replacement.Flip();
         replacement.Faces[0].Transpose(true);
         if (!replacement.IsValid || FrontNormal(replacement) * normal < 1 - 1e-8)
@@ -90,7 +87,7 @@ public sealed class LivePanelCladdingPointOrderService
         public bool Apply(RhinoDoc document, Guid id)
         {
             if (!Changed) return true;
-            Applied = true; // Include attempted writes in rollback even if Rhino returns failure.
+            Applied = true;
             return document.Objects.Replace(id, Replacement!);
         }
         public bool Restore(RhinoDoc document, Guid id) => !Applied || (original is not null && document.Objects.Replace(id, original));

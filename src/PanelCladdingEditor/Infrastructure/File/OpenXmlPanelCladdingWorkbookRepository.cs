@@ -1706,7 +1706,6 @@ public sealed class OpenXmlPanelCladdingWorkbookRepository : IPanelCladdingWorkb
         }
         catch
         {
-            // Best effort for an operation-owned temporary file only.
         }
     }
 

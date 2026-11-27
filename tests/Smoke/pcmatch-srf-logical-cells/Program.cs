@@ -44,7 +44,6 @@ internal static class Program
             MergeRuns = [new(PanelCladdingTopologyAxis.Horizontal, 0, 0, 1)]
         });
         IReadOnlyDictionary<string, string> unconfiguredText = GridText("40", "30", sourceMasks);
-        // Since 1.2.4 a source must be configured; a blank source carries an all-blank logic.
         IReadOnlyDictionary<string, string> sourceText = new Dictionary<string, string>(unconfiguredText, StringComparer.OrdinalIgnoreCase)
         {
             [PanelCladdingKeyService.CladdingLogicKey] = "{\"0A\":\"\",\"0B\":\"\",\"1A\":\"\",\"1B\":\"\"}"
@@ -155,7 +154,6 @@ internal static class Program
             [Snapshot(TargetOneId, GridText("60", "70", Masks(keys, new PanelCladdingTopologyState()))) ]);
         Require(!rejected.Success &&
                 rejected.Message.Contains("PANEL_CLADDING_MATCH_SOURCE_NOT_CONFIGURED", StringComparison.Ordinal) &&
-                // Since 1.2.4 the reference is stored in UD_CLADDING_LOGIC and fails its decode.
                 rejected.Message.Contains("PANEL_CLADDING_LOGIC_PARENT_UNKNOWN", StringComparison.Ordinal),
             "An invalid source parent reference was accepted.");
         Console.WriteLine("[OK] invalid parent references remain fail-closed.");

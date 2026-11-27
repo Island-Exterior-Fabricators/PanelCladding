@@ -1,44 +1,44 @@
 PanelCladdingEditor for Rhino 8 - Windows x64
 
 Requirements: Windows x64 and Rhino 8 running .NET 8 (8.20 or newer recommended).
-The plug-in uses WPF and
-does not support macOS. No .NET SDK, MCP server, or administrator access is needed
-to install this package. Rhino and its .NET 8 runtime must already be installed.
+The plug-in uses WPF and does not support macOS.
+No .NET SDK, MCP server, or administrator access is needed to install this package.
+Rhino and its .NET 8 runtime must already be installed.
 
 INSTALL
 1. Download the PanelCladdingEditor-<version>-win-x64.zip release asset.
-2. Extract ALL files to a folder you can write to. Do not run inside the ZIP.
+2. Extract ALL files to a folder you can write to.
+   Do not run inside the ZIP.
 3. Close every Rhino window.
 4. Double-click Install.cmd normally (do not choose Run as administrator).
 5. After installation and validation pass, start Rhino 8 and run PCeditor.
 
-Install.cmd uses Windows PowerShell supplied with Windows. Its execution-policy
-override applies only to that process; it does not change your saved policy.
+Install.cmd uses Windows PowerShell supplied with Windows.
+Its execution-policy override applies only to that process; it does not change your saved policy.
 An organization policy may still block unsigned scripts: ask your IT team if so.
 
 Files go to %LOCALAPPDATA%\PanelCladdingEditor\plugin\<version>.
-Rhino registration is written only to HKEY_CURRENT_USER. Nothing is installed
-to Program Files or HKEY_LOCAL_MACHINE. Do not also copy this plug-in into Rhino's
-Package Manager folders; that would create a duplicate plug-in identity.
+Rhino registration is written only to HKEY_CURRENT_USER.
+Nothing is installed to Program Files or HKEY_LOCAL_MACHINE.
+Do not also copy this plug-in into Rhino's Package Manager folders; that would create a duplicate plug-in identity.
 
 PACKAGE MANAGER INSTEAD
-If your team publishes PanelCladdingEditor to an internal Package Manager source,
-install from there instead of this zip: close Rhino, run Uninstall.cmd if this zip
-was installed, add the source folder in Rhino Options > Package Manager > Sources,
-then install PanelCladdingEditor from _PackageManager. See README.md.
+If your team publishes PanelCladdingEditor to an internal Package Manager source, install from there instead of this zip: close Rhino, run Uninstall.cmd if this zip was installed, add the source folder in Rhino Options > Package Manager > Sources, then install PanelCladdingEditor from _PackageManager.
+See README.md.
 
-REPAIR OR VALIDATE (PowerShell, from this extracted folder)
-powershell -NoProfile -ExecutionPolicy Bypass -File .\Installer\Install-PanelCladdingEditor.ps1 -Mode Repair
-powershell -NoProfile -ExecutionPolicy Bypass -File .\Installer\Install-PanelCladdingEditor.ps1 -Mode Validate
-Close Rhino before repair. Run Validate after every install or repair.
+REPAIR OR VALIDATE
+Run these in PowerShell from this extracted folder:
+    powershell -NoProfile -ExecutionPolicy Bypass -File .\Installer\Install-PanelCladdingEditor.ps1 -Mode Repair
+    powershell -NoProfile -ExecutionPolicy Bypass -File .\Installer\Install-PanelCladdingEditor.ps1 -Mode Validate
+Close Rhino before repair.
+Run Validate after every install or repair.
 
 UNINSTALL
-Close Rhino and double-click Uninstall.cmd. Modified files and migration backups
-are retained. Keep the extracted package to access repair and uninstall later.
+Close Rhino and double-click Uninstall.cmd.
+Modified files and migration backups are retained.
+Keep the extracted package to access repair and uninstall later.
 
-CHECK DOWNLOAD (PowerShell)
-Get-FileHash .\PanelCladdingEditor-<version>-win-x64.zip -Algorithm SHA256
-Compare with the adjacent .zip.sha256 release asset.
+CHECK DOWNLOAD (PowerShell) Get-FileHash .\PanelCladdingEditor-<version>-win-x64.zip -Algorithm SHA256 Compare with the adjacent .zip.sha256 release asset.
 
 See README.md for commands and workflows.
 Releases: https://github.com/Island-Exterior-Fabricators/PanelCladding/releases

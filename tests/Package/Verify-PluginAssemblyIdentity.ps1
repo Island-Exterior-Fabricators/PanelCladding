@@ -3,18 +3,14 @@ param(
     [ValidateSet('Debug', 'Release')]
     [string] $Configuration = 'Release',
 
-    # Optional explicit plug-in file for this repository's product.
-    # Use this to check packaged bundle output instead of repository build output.
     [string[]] $PluginPath,
 
-    # Skip the RHP rebuild. Only safe when the expected .rhp files already exist.
     [switch] $SkipBuild
 )
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 
-# Each entry pairs an RHP project with the package manifest that declares its canonical plug-in id.
 $products = @(
     [pscustomobject]@{
         Name     = 'PanelCladdingEditor'
@@ -33,7 +29,6 @@ if ($PluginPath) {
     }
 }
 elseif (-not $SkipBuild) {
-    # Build the product directly to verify the RHP that Rhino actually loads.
     foreach ($product in $products) {
         & dotnet build $product.Project -c $Configuration --nologo | Out-Host
         if ($LASTEXITCODE -ne 0) { throw "$($product.Name) RHP build failed." }

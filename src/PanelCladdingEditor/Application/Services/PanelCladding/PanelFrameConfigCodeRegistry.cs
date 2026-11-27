@@ -3,11 +3,6 @@ using PanelCladdingEditor.Contracts.Responses;
 
 namespace PanelCladdingEditor.Application.Services.PanelCladding;
 
-// Frame configuration codes (CW_1.08_FRAME_CONFIG) in the project's Frame-Config token
-// (PanelNamingFormat, AA when none is recorded). AA and A1 codes are grouped: configurations
-// with the same horizontal/vertical intermediate counts share the first letter and the
-// second character distinguishes variants. A, 01 and 001 codes take the next free code.
-// Letters I and O are not used. Codes are never reassigned.
 public sealed class PanelFrameConfigCodeRegistry(string token = "AA")
 {
     public const string Alphabet = PanelNamingFormat.Letters;
@@ -24,7 +19,6 @@ public sealed class PanelFrameConfigCodeRegistry(string token = "AA")
 
     public bool TryGetCode(string config, out string code) => _codeByConfig.TryGetValue(config, out code!);
 
-    // Registers an existing pair. Conflicting pairs are rejected so stored codes never move.
     public OperationResponse Register(string code, string config)
     {
         if (!IsCode(code) || !PanelFrameConfigFormat.IsFormatted(config))
@@ -89,7 +83,6 @@ public sealed class PanelFrameConfigCodeRegistry(string token = "AA")
         .OrderBy(entry => entry.Key, StringComparer.Ordinal)
         .Select(entry => new Entry(entry.Key, entry.Value)));
 
-    // Entries whose code does not fit the token were assigned under another format and are skipped.
     public static OperationResponse<PanelFrameConfigCodeRegistry> FromJson(string? json, string token = "AA")
     {
         var registry = new PanelFrameConfigCodeRegistry(token);

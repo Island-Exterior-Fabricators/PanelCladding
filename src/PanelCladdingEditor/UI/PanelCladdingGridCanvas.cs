@@ -620,7 +620,6 @@ public sealed class PanelCladdingGridCanvas : Canvas
             {
                 continue;
             }
-            // Only physical neighbors share an edge. Representative labels can be arbitrarily far apart.
             foreach (bool vertical in new[] { true, false })
             {
                 var coordinate = vertical ? (cell.Column + 1, cell.Row) : (cell.Column, cell.Row + 1);

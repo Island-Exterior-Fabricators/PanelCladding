@@ -5,9 +5,6 @@ namespace PanelCladdingEditor.Application.Services.PanelCladding;
 
 public static partial class PanelCladdingCidService
 {
-    // Unit types: C Curved, F Flat, L Two Face, Z Three Face. Multi-face roles live in
-    // CW_5.00_DEFINITION_A as parent / child / child 1 / child 2, lowercase (flat and curved are
-    // parent); any case is read.
     public const string UnitTypeUserTextKey = "CW_1.06_UNIT_TYPE";
     public const string RoleDefinitionKey = "CW_5.00_DEFINITION_A";
     public const string CurvedUnitType = "C";
@@ -16,8 +13,6 @@ public static partial class PanelCladdingCidService
     public const string ThreeFaceUnitType = "Z";
     public const string ParentRole = "parent";
     public const string ChildRole = "child";
-    // '-' separates the tokens of one identifier (PID-ABC-N2-05-05, CID-ABC-N2-05-05);
-    // '_' joins a panel CID to its role and component codes (CID-ABC-N2-05-05_C_0A).
     public const string IdSeparator = "-";
     public const string ComponentSeparator = "_";
     public const string PanelIdPrefix = "PID" + IdSeparator;
@@ -31,11 +26,9 @@ public static partial class PanelCladdingCidService
 
     public static bool IsRole(string? value) => RoleRegex().IsMatch(value?.Trim() ?? string.Empty);
 
-    // The stored form of a role value (trimmed, lowercase); other values are returned unchanged.
     public static string NormalizeRole(string value) =>
         IsRole(value) ? value.Trim().ToLowerInvariant() : value;
 
-    // Object name: the CID without "CID-<project>-" (everything up to and including the second '-').
     public static string ShortName(string cid)
     {
         string value = (cid ?? string.Empty).Trim();
@@ -66,8 +59,6 @@ public static partial class PanelCladdingCidService
     public static string RoleSuffix(IReadOnlyDictionary<string, string> userText) =>
         UnitTypeSuffix(userText) ?? string.Empty;
 
-    // Null means unspecified/unsupported; an empty suffix is an explicit single-face panel.
-    // Two- and three-face panels take _P, _C or _C<n> from their Definition A role.
     private static string? UnitTypeSuffix(IReadOnlyDictionary<string, string> userText)
     {
         string unitType = Get(userText, UnitTypeUserTextKey).Trim().ToUpperInvariant();
@@ -112,8 +103,6 @@ public static partial class PanelCladdingCidService
         IReadOnlyDictionary<string, string> userText) =>
         Component(FromPanelId(panelId) + RoleSuffix(userText), cellLabel);
 
-    // Explicit unit types own the canonical CID, including removing stale corner suffixes
-    // for flat panels. Missing/unsupported unit types and missing PIDs are not rewritten.
     public static string? PanelCidWrite(IReadOnlyDictionary<string, string> userText)
     {
         string pid = Get(userText, PanelCladdingSpawnPlanningService.PanelIdUserTextKey).Trim();
@@ -145,7 +134,7 @@ public static partial class PanelCladdingCidService
                 return string.Equals(panelCid, prefix + role.Groups[1].Value, StringComparison.OrdinalIgnoreCase);
             }
         }
-        return true; // Existing unsuffixed dependencies can be migrated by PCbake.
+        return true;
     }
 
     private static string Get(IReadOnlyDictionary<string, string> userText, string key) =>
@@ -155,7 +144,6 @@ public static partial class PanelCladdingCidService
     [GeneratedRegex(@"^(?:(?<parent>parent)|child(?:\s*(?<index>[0-9]+))?)$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex RoleRegex();
 
-    // The role component of a dependency CID: P_, C_ or C<n>_ before the cell/curve code.
     [GeneratedRegex(@"^(P|C[0-9]*)_", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex RoleComponentRegex();
 }

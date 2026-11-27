@@ -20,7 +20,6 @@ try {
         & dotnet build PanelCladding.sln -c $configuration -t:Rebuild -m:1 --nologo *> (Join-Path $logs "$configuration-build.log")
         if ($LASTEXITCODE -ne 0) { throw "$configuration production build failed; see log." }
         Write-Output "PASS $configuration solution build"
-        # The solution also builds the DLL-host smoke; restore the direct RHP last.
         & dotnet build src/PanelCladdingEditor/PanelCladdingEditor.csproj -c $configuration -t:Rebuild --nologo *> (Join-Path $logs "$configuration-rhp-build.log")
         if ($LASTEXITCODE -ne 0) { throw "$configuration direct RHP rebuild failed; see log." }
         Write-Output "PASS $configuration production RHP build"

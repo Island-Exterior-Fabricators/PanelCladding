@@ -55,14 +55,11 @@ function Require([bool] $Condition, [string] $Message) {
     Write-Output "PASS $Message"
 }
 function Run-Install([string] $Mode, [bool] $ShouldPass = $true) {
-    # Each invocation exits before the next process validates or reads registry data.
     $exitCode = Run-Process ($installArgs + @('-Mode', $Mode)) "$Mode.log"
     if (($exitCode -eq 0) -ne $ShouldPass) { Get-Content (Join-Path $testRoot "$Mode.log") | Write-Output }
     Require (($exitCode -eq 0) -eq $ShouldPass) "$Mode expected success=$ShouldPass"
 }
 function Run-Process([string[]] $Arguments, [string] $Log) {
-    # Windows PowerShell emits NativeCommandError for redirected stderr, including
-    # deliberately rejected inputs. Inspect the native exit code explicitly.
     $ErrorActionPreference = 'Continue'
     & $shell @Arguments *> (Join-Path $testRoot $Log)
     return $LASTEXITCODE
@@ -126,8 +123,6 @@ try {
     Require ($exitCode -ne 0 -and (Get-Content -Raw (Join-Path $testRoot 'HKLM-rejection.log')).Contains('HKEY_CURRENT_USER')) 'HKLM rejected before installation'
     Run-Install Validate
 
-    # Force a failure after the replacement RHP and registration have been written.
-    # The previous manifest remains readable but cannot be overwritten.
     $priorRhpHash = (Get-FileHash -LiteralPath $rhp).Hash
     $manifestLock = [IO.File]::Open($ownershipPath, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::Read)
     try { Run-Install Repair $false } finally { $manifestLock.Dispose() }

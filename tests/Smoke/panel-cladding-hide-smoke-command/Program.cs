@@ -5,7 +5,6 @@ using Rhino.Commands;
 
 namespace PanelCladdingHideSmokeCommandSmoke;
 
-// The exact command set is owned by the panel-cladding-pc-commands smoke.
 internal static class Program
 {
     private static int Main()

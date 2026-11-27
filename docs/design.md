@@ -1,16 +1,12 @@
 # PanelCladding design
 
-The current internal model of `PanelCladdingEditor`: its layers, the data it keeps in Rhino
-documents, and the invariants a change must preserve. User-facing command behaviour and the full
-attribute reference for users are in the [package README](../Packaging/PanelCladdingEditor/README.md);
-build, packaging, installation and release are in [Operations](operations.md); the
-reasons behind deliberate choices are in [Decisions](decisions.md).
+The current internal model of `PanelCladdingEditor`: its layers, the data it keeps in Rhino documents, and the invariants a change must preserve.
+User-facing command behaviour and the full attribute reference for users are in the [package README](../Packaging/PanelCladdingEditor/README.md); build, packaging, installation and release are in [Operations](operations.md); the reasons behind deliberate choices are in [Decisions](decisions.md).
 The rules the check command enforces are listed under [Enforced rules](#enforced-rules).
 
-Paths are relative to `src/PanelCladdingEditor/`. `Svc/` stands for
-`Application/Services/PanelCladding/` and `Live/` for `Infrastructure/Rhino/Live/PanelCladding/`.
-Every failure message starts with a stable upper-case code (`PANEL_CLADDING_...`); smokes assert
-these codes, so keep them when changing a message.
+Paths are relative to `src/PanelCladdingEditor/`.
+`Svc/` stands for `Application/Services/PanelCladding/` and `Live/` for `Infrastructure/Rhino/Live/PanelCladding/`.
+Every failure message starts with a stable upper-case code (`PANEL_CLADDING_...`); smokes assert these codes, so keep them when changing a message.
 
 ## Repository layout
 
@@ -26,21 +22,18 @@ these codes, so keep them when changing a message.
 
 ## Product boundaries
 
-- `src/PanelCladdingEditor` is a standalone .NET 8 (`net8.0-windows`, WPF) Rhino 8 plug-in. It
-  does not host MCP and must not reference MCP_Rhino or ModelContextProtocol. (The live acceptance
-  suite in `tests/Live` is driven through an external MCP_Rhino script host; that is a test tool,
-  not a dependency.) Older history may mention MCP_Rhino as its original execution context.
-- RhinoCommon comes from the local Rhino 8 installation (`PanelCladdingEditor.csproj`,
-  `Private=false`, alias `rhinocommon`) and is never shipped in a package.
-- Identity: the assembly-level GUID (`AssemblyInfo.cs`), the `[Guid]` on
-  `PanelCladdingEditorPlugin.cs`, the package manifest `pluginId` and the HKCU registration GUID
-  must agree (`7C1A4D3B-5E29-4F68-9A72-1D8C6B0F4E35`). Rhino reads the assembly-level attribute.
+- `src/PanelCladdingEditor` is a standalone .NET 8 (`net8.0-windows`, WPF) Rhino 8 plug-in.
+  It does not host MCP and must not reference MCP_Rhino or ModelContextProtocol.
+  (The live acceptance suite in `tests/Live` is driven through an external MCP_Rhino script host; that is a test tool, not a dependency.)
+  Older history may mention MCP_Rhino as its original execution context.
+- RhinoCommon comes from the local Rhino 8 installation (`PanelCladdingEditor.csproj`, `Private=false`, alias `rhinocommon`) and is never shipped in a package.
+- Identity: the assembly-level GUID (`AssemblyInfo.cs`), the `[Guid]` on `PanelCladdingEditorPlugin.cs`, the package manifest `pluginId` and the HKCU registration GUID must agree (`7C1A4D3B-5E29-4F68-9A72-1D8C6B0F4E35`).
+  Rhino reads the assembly-level attribute.
   Product identity is separate from the repository name.
-- Command classes carry fixed `[Guid]`s that survive renames (`UI/*Command.cs`); the 13 command
-  names and the `PC` + camel-case rule are owned by the `panel-cladding-pc-commands` smoke.
+- Command classes carry fixed `[Guid]`s that survive renames (`UI/*Command.cs`); the 13 command names and the `PC` + camel-case rule are owned by the `panel-cladding-pc-commands` smoke.
 - A normal build produces the `.rhp`; `PanelCladdingTestHost=true` produces a `.dll` for smokes.
-- There are two mutually exclusive install channels (zip/registry and Yak); a machine uses one,
-  never both. See Operations.
+- There are two mutually exclusive install channels (zip/registry and Yak); a machine uses one, never both.
+  See Operations.
 
 ## Project structure and dependency direction
 
@@ -58,24 +51,21 @@ these codes, so keep them when changing a message.
 
 Rules that keep this direction:
 
-- Only files that declare `extern alias rhinocommon` can use Rhino types; they live in
-  `Infrastructure/Rhino/`, `UI/` and the plug-in class. Application, Domain and Contracts have no
-  Rhino or WPF reference. Infrastructure never references `UI`.
-- Planners take snapshots (user-text dictionaries, measured geometry descriptors) and return plans;
-  they never see Rhino objects. Example: `PanelCladdingPidPanel` carries a normal and boundary
-  points, not a Brep (`Domain/PanelCladdingPidModels.cs`).
+- Only files that declare `extern alias rhinocommon` can use Rhino types; they live in `Infrastructure/Rhino/`, `UI/` and the plug-in class.
+  Application, Domain and Contracts have no Rhino or WPF reference.
+  Infrastructure never references `UI`.
+- Planners take snapshots (user-text dictionaries, measured geometry descriptors) and return plans; they never see Rhino objects.
+  Example: `PanelCladdingPidPanel` carries a normal and boundary points, not a Brep (`Domain/PanelCladdingPidModels.cs`).
 - Composition is explicit: each `UI/*Command.cs` `RunCommand` constructs its services with `new`.
   There is no DI container and no global service locator.
 
 ## Panel state: where data lives
 
-A panel is a Brep under the panel layer branch. All of its state is object user text on that Brep
-(plus its layer and object name). Keys are matched case-insensitively everywhere; a write deletes
-every case variant and writes the canonical spelling. Conflicting case variants of a frame key fail
-with `PANEL_FRAME_ATTRIBUTE_CONFLICT` (`PanelCladdingKeyService.FrameConfiguration.cs`). Key numbers
-were reused across versions, so always match exact key names (for example `CW_1.10_CAD_TYPE` is a
-setup key while `CW_1.10_CLADDING_TYPE` is retired; `CW_2.05`–`CW_2.07` once held masks and now
-hold anchor, penetration and area keys).
+A panel is a Brep under the panel layer branch.
+All of its state is object user text on that Brep (plus its layer and object name).
+Keys are matched case-insensitively everywhere; a write deletes every case variant and writes the canonical spelling.
+Conflicting case variants of a frame key fail with `PANEL_FRAME_ATTRIBUTE_CONFLICT` (`PanelCladdingKeyService.FrameConfiguration.cs`).
+Key numbers were reused across versions, so always match exact key names (for example `CW_1.10_CAD_TYPE` is a setup key while `CW_1.10_CLADDING_TYPE` is retired; `CW_2.05`–`CW_2.07` once held masks and now hold anchor, penetration and area keys).
 
 ### Key classes
 
@@ -97,36 +87,22 @@ hold anchor, penetration and area keys).
 | `UD_PLANE` | Derived, read by all | `{ox, oy, oz};{xx,xy,xz};{yx,yy,yz}`, 6 decimals: Z out of the facade, Y world-up in plane, X = Y×Z, origin lower-left. Kept current by the auto attributes; every command reads the stored frame first so all share one frame | `Svc/PanelCladdingPlaneFormat.cs`, `Infrastructure/Rhino/LivePanelPlane.cs` |
 | Object name | Derived | `ShortName(CID)`: the CID without `CID-<CODE>-`, e.g. `N2-05-05_C` | `PanelCladdingCidService.ShortName` |
 
-`PCpid` also adds blank placeholders (`" "`) for the 30 setup keys in
-`PanelCladdingPidSetupService.RequiredKeys` and never overwrites a key that exists in any case,
-except the identity and unit-dimension keys it owns.
+`PCpid` also adds blank placeholders (`" "`) for the 30 setup keys in `PanelCladdingPidSetupService.RequiredKeys` and never overwrites a key that exists in any case, except the identity and unit-dimension keys it owns.
 
-Legacy keys, still read for old panels: `CW_9.01_CLADDING_LOGIC` and `CW_9.02_FRAME_CONFIG` (read
-when the `UD_` key is blank, renamed on the next normalized write by `PlanUserDefinedKeyMigration`);
-`CW_2.12_DELETE_MASK`, `CW_2.10_MERGE_MASK`, `CW_2.11_HIDE_MASK` (Base64 binary masks, 10-byte
-header: version 1, kind 1/2/3, H/V track, column and row counts), JSON `{"v":1,"delete","merge","hide"}`
-or readable text in `CW_1.08`, and `CW_2.09_FRAME_ASSIGNMENTS`. A normalized write converts the
-masks into `UD_FRAME_CONFIG`, which then wins; the next topology write deletes them.
-Not read and deleted when touched: `CW_2.13_CLADDING_LOGIC`, the retired type keys
-`CW_2.14_CLADDING_TYPE`, `CW_2.13_CLADDING_TYPE`, `CW_1.10_CLADDING_TYPE`, `CW_4.00_CLADDING_TYPE`,
-`Signature`, `CW_4.00_CLADDING_SIGNATURE`, and `CW_1.5D_FRAME TYPOLOGY`. `Plane`, `Config` and
-`AUTO_panel` are only reported by PCreport. Assignment payloads left in `CW_1.09_FRAME_TYPE` by
-1.2.0–1.2.4 are not read (PCreport rule A09).
+Legacy keys, still read for old panels: `CW_9.01_CLADDING_LOGIC` and `CW_9.02_FRAME_CONFIG` (read when the `UD_` key is blank, renamed on the next normalized write by `PlanUserDefinedKeyMigration`); `CW_2.12_DELETE_MASK`, `CW_2.10_MERGE_MASK`, `CW_2.11_HIDE_MASK` (Base64 binary masks, 10-byte header: version 1, kind 1/2/3, H/V track, column and row counts), JSON `{"v":1,"delete","merge","hide"}` or readable text in `CW_1.08`, and `CW_2.09_FRAME_ASSIGNMENTS`.
+A normalized write converts the masks into `UD_FRAME_CONFIG`, which then wins; the next topology write deletes them.
+Not read and deleted when touched: `CW_2.13_CLADDING_LOGIC`, the retired type keys `CW_2.14_CLADDING_TYPE`, `CW_2.13_CLADDING_TYPE`, `CW_1.10_CLADDING_TYPE`, `CW_4.00_CLADDING_TYPE`, `Signature`, `CW_4.00_CLADDING_SIGNATURE`, and `CW_1.5D_FRAME TYPOLOGY`.
+`Plane`, `Config` and `AUTO_panel` are only reported by PCreport.
+Assignment payloads left in `CW_1.09_FRAME_TYPE` by 1.2.0–1.2.4 are not read (PCreport rule A09).
 
 ### Value conventions
 
-- A blank value is stored as one space, `PanelCladdingKeyService.PersistedBlankCellValue`, because
-  Rhino does not reliably keep empty user strings; readers trim it to empty.
-- Frame configuration decoding order (`PanelCladdingKeyService.DecodeTopology`): readable text in
-  `UD_FRAME_CONFIG` (or `CW_9.02`), then readable text in `CW_1.08`; a code in `CW_1.08` without a
-  readable configuration fails (`PANEL_FRAME_CONFIG_BACKUP_MISSING`); then JSON; then the binary
-  mask keys. A panel with none of them is the full lattice with nothing merged or hidden.
-- Writers (save, PCcreate, PCmatchCrv, PCcrvTemplate, PCsync) write only `UD_FRAME_CONFIG`
-  (`EncodeFrameConfigurationUserText`) and delete the other topology keys; the code in `CW_1.08` is
-  derived at write time (below). `EncodeNonDefaultTopology` (binary masks) is kept only for the
-  `panel-cladding-sparse-topology` smoke.
-- Retired cladding type and signature generation is suspended: saves and matches delete those keys;
-  `PanelCladdingTypeSignatureService` and the workbook `_CLADDING_INDEX` sheets are dormant.
+- A blank value is stored as one space, `PanelCladdingKeyService.PersistedBlankCellValue`, because Rhino does not reliably keep empty user strings; readers trim it to empty.
+- Frame configuration decoding order (`PanelCladdingKeyService.DecodeTopology`): readable text in `UD_FRAME_CONFIG` (or `CW_9.02`), then readable text in `CW_1.08`; a code in `CW_1.08` without a readable configuration fails (`PANEL_FRAME_CONFIG_BACKUP_MISSING`); then JSON; then the binary mask keys.
+  A panel with none of them is the full lattice with nothing merged or hidden.
+- Writers (save, PCcreate, PCmatchCrv, PCcrvTemplate, PCsync) write only `UD_FRAME_CONFIG` (`EncodeFrameConfigurationUserText`) and delete the other topology keys; the code in `CW_1.08` is derived at write time (below).
+  `EncodeNonDefaultTopology` (binary masks) is kept only for the `panel-cladding-sparse-topology` smoke.
+- Retired cladding type and signature generation is suspended: saves and matches delete those keys; `PanelCladdingTypeSignatureService` and the workbook `_CLADDING_INDEX` sheets are dormant.
 
 ### Document-level strings
 
@@ -139,34 +115,31 @@ Not read and deleted when touched: `CW_2.13_CLADDING_LOGIC`, the retired type ke
 
 ## Grid and topology model
 
-- **Tracks.** H tracks are horizontal dividers (`CW_2.03`), V tracks vertical dividers (`CW_2.04`).
+- **Tracks.**
+  H tracks are horizontal dividers (`CW_2.03`), V tracks vertical dividers (`CW_2.04`).
   With h H and v V tracks the panel has h+1 rows and v+1 columns.
-- **Cells.** Label = column number + row letters (`0A`, `1C`); columns count from 0 left to right,
-  rows A, B, …, Z, AA … bottom to top (`PanelCladdingKeyService.GetRowLabel`, all 26 letters).
-- **Segments.** One track crossing one bay: `(axis, track, bay)` (`PanelCladdingSegmentCoordinate`).
+- **Cells.**
+  Label = column number + row letters (`0A`, `1C`); columns count from 0 left to right, rows A, B, …, Z, AA … bottom to top (`PanelCladdingKeyService.GetRowLabel`, all 26 letters).
+- **Segments.**
+  One track crossing one bay: `(axis, track, bay)` (`PanelCladdingSegmentCoordinate`).
   The four frame edges are not segments and cannot be deleted, merged or hidden.
-- **Topology state** (`PanelCladdingTopologyState`): `MissingSegments` (deleted), `MergeRuns`
-  (axis, track, start–end bay) and `HiddenSegments`. Invariants enforced on decode and encode in
-  `PanelCladdingKeyService.cs`: a hidden segment cannot be missing; a merge cannot cross a missing
-  segment; a merge run is wholly hidden or wholly visible.
-- **Text format** (`Svc/PanelFrameConfigFormat.cs`): H segments are track letter + bay number
-  (`A1`), V segments track number + bay letter (`0B`); merge runs give first and last bay with an
-  en dash (`A0–1`, a hyphen is also read). Sections with nothing are omitted.
-- **Logical cells.** Deleting a segment joins the two cells it separates; connected groups are the
-  logical cells, possibly non-rectangular. The representative is the lowest row, then lowest column
-  (`Svc/PanelCladdingLogicalCellService.cs`; the editor's `UI/PanelCladdingCellTopology.cs` mirrors
-  it). Merges and hides do not join cells. `Collapse` keeps representatives only; `Expand` gives
-  members the representative's label.
-- **Regions and parent cells** (`Svc/PanelCladdingRegionService.cs`). A cell value is a material, a
-  cell label (reference to a parent) or blank. References are followed to a material; cycles,
-  unknown or blank targets, disconnected regions and owners without material fail. The canonical
-  owner is the region's lowest row, then lowest column; materials are upper-cased.
+- **Topology state** (`PanelCladdingTopologyState`): `MissingSegments` (deleted), `MergeRuns` (axis, track, start–end bay) and `HiddenSegments`.
+  Invariants enforced on decode and encode in `PanelCladdingKeyService.cs`: a hidden segment cannot be missing; a merge cannot cross a missing segment; a merge run is wholly hidden or wholly visible.
+- **Text format** (`Svc/PanelFrameConfigFormat.cs`): H segments are track letter + bay number (`A1`), V segments track number + bay letter (`0B`); merge runs give first and last bay with an en dash (`A0–1`, a hyphen is also read).
+  Sections with nothing are omitted.
+- **Logical cells.**
+  Deleting a segment joins the two cells it separates; connected groups are the logical cells, possibly non-rectangular.
+  The representative is the lowest row, then lowest column (`Svc/PanelCladdingLogicalCellService.cs`; the editor's `UI/PanelCladdingCellTopology.cs` mirrors it).
+  Merges and hides do not join cells.
+  `Collapse` keeps representatives only; `Expand` gives members the representative's label.
+- **Regions and parent cells** (`Svc/PanelCladdingRegionService.cs`).
+  A cell value is a material, a cell label (reference to a parent) or blank.
+  References are followed to a material; cycles, unknown or blank targets, disconnected regions and owners without material fail.
+  The canonical owner is the region's lowest row, then lowest column; materials are upper-cased.
 - **Blank cells** are allowed in the logic (`""`) and stored as `" "` in `CW_4`.
-- **Track collapse.** A track whose segments are all missing is removed (offset dropped, cells and
-  parents renumbered, masks rebuilt) until stable (`Svc/PanelCladdingTopologyNormalizationService.cs`),
-  in the editor and again in `PanelCladdingSaveService`.
-- **Editor segment ids** are `H|V:<offset>:<bay>` (`UI/PanelCladdingExtrusion.cs`), keyed by offset
-  so selections survive track edits; they are mapped back to track indices on save.
+- **Track collapse.**
+  A track whose segments are all missing is removed (offset dropped, cells and parents renumbered, masks rebuilt) until stable (`Svc/PanelCladdingTopologyNormalizationService.cs`), in the editor and again in `PanelCladdingSaveService`.
+- **Editor segment ids** are `H|V:<offset>:<bay>` (`UI/PanelCladdingExtrusion.cs`), keyed by offset so selections survive track edits; they are mapped back to track indices on save.
 
 ## Managed geometry
 
@@ -183,132 +156,92 @@ Managed objects are generated from panel attributes by PCbake and read back by P
 | Name | `ShortName(CID)` | `ShortName(CID)` |
 | Planner | `Svc/PanelCladdingSpawnPlanningService.cs` | `Svc/PanelCladdingExtrusionPlanningService.cs` |
 
-- **Curve codes.** H intermediates `INT-<track letter><bay>`, V intermediates
-  `INT-<track><bay letter>`; a merge over all bays `INT-<track>`, a partial one
-  `INT-<track><start>–<end>`. Missing and hidden segments get no curve.
-- **Identity separators** (`Svc/PanelCladdingCidService.cs`): `-` joins tokens of one identifier,
-  `_` joins a CID to its role and component (`IdSeparator`, `ComponentSeparator`, `Component()`).
-  Role suffixes `_P`, `_C`, `_C<n>` apply only to unit types L and Z; C and F have none; a missing
-  or unknown unit type leaves the stored CID alone. A CID is never written without a PID.
-- **Ownership.** A dependency belongs to a panel when its PID equals the panel PID and its role
-  component matches the panel CID (`PanelCladdingCidService.IncludesDependency`); unsuffixed legacy
-  dependencies match any role. PCsync additionally requires geometric association with exactly one
-  selected panel (`LivePanelCladdingGeometryPartitionService.IsAssociated`; ambiguity is an issue).
-- **CID scope.** CIDs are re-derived, never edited directly: changing PID, unit type or role and
-  running any normalizing write updates the panel CID and name; PCbake rebuilds surfaces with new
-  CIDs; PCsync reindexes dependency PID, CID, `CRV`, name, lot and colour without moving geometry.
-  Selected panels sharing a CID are skipped by PCbake like any other failing panel
-  (`Svc/PanelCladdingUpdateSelectionService.cs`, below); duplicate selected PIDs fail PCsync.
-- **Lot (release).** A dependency's `CW_1.05_LOT` mirrors the panel: case variants removed, absent
-  when the panel has none, drift alone counts as a change.
-- **Coverage metadata.** `Merge_Mark` = owner cell first, then the other covered cells by column and
-  row, upper case, `;`-separated (`Svc/PanelCladdingSurfaceCoverageService.cs`).
+- **Curve codes.**
+  H intermediates `INT-<track letter><bay>`, V intermediates `INT-<track><bay letter>`; a merge over all bays `INT-<track>`, a partial one `INT-<track><start>–<end>`.
+  Missing and hidden segments get no curve.
+- **Identity separators** (`Svc/PanelCladdingCidService.cs`): `-` joins tokens of one identifier, `_` joins a CID to its role and component (`IdSeparator`, `ComponentSeparator`, `Component()`).
+  Role suffixes `_P`, `_C`, `_C<n>` apply only to unit types L and Z; C and F have none; a missing or unknown unit type leaves the stored CID alone.
+  A CID is never written without a PID.
+- **Ownership.**
+  A dependency belongs to a panel when its PID equals the panel PID and its role component matches the panel CID (`PanelCladdingCidService.IncludesDependency`); unsuffixed legacy dependencies match any role.
+  PCsync additionally requires geometric association with exactly one selected panel (`LivePanelCladdingGeometryPartitionService.IsAssociated`; ambiguity is an issue).
+- **CID scope.**
+  CIDs are re-derived, never edited directly: changing PID, unit type or role and running any normalizing write updates the panel CID and name; PCbake rebuilds surfaces with new CIDs; PCsync reindexes dependency PID, CID, `CRV`, name, lot and colour without moving geometry.
+  Selected panels sharing a CID are skipped by PCbake like any other failing panel (`Svc/PanelCladdingUpdateSelectionService.cs`, below); duplicate selected PIDs fail PCsync.
+- **Lot (release).**
+  A dependency's `CW_1.05_LOT` mirrors the panel: case variants removed, absent when the panel has none, drift alone counts as a change.
+- **Coverage metadata.**
+  `Merge_Mark` = owner cell first, then the other covered cells by column and row, upper case, `;`-separated (`Svc/PanelCladdingSurfaceCoverageService.cs`).
   `CW_1.03_CLADDING_CELLS` is a read-only alias; differing values fail; sync rewrites `Merge_Mark`.
-- **Bake reconciliation** (`Svc/PanelCladdingDependencyReconciliationService.cs`). Within the
-  selected `Scope` (`Surfaces` default, `Curves`, `All`): surfaces and curves matching by kind +
-  PID + CID are replaced in place (geometry, layer, colour, user text), missing ones created, stale
-  or duplicate ones deleted. Objects outside the scope are untouched.
-- **Locked and hidden objects** (`Live/LivePanelCladdingUpdateService.cs`). Dependencies are found
-  including locked and hidden ones (reference objects excluded) and changed with
-  `Replace(..., ignoreModes: true)` / `Delete(..., ignoreModes: true)`, keeping the object's `Mode`.
+- **Bake reconciliation** (`Svc/PanelCladdingDependencyReconciliationService.cs`).
+  Within the selected `Scope` (`Surfaces` default, `Curves`, `All`): surfaces and curves matching by kind + PID + CID are replaced in place (geometry, layer, colour, user text), missing ones created, stale or duplicate ones deleted.
+  Objects outside the scope are untouched.
+- **Locked and hidden objects** (`Live/LivePanelCladdingUpdateService.cs`).
+  Dependencies are found including locked and hidden ones (reference objects excluded) and changed with `Replace(..., ignoreModes: true)` / `Delete(..., ignoreModes: true)`, keeping the object's `Mode`.
   Locked, hidden or reference source panels are skipped as issues.
 - **Per-panel issues** (`Svc/PanelCladdingBakeIssueService.cs`, `Live/LivePanelCladdingBakeIssueDots.cs`).
-  PCbake skips a panel with its own problem (not found, no PID, not editable, duplicate CID, point
-  order, surface or curve generation, an uncreatable layer name, two dependents with one CID) and
-  bakes the rest. A skipped panel is not changed: only candidates get CID and point-order writes,
-  and a candidate that fails later has both restored. Every selected panel with a PID stays an
-  ownership candidate, so a skipped panel's dependents are never matched to another panel. Each
-  skipped panel gets a `TextDot` at its bounding-box centre on the top-level layer `PCbake Issues`
-  (red when created) with `PCbake: <stage>` and a short reason, user text `PCbake_Panel` (panel
-  object id) and `PCbake_Issue` (full reason), and stays selected. A run first deletes the dots of
-  all panels it was given. Failures that are not about one panel still roll back the whole run.
-- **Point order.** PCbake and PCpid rebuild straight quad panels to the standard corner order in
-  the same Undo scope (`Svc/PanelCladdingPointOrderService.cs`, `Live/LivePanelCladdingPointOrderService.cs`);
-  unsupported shapes are skipped with a warning.
+  PCbake skips a panel with its own problem (not found, no PID, not editable, duplicate CID, point order, surface or curve generation, an uncreatable layer name, two dependents with one CID) and bakes the rest.
+  A skipped panel is not changed: only candidates get CID and point-order writes, and a candidate that fails later has both restored.
+  Every selected panel with a PID stays an ownership candidate, so a skipped panel's dependents are never matched to another panel.
+  Each skipped panel gets a `TextDot` at its bounding-box centre on the top-level layer `PCbake Issues` (red when created) with `PCbake: <stage>` and a short reason, user text `PCbake_Panel` (panel object id) and `PCbake_Issue` (full reason), and stays selected.
+  A run first deletes the dots of all panels it was given.
+  Failures that are not about one panel still roll back the whole run.
+- **Point order.**
+  PCbake and PCpid rebuild straight quad panels to the standard corner order in the same Undo scope (`Svc/PanelCladdingPointOrderService.cs`, `Live/LivePanelCladdingPointOrderService.cs`); unsupported shapes are skipped with a warning.
 
 ## Layers and naming
 
-- **Project code** (`Svc/PanelCladdingProjectService.cs`): from the saved file name, the text before
-  the first ` - `, cut at the first non-alphanumeric character, upper case (`ABC - Wireframe.3dm` →
-  `ABC`); empty for an unsaved document. PCpid prompts for a three-letter code, defaulting to it.
-- **Layer standard** (`Svc/PanelCladdingExtrusionPlanningService.cs`): the root is the top-level
-  `<CODE>-IEF-Wireframe` (any `*-IEF-Wireframe` when there is no code); panels live on
-  `<root>::Surfaces - PNL::Surfaces - <type>…`; curves on `<root>::Curves - PNL::Curves - <type>…`.
+- **Project code** (`Svc/PanelCladdingProjectService.cs`): from the saved file name, the text before the first ` - `, cut at the first non-alphanumeric character, upper case (`ABC - Wireframe.3dm` → `ABC`); empty for an unsaved document.
+  PCpid prompts for a three-letter code, defaulting to it.
+- **Layer standard** (`Svc/PanelCladdingExtrusionPlanningService.cs`): the root is the top-level `<CODE>-IEF-Wireframe` (any `*-IEF-Wireframe` when there is no code); panels live on `<root>::Surfaces - PNL::Surfaces - <type>…`; curves on `<root>::Curves - PNL::Curves - <type>…`.
   A panel directly on `Surfaces - PNL` cannot route curves (`PANEL_CLADDING_PANEL_TYPE_LAYER_REQUIRED`).
-  Adapters call these predicates (`IsPanelLayerPath`, `IsCurveLayerPath`, `IsPanelBranchPath`,
-  `ResolveCurveLayerPath`) instead of parsing paths themselves.
-- **Excluded keywords.** A path any of whose segments contains `Not in Scope` or `By Others`
-  (letters and digits compared, case ignored) is outside the panel and curve scopes
-  (`ExcludedLayerKeywords`, `IsExcludedLayerPath`); curve routing fails with
-  `PANEL_CLADDING_PANEL_LAYER_EXCLUDED`. Only the auto attributes still cover excluded panel layers
-  (`IsPanelBranchPath`).
-- **Retired trees** (`01_CW Panels`, `02_CW Extrusions`, `03_Material Surfaces (STEP)`,
-  `04_STEP Surfaces`) are not recognized; only PCreport names them (`Svc/PanelCladdingComplianceService.cs`).
-- **PNL format** (`Svc/PanelNamingFormat.cs`): per segment (Wall-Type, Frame-Config, Frame-Type,
-  Cladding, Definition) one token of `AA`, `A`, `A1`, `01`, `001`; letters exclude I and O;
-  Definition is always `01`. PCtemplatePNL records it in the workbook custom property
-  `PanelCladdingEditor.PNLFormat` (`Infrastructure/File/OpenXmlPanelNamingTemplate.cs`); without
-  one the legacy format applies.
-- **Frame-config codes** (`Svc/PanelFrameConfigCodeRegistry.cs`, `Live/LivePanelFrameConfigCodes.cs`):
-  per document, seeded from the sheet's Frame-Config rows, the stored registry and panels that
-  already carry a code with its text. Codes are never reassigned; `AA`/`A1` codes group by H/V
-  count (first letter). A code in another format on a model without a recorded format is left as it
-  is and reported.
-- **Naming-convention sync** (`Live/LivePanelNamingConventionSync.cs`): on `EndSaveDocument` of a
-  real `.3dm` save (not export-selected or autosave). The sheet is
-  `<CODE> - Naming Convention.xlsx` beside the model unless the document string overrides it. Every
-  model reads it (format and reserved codes); only the main model `<CODE> - Wireframe.3dm` (whole
-  name, any case; `PanelCladdingProjectService.IsMainModelPath`) writes it. It writes sheet `PNL`
-  only: the Unit-Type, Wall-Type, Frame-Config and Frame-Type tables located by their row-12 titles
-  (codes from row 13) and the Job Code cells under the row-7 header
-  (`Infrastructure/File/OpenXmlPanelNamingConventionWorkbook.cs`). Codes keep their rows, written
-  descriptions are never changed, only the struck state of unused rows changes, new codes go below.
-  Usage comes from non-excluded, non-reference panels. An unchanged sheet is not rewritten; writes
-  go to a temporary copy moved over the original (`Infrastructure/File/OpenXmlPnlSheet.cs`); a
-  locked sheet is reported and retried on the next save. The model is never modified by the sync.
+  Adapters call these predicates (`IsPanelLayerPath`, `IsCurveLayerPath`, `IsPanelBranchPath`, `ResolveCurveLayerPath`) instead of parsing paths themselves.
+- **Excluded keywords.**
+  A path any of whose segments contains `Not in Scope` or `By Others` (letters and digits compared, case ignored) is outside the panel and curve scopes (`ExcludedLayerKeywords`, `IsExcludedLayerPath`); curve routing fails with `PANEL_CLADDING_PANEL_LAYER_EXCLUDED`.
+  Only the auto attributes still cover excluded panel layers (`IsPanelBranchPath`).
+- **Retired trees** (`01_CW Panels`, `02_CW Extrusions`, `03_Material Surfaces (STEP)`, `04_STEP Surfaces`) are not recognized; only PCreport names them (`Svc/PanelCladdingComplianceService.cs`).
+- **PNL format** (`Svc/PanelNamingFormat.cs`): per segment (Wall-Type, Frame-Config, Frame-Type, Cladding, Definition) one token of `AA`, `A`, `A1`, `01`, `001`; letters exclude I and O; Definition is always `01`.
+  PCtemplatePNL records it in the workbook custom property `PanelCladdingEditor.PNLFormat` (`Infrastructure/File/OpenXmlPanelNamingTemplate.cs`); without one the legacy format applies.
+- **Frame-config codes** (`Svc/PanelFrameConfigCodeRegistry.cs`, `Live/LivePanelFrameConfigCodes.cs`): per document, seeded from the sheet's Frame-Config rows, the stored registry and panels that already carry a code with its text.
+  Codes are never reassigned; `AA`/`A1` codes group by H/V count (first letter).
+  A code in another format on a model without a recorded format is left as it is and reported.
+- **Naming-convention sync** (`Live/LivePanelNamingConventionSync.cs`): on `EndSaveDocument` of a real `.3dm` save (not export-selected or autosave).
+  The sheet is `<CODE> - Naming Convention.xlsx` beside the model unless the document string overrides it.
+  Every model reads it (format and reserved codes); only the main model `<CODE> - Wireframe.3dm` (whole name, any case; `PanelCladdingProjectService.IsMainModelPath`) writes it.
+  It writes sheet `PNL` only: the Unit-Type, Wall-Type, Frame-Config and Frame-Type tables located by their row-12 titles (codes from row 13) and the Job Code cells under the row-7 header (`Infrastructure/File/OpenXmlPanelNamingConventionWorkbook.cs`).
+  Codes keep their rows, written descriptions are never changed, only the struck state of unused rows changes, new codes go below.
+  Usage comes from non-excluded, non-reference panels.
+  An unchanged sheet is not rewritten; writes go to a temporary copy moved over the original (`Infrastructure/File/OpenXmlPnlSheet.cs`); a locked sheet is reported and retried on the next save.
+  The model is never modified by the sync.
 
 ## Command pipeline
 
-1. **Adapter** (`UI/*Command.cs`): requires a saved active document, selects objects, composes
-   services and passes `doc.Path` and object ids.
-2. **Read**: the `Live/` service resolves `RhinoDoc.ActiveDoc` and requires its path to equal the
-   passed path (`FILE_NOT_ACTIVE`, `ACTIVE_DOC_UNSAVED`), then builds Domain snapshots.
+1. **Adapter** (`UI/*Command.cs`): requires a saved active document, selects objects, composes services and passes `doc.Path` and object ids.
+2. **Read**: the `Live/` service resolves `RhinoDoc.ActiveDoc` and requires its path to equal the passed path (`FILE_NOT_ACTIVE`, `ACTIVE_DOC_UNSAVED`), then builds Domain snapshots.
    `LivePanelCladdingRepository.ReadLayout` measures the panel in its frame and parses keys.
-3. **Plan**: a pure `Svc/` planner validates the whole batch and returns writes/deletes. Nothing is
-   mutated when any panel fails (PCsync and PCbake instead report per-panel issues, skip those
-   panels and select them; PCbake also marks them with dots).
-4. **Prepare**: proposed `ObjectAttributes` are duplicates of the originals with the plan applied,
-   then `LivePanelCladdingCidService.Normalize`: rename `CW_9.xx` to `UD_` keys, lowercase the role,
-   write canonical `UD_FRAME_CONFIG` and its `CW_1.08` code, rewrite the panel CID and name. The
-   editor save, PCcreate, PCmatchSrf/Crv, PCsync and PCbake (source panels) normalize fully;
-   PCcrvTemplate applies only the `UD_` rename and the frame-config code; PCpid writes identity
-   itself; PCclear only deletes.
-5. **Apply** in one Undo record named for the operation (`BeginUndoRecord`/`EndUndoRecord`), e.g.
-   "Save Panel Cladding Attributes", "Clear Panel Cladding", "Match Panel Cladding". PCbake and
-   PCpid reuse an open command record (`CurrentUndoRecordSerialNumber`) and roll back only what they
-   changed; when PCbake owns the record it undoes it on failure.
-6. **Verify and roll back**: on any failed write the service restores the original attributes in
-   reverse order (`ROLLBACK_FAILED` when that fails). PCmatchSrf/Crv and PCsync read the written
-   values back and restore the batch on mismatch. One redraw at the end.
+3. **Plan**: a pure `Svc/` planner validates the whole batch and returns writes/deletes.
+   Nothing is mutated when any panel fails (PCsync and PCbake instead report per-panel issues, skip those panels and select them; PCbake also marks them with dots).
+4. **Prepare**: proposed `ObjectAttributes` are duplicates of the originals with the plan applied, then `LivePanelCladdingCidService.Normalize`: rename `CW_9.xx` to `UD_` keys, lowercase the role, write canonical `UD_FRAME_CONFIG` and its `CW_1.08` code, rewrite the panel CID and name.
+   The editor save, PCcreate, PCmatchSrf/Crv, PCsync and PCbake (source panels) normalize fully; PCcrvTemplate applies only the `UD_` rename and the frame-config code; PCpid writes identity itself; PCclear only deletes.
+5. **Apply** in one Undo record named for the operation (`BeginUndoRecord`/`EndUndoRecord`), e.g. "Save Panel Cladding Attributes", "Clear Panel Cladding", "Match Panel Cladding".
+   PCbake and PCpid reuse an open command record (`CurrentUndoRecordSerialNumber`) and roll back only what they changed; when PCbake owns the record it undoes it on failure.
+6. **Verify and roll back**: on any failed write the service restores the original attributes in reverse order (`ROLLBACK_FAILED` when that fails).
+   PCmatchSrf/Crv and PCsync read the written values back and restore the batch on mismatch.
+   One redraw at the end.
 
-Stale-edit guard: the editor keeps a fingerprint (SHA-256 of the Brep CRC, layer index and the
-`CW_2.*`, `CW_4.*`, `UD_*`, `CW_9.*` and `CW_1.08` values; `LivePanelCladdingRepository.BuildFingerprint`)
-and saves fail with `PANEL_CLADDING_STALE_EDITOR` when it changed. PCsync re-checks it per panel.
+Stale-edit guard: the editor keeps a fingerprint (SHA-256 of the Brep CRC, layer index and the `CW_2.*`, `CW_4.*`, `UD_*`, `CW_9.*` and `CW_1.08` values; `LivePanelCladdingRepository.BuildFingerprint`) and saves fail with `PANEL_CLADDING_STALE_EDITOR` when it changed.
+PCsync re-checks it per panel.
 
 ### Background services
 
 Registered once in `PanelCladdingEditorPlugin.OnLoad`; they are not commands.
 
-- **Auto attributes** (`Live/LivePanelAutoAttributes.cs`, values in
-  `Svc/PanelCladdingAutoAttributeService.cs`). Object add, replace and attribute changes (layer or
-  an input key: the auto keys or `CW_6.01_PSF`) only queue ids; a full scan runs after opening a
-  document (not merge or reference) and after a layer rename or reparent. Writes happen on
-  `RhinoApp.Idle` when no command runs, never during Undo, with quiet `ModifyAttributes`, and only
-  for keys whose value differs (a `UD_PLANE` describing the same frame is kept). Scope: every
-  non-reference panel in the panel branch, excluded layers included.
+- **Auto attributes** (`Live/LivePanelAutoAttributes.cs`, values in `Svc/PanelCladdingAutoAttributeService.cs`).
+  Object add, replace and attribute changes (layer or an input key: the auto keys or `CW_6.01_PSF`) only queue ids; a full scan runs after opening a document (not merge or reference) and after a layer rename or reparent.
+  Writes happen on `RhinoApp.Idle` when no command runs, never during Undo, with quiet `ModifyAttributes`, and only for keys whose value differs (a `UD_PLANE` describing the same frame is kept).
+  Scope: every non-reference panel in the panel branch, excluded layers included.
 - **Naming-convention sync**, above.
-- Per-document caches (PNL format, frame-config registry) are keyed by runtime serial number and
-  dropped on `CloseDocument`; PCtemplatePNL clears them.
+- Per-document caches (PNL format, frame-config registry) are keyed by runtime serial number and dropped on `CloseDocument`; PCtemplatePNL clears them.
 
 ## Model-level commands
 
@@ -327,62 +260,61 @@ Registered once in `PanelCladdingEditorPlugin.OnLoad`; they are not commands.
 | PCreport | Whole model, read-only | Nothing; optional `.xlsx` export (`Summary`, `Issues`) | `Svc/PanelCladdingComplianceService.cs` (rules L01–L07, A01–A13, D01–D06) |
 | PCtemplatePNL | Naming sheet | Sheet layout and `PNLFormat` property; document mirror | `Infrastructure/File/OpenXmlPanelNamingTemplate.cs` |
 
-The compliance rules reuse the commands' own predicates and services, so the report and the commands
-agree; add a rule there when you add a document invariant.
+The compliance rules reuse the commands' own predicates and services, so the report and the commands agree; add a rule there when you add a document invariant.
 
 ## UI architecture
 
-- WPF, code-behind; there are no view models. `UI/PanelCladdingEditorController.cs` is the only
-  bridge from the window to Application services (load, project, save, catalogue, PDF import).
-- `UI/PanelCladdingEditorCommand.cs` keeps a single modeless `PanelCladdingEditorWindow`, owned by
-  Rhino's main window (`WindowInteropHelper.Owner = RhinoApp.MainWindowHandle()`); rerunning loads
-  the new panel into it.
-- The window holds the edit session: values, offsets, deleted/merged/hidden segment ids, its own
-  snapshot undo stack, and dirty flags per scope. Edits are previews until Save; Save Cladding is
-  refused while structural edits are unsaved; a grid-size change on a configured panel needs Save
-  Both (`PANEL_CLADDING_LOGIC_REQUIRES_SAVE_BOTH`, `PanelCladdingSaveService.cs`).
-- `UI/PanelCladdingGridCanvas.cs` (`Canvas`, custom `OnRender`) draws cells, segments and
-  dimensions and raises events (drop, dimension edit, placement, zoom); it never writes. It resolves
-  owner boundaries with the same `PanelCladdingLogicalCellService` and `PanelCladdingRegionService`
-  as save: edges between logical cells of one region are dashed.
-- Extrusion assignment is suspended by `_extrusionAssignmentEnabled = false` in
-  `PanelCladdingEditorWindow.xaml.cs`; handlers, payloads and save are kept.
-- Viewport feedback goes through `IPanelViewportHighlight` (`LivePanelViewportHighlight`, a
-  read-only display conduit retargeted after each successful load). PCreport's modeless window
-  navigates through `IPanelReportNavigator`.
-- Dialogs (`MaterialSetupDialog`, `ExtrusionSetupDialog`, `MaterialCategoryDialog`,
-  `PanelNumericEditorDialog`) take injectable prompts: `IMaterialColorPicker` (Rhino colour dialog,
-  hence the WindowsForms framework reference), `IMaterialCategoryPrompt`,
-  `IExtrusionCatalogueClearPrompt`.
+- WPF, code-behind; there are no view models.
+  `UI/PanelCladdingEditorController.cs` is the only bridge from the window to Application services (load, project, save, catalogue, PDF import).
+- `UI/PanelCladdingEditorCommand.cs` keeps a single modeless `PanelCladdingEditorWindow`, owned by Rhino's main window (`WindowInteropHelper.Owner = RhinoApp.MainWindowHandle()`); rerunning loads the new panel into it.
+- The window holds the edit session: values, offsets, deleted/merged/hidden segment ids, its own snapshot undo stack, and dirty flags per scope.
+  Edits are previews until Save; Save Cladding is refused while structural edits are unsaved; a grid-size change on a configured panel needs Save Both (`PANEL_CLADDING_LOGIC_REQUIRES_SAVE_BOTH`, `PanelCladdingSaveService.cs`).
+- `UI/PanelCladdingGridCanvas.cs` (`Canvas`, custom `OnRender`) draws cells, segments and dimensions and raises events (drop, dimension edit, placement, zoom); it never writes.
+  It resolves owner boundaries with the same `PanelCladdingLogicalCellService` and `PanelCladdingRegionService` as save: edges between logical cells of one region are dashed.
+- Extrusion assignment is suspended by `_extrusionAssignmentEnabled = false` in `PanelCladdingEditorWindow.xaml.cs`; handlers, payloads and save are kept.
+- Viewport feedback goes through `IPanelViewportHighlight` (`LivePanelViewportHighlight`, a read-only display conduit retargeted after each successful load).
+  PCreport's modeless window navigates through `IPanelReportNavigator`.
+- Dialogs (`MaterialSetupDialog`, `ExtrusionSetupDialog`, `MaterialCategoryDialog`, `PanelNumericEditorDialog`) take injectable prompts: `IMaterialColorPicker` (Rhino colour dialog, hence the WindowsForms framework reference), `IMaterialCategoryPrompt`, `IExtrusionCatalogueClearPrompt`.
 
 ## Test seams
 
-- Smokes (`tests/Smoke/<capability>/`) reference the project with `PanelCladdingTestHost=true` and
-  copy RhinoCommon locally; all build into `artifacts/tests/bin/<Configuration>/`, so build them
-  serially and rebuild the production project before packaging.
-- Pure planners are tested directly with in-memory user-text dictionaries; shared fixtures are in
-  `tests/Shared/` (`CladdingLogicFixture.cs`, `RegressionPaths.cs`).
-- Ports replaced by fakes: `ILivePanelCladdingRepository` (capturing/stub repositories for the
-  editor and save), `ILivePanelCladdingSurfaceSyncRepository`, `IPanelCladdingWorkbookRepository`,
-  `IPanelReportNavigator`, the three prompt interfaces; `IPanelViewportHighlight` is optional.
-- WPF windows and the canvas render off-screen in-process; private switches and fields are reached
-  by reflection. There is no `InternalsVisibleTo`, so `internal` Live services are covered by the
-  live suite (`tests/Live`, inside Rhino, not part of `Run-Regression.ps1`).
+- Smokes (`tests/Smoke/<capability>/`) reference the project with `PanelCladdingTestHost=true` and copy RhinoCommon locally; all build into `artifacts/tests/bin/<Configuration>/`, so build them serially and rebuild the production project before packaging.
+- Pure planners are tested directly with in-memory user-text dictionaries; shared fixtures are in `tests/Shared/` (`CladdingLogicFixture.cs`, `RegressionPaths.cs`).
+- Ports replaced by fakes: `ILivePanelCladdingRepository` (capturing/stub repositories for the editor and save), `ILivePanelCladdingSurfaceSyncRepository`, `IPanelCladdingWorkbookRepository`, `IPanelReportNavigator`, the three prompt interfaces; `IPanelViewportHighlight` is optional.
+- WPF windows and the canvas render off-screen in-process; private switches and fields are reached by reflection.
+  There is no `InternalsVisibleTo`, so `internal` Live services are covered by the live suite (`tests/Live`, inside Rhino, not part of `Run-Regression.ps1`).
 - Parts that need a Rhino host print `[SKIP]` in a plain run; a managed pass is not live acceptance.
 
 ## Changing the model safely
 
-- New panel key: add the constant in `PanelCladdingKeyService.cs` (or the owning service), decide
-  its class (authority, derived, output, hand input), include it in the fingerprint if the editor
-  depends on it, in `IsClearableCladdingAssignmentKey` if PCclear should remove it, and in a
-  compliance rule if it can be wrong in a model.
-- Renaming a key: keep reading the old name, migrate on the next normalized write, never reuse a
-  number that old panels may still carry with another meaning.
-- Writes that change cladding, topology or identity go through `LivePanelCladdingCidService.Normalize`;
-  every mutating command plans the whole batch first and applies it in one named Undo record
-  (see Command pipeline).
-- Update the package README, this guide and the smokes the change affects (see the
-  [contributing guide](../CONTRIBUTING.md)).
+- New panel key: add the constant in `PanelCladdingKeyService.cs` (or the owning service), decide its class (authority, derived, output, hand input), include it in the fingerprint if the editor depends on it, in `IsClearableCladdingAssignmentKey` if PCclear should remove it, and in a compliance rule if it can be wrong in a model.
+- Renaming a key: keep reading the old name, migrate on the next normalized write, never reuse a number that old panels may still carry with another meaning.
+- Writes that change cladding, topology or identity go through `LivePanelCladdingCidService.Normalize`; every mutating command plans the whole batch first and applies it in one named Undo record (see Command pipeline).
+- Update the package README, this guide and the smokes the change affects (see the [contributing guide](../CONTRIBUTING.md)).
+
+## Implementation notes
+
+These notes keep the reasons that used to sit in code comments and are not obvious from the code.
+
+- `UD_PLANE` is stored as `{ox, oy, oz};{xx,xy,xz};{yx,yy,yz}`: the origin is the lower-left corner of the panel, Y is up and X is right seen from outside, and Z = X × Y points out of the facade.
+  A stored frame is kept when its origin is within the tolerance and its axes are parallel to the computed ones, whatever its number format.
+- PCpid groups panels into rows and columns by comparing each coordinate with the first value of the row or column, not with the previous one, so a chain of near-equal values never merges rows whose ends are farther apart than the model tolerance.
+- The four-point standardization works relative to a nearby point to avoid losing precision at large coordinates, and repeats the standard sequence exactly: clockwise rebuild, front and back flip, then the default `SwapUV`.
+- PCpid setup never overwrites a key that already exists, in any case and even when blank, because many of those fields are filled by hand.
+  Rhino does not reliably keep empty user strings, so a blank value is stored as a single space, the same convention the editor uses for unassigned cells.
+- The auto attributes are written on idle outside a command, because changing the document inside object events is unsafe; object events only queue object ids, and Undo is left to restore the values recorded with the previous geometry.
+- PCbake reads the panels again after its CID writes, so selection and generation see the same document state, and checks layer names and CID claims before any write, so one bad panel cannot fail the whole run halfway.
+- The naming-convention workbook is edited in a copy that is moved over the original in one step, as Excel saves.
+  `File.Replace` is not used because it needs a backup file, and a cloud drive such as Egnyte can hold that backup so it cannot be removed.
+  Temporary and backup files of an earlier save that a sync client held are removed once they are over a minute old.
+- A cell is written as a number only when its text is exactly how Excel would show that number, so codes such as `01` keep their leading zero.
+  Equal fonts and formats are reused, so repeated saves do not grow the stylesheet.
+- The viewport highlight draws in `DrawForeground`, where depth testing is off, so it stays legible on coplanar panels and generated cladding.
+  It draws the Brep edges with `DrawCurve`, because the integer of `DrawBrepWires` is wire density, not pixel thickness (`tests/Checks/Test-ViewportHighlightDrawing.ps1`).
+- PCweb starts the Wireframe Web launcher through the shell and reads its output from files, so the launcher inherits none of Rhino's handles; a browser it starts would otherwise hold Rhino's handle on the open model and Rhino could no longer save it.
+  The launcher's output files are read shared and deleted when possible, and files older than a day are removed on the next run.
+- The material and extrusion catalogues keep loading the valid rows of a workbook; a malformed row stays editable in Excel instead of stopping the editor.
+- Time-dependent infrastructure takes a `TimeProvider` (`OpenXmlPanelNamingConventionWorkbook`, `OpenXmlPanelNamingTemplate`, `WireframeWebLauncher.Open`), so tests drive it with `tests/Shared/ManualTimeProvider.cs`.
 
 ## Enforced rules
 
@@ -398,3 +330,11 @@ Each one fails the check command `tools/check.ps1` when it is broken; anything n
 7. The compiled RHP carries an assembly-level GUID equal to the plug-in class GUID and the package manifest `pluginId`, and its version equals the manifest version.
 8. No project references code outside the repository or MCP_Rhino.
 9. Text files are checked out with LF line endings (`.gitattributes`), except `.cmd` files.
+10. No tracked file holds a comment: C# (Roslyn), PowerShell (the PowerShell parser), XML, YAML, shell, git, solution, batch and JSON files, and HTML comments in Markdown (`tools/RepoCheck`).
+    A file type without a comment rule fails the check, so the list of file types stays closed.
+11. Markdown and plain-text documents have one sentence per line, and no sentence is wrapped onto the next line (`tools/RepoCheck`).
+    Headings, tables, HTML lines and code blocks are not prose.
+12. Tests take time from a clock they control: C# test projects cannot use the system clock, `Stopwatch`, sleeps, delays, timers or waits with a time limit (`tests/BannedSymbols.txt`), and test scripts in `tests/` neither sleep nor wait with a time limit (`tools/RepoCheck`).
+    The live suites in `tests/Live/` are excluded (see the decision log).
+
+The exclusions from rules 10 to 12 are listed in one place, `tools/RepoCheck/Exclusions.cs`.

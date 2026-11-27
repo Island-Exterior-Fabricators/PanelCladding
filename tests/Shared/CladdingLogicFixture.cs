@@ -5,10 +5,6 @@ using PanelCladdingEditor.Application.Services.PanelCladding;
 
 namespace PanelCladdingTestFixtures;
 
-// Since 1.2.4 the plug-in reads cladding only from UD_CLADDING_LOGIC. Smokes written for the
-// CW_4.xx read path link this file and pass their fixture user text through WithLogic, which stores
-// the fixture's CW_4 values (every grid cell, blank when absent) as the logic, unvalidated, so
-// fixtures that test invalid references still reach the plug-in's own checks.
 internal static partial class CladdingLogicFixture
 {
     private static readonly JsonSerializerOptions Options = new() { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };

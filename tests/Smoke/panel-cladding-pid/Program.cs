@@ -91,7 +91,6 @@ var diagonal = panels.Append(Rect(Math.PI / 4, 0, 600, 0)).ToArray();
 Reject(Plan(diagonal, request with { PanelObjectIds = diagonal.Select(p => p.ObjectId).ToArray() }), "ambiguous");
 Console.WriteLine("[OK] invalid project/reference/tolerance/geometry, nonplanar/diagonal/degenerate panels and duplicate addresses rejected");
 
-// Variable widths/heights do not move a panel to another row/column when starts align.
 var lower = Rect(0, 0, 100, 0, 30, 17);
 var upper = Rect(0, 0, 100, 20, 60, 80);
 var leftBay = Rect(0, -100, 100, 0, 40, 30);
@@ -103,7 +102,6 @@ Check(customPlan.Panels.Single(p => p.ObjectId == lower.ObjectId).Bay == "02" &&
 Check(customPlan.Panels.Single(p => p.ObjectId == lower.ObjectId).Level == "01" &&
     customPlan.Panels.Single(p => p.ObjectId == leftBay.ObjectId).Level == "01", "Bottom edges, not centers, establish level");
 
-// Planes aligned at the same left edge are sorted bottom-to-top, even with tiny x noise.
 var lowerPlane = Rect(0, 0, 110, 0);
 var upperPlane = Rect(0, -0.000001, 120, 50);
 custom = [upperPlane, lowerPlane];
@@ -111,7 +109,6 @@ customPlan = Required(Plan(custom, Request(custom, lowerPlane.ObjectId)));
 Check(customPlan.Panels.Single(p => p.ObjectId == lowerPlane.ObjectId).Elevation == "N1", "Plane order uses tolerance-aware bottom tie break");
 Check(customPlan.Panels.Single(p => p.ObjectId == upperPlane.ObjectId).Bay == "01", "Bay restarts for each plane");
 
-// Coordinate bands must not chain 0 -> .0000075 -> .000015 into one .00001 row.
 custom = [Rect(0, 0, 100, 0), Rect(0, 40, 100, 0.0000075), Rect(0, 80, 100, 0.000015)];
 customPlan = Required(Plan(custom, Request(custom, custom[0].ObjectId)));
 Check(customPlan.Panels.Single(p => p.ObjectId == custom[2].ObjectId).Level == "02", "Row tolerance does not chain");

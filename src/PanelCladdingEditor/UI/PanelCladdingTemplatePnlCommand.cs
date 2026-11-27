@@ -13,9 +13,6 @@ using RunMode = rhinocommon::Rhino.Commands.RunMode;
 
 namespace PanelCladdingEditor.UI;
 
-// Records the project's PNL code format in "<PROJECT> - Naming Convention.xlsx" and lays out the
-// PNL sheet for it. Wall-Type, Frame-Config, Frame-Type and Cladding are asked one at a time;
-// Definition is always 01 (01..99, then A1..Z9, then AA..ZZ).
 [System.Runtime.InteropServices.Guid("C2F02782-3BB5-4604-8345-88B88C6DB9EE")]
 public sealed class PanelCladdingTemplatePnlCommand : RhinoCommand
 {
@@ -91,7 +88,6 @@ public sealed class PanelCladdingTemplatePnlCommand : RhinoCommand
             return Result.Failure;
         }
         foreach (string note in applied.Data.Notes) RhinoApp.WriteLine("PCtemplatePNL: " + note);
-        // Every open model reads the new format again; this one also keeps a copy of it.
         LivePanelNamingFormat.ForgetAll();
         LivePanelFrameConfigCodes.ForgetAll();
         LivePanelNamingFormat.Mirror(doc);

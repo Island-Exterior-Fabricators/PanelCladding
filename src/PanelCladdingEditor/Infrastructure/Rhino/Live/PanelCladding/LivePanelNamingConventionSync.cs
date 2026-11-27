@@ -12,10 +12,6 @@ using RhinoDoc = rhinocommon::Rhino.RhinoDoc;
 
 namespace PanelCladdingEditor.Infrastructure.Rhino.Live.PanelCladding;
 
-// Updates the PNL sheet of "<PROJECT> - Naming Convention.xlsx" after every save of the main
-// model "<PROJECT> - Wireframe.3dm". Other models of the project only read the sheet (format and
-// reserved codes). The model keeps the codes (CW_1.08 + UD_FRAME_CONFIG backup), so a locked sheet only
-// delays the update to the next save. The document is never modified from here.
 internal static class LivePanelNamingConventionSync
 {
     public const string PathDocumentKey = "PanelCladdingEditor.NamingConventionPath";
@@ -58,12 +54,9 @@ internal static class LivePanelNamingConventionSync
 
     private static void Sync(RhinoDoc document, string? savedPath)
     {
-        // The project comes from the saved file name: ABC - Wireframe.3dm is ABC, its panels live under
-        // ABC-IEF-Wireframe and its sheet is ABC - Naming Convention.xlsx with Job Code ABC.
         string modelPath = (string.IsNullOrWhiteSpace(savedPath) ? document.Path : savedPath) ?? string.Empty;
         string projectCode = PanelCladdingProjectService.CodeFromDocumentPath(modelPath);
         if (projectCode.Length == 0) return;
-        // The sheet is read first: its recorded PNL format decides which codes are valid.
         string? path = ResolvePath(document, savedPath, projectCode);
         bool exists = path is not null && File.Exists(path);
         var sheet = exists ? Workbook.Read(path!) : null;
@@ -93,8 +86,6 @@ internal static class LivePanelNamingConventionSync
             RhinoApp.WriteLine($"PanelCladdingEditor: {sheet.Message}");
             return;
         }
-        // Codes listed only in the sheet stay reserved for this session's new assignments. A sheet
-        // row that gives a code another configuration is never overwritten; it is reported.
         foreach ((string code, string config) in sheet.Data.FrameConfigs)
         {
             if (!PanelFrameConfigFormat.IsFormatted(config) || registry.Register(code, config).Success) continue;
@@ -102,8 +93,6 @@ internal static class LivePanelNamingConventionSync
             RhinoApp.WriteLine($"PanelCladdingEditor: {Path.GetFileName(path)} lists Frame-Config {code} as '{config}' but the model " +
                 (modelConfig.Length > 0 ? $"uses {code} for '{modelConfig}'" : $"codes '{config}' differently") + "; the sheet row is left as it is.");
         }
-        // Only the main model writes the sheet: another model of the project (XYZ - Wireframe_STN.3dm)
-        // holds a subset of the panels and would strike or add codes for that subset alone.
         if (!PanelCladdingProjectService.IsMainModelPath(modelPath))
         {
             if (ReportedSecondaryModel.Add(document.RuntimeSerialNumber))
@@ -163,7 +152,6 @@ internal static class LivePanelNamingConventionSync
                 string.Equals(item.Key, key, StringComparison.OrdinalIgnoreCase)).Value ?? string.Empty).Trim();
             string unitType = Value(PanelCladdingCidService.UnitTypeUserTextKey).ToUpperInvariant();
             if (PanelNamingConventionService.UnitTypeCodes.Any(item => item.Code == unitType)) unitTypes.Add(unitType);
-            // The configuration is authoritative: a panel uses the code of its UD_FRAME_CONFIG text.
             string frameCode = Value(PanelCladdingKeyService.FrameConfigKey);
             string config = PanelCladdingKeyService.ReadUserDefinedValue(userText, PanelCladdingKeyService.FrameConfigBackupKey).Trim();
             if (PanelFrameConfigFormat.IsFormatted(config) && registry.TryGetCode(config, out string configCode))
@@ -177,7 +165,6 @@ internal static class LivePanelNamingConventionSync
             }
             string wallType = Value(PanelCladdingSpawnPlanningService.WallTypeUserTextKey);
             if (wallType.Length > 0) wallTypes.Add(wallType);
-            // CW_1.09 is hand-filled; a leftover assignment payload of 1.2.4 or older is not a type.
             string frameType = Value(PanelCladdingKeyService.FrameTypeKey);
             if (frameType.Length == 0) blankFrameType = true;
             else if (!frameType.StartsWith('{')) frameTypes.Add(frameType);
@@ -193,7 +180,6 @@ internal static class LivePanelNamingConventionSync
             mismatched);
     }
 
-    // An explicit document path wins; otherwise the sheet sits next to the model.
     internal static string? ResolvePath(RhinoDoc document, string? savedPath, string projectCode)
     {
         string? configured = document.Strings.GetValue(PathDocumentKey)?.Trim();

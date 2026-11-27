@@ -1,15 +1,3 @@
-# Answers the Win32 dialogs that a live suite opens in Rhino (Save As, overwrite confirmation,
-# MessageBox). Dialogs are found with EnumWindows and read with UI Automation; a button is pressed
-# with its UIA Invoke pattern or, where the dialog exposes its buttons only as panes, the WM_COMMAND
-# message the button would send. No keyboard or mouse input is sent and the cursor does not move.
-#
-#   .\Watch-Dialogs.ps1 -ProcessId 64724 -Answers Save,Save,Yes -Log "$env:LOCALAPPDATA\PanelCladding\LiveEvidence\<yyMMdd>\export-dialogs.json"
-#
-# Each visible dialog that appears takes the next answer, which may list alternatives ("No|Don't
-# Save"). The Save As dialog's offered file name and folder are logged before it is answered. A
-# button is looked for until -ButtonWaitSeconds have passed (dialogs fill in their controls after
-# they appear); then OK or Cancel is pressed instead and the mismatch logged. The script ends when
-# every answer is used or after -TimeoutSeconds.
 param(
     [Parameter(Mandatory)] [int] $ProcessId,
     [Parameter(Mandatory)] [string[]] $Answers,
@@ -69,14 +57,12 @@ function Get-Button($elements, [string] $answer) {
     }
 }
 
-# WM_COMMAND with the button's control id, as the button itself sends when clicked. BM_CLICK is not
-# used: it is ignored while the dialog is not the active window, which it often is not here.
 function Press($dialogHandle, $button) {
     $pattern = $null
     if ($button.TryGetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern, [ref]$pattern)) { $pattern.Invoke(); return 'Invoke' }
     $buttonHandle = [IntPtr]$button.Current.NativeWindowHandle
     $id = [LiveDialogs]::GetDlgCtrlID($buttonHandle)
-    [void][LiveDialogs]::PostMessage($dialogHandle, 0x0111, [IntPtr]$id, $buttonHandle)   # WM_COMMAND, BN_CLICKED
+    [void][LiveDialogs]::PostMessage($dialogHandle, 0x0111, [IntPtr]$id, $buttonHandle)
     "WM_COMMAND $id"
 }
 

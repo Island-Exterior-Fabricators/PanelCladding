@@ -30,8 +30,6 @@ public sealed class LivePanelCladdingPidService : ILivePanelCladdingPidService
             : OperationResponse<IReadOnlyList<Guid>>.Ok(ids);
     }
 
-    // Called synchronously from RunCommand on Rhino's UI thread, bound to that
-    // command's document rather than whichever document later becomes active.
     public OperationResponse<PanelCladdingPidResult> Assign(uint documentSerialNumber, PanelCladdingPidRequest request)
     {
         if (RhinoApp.InvokeRequired) return Fail("Run PCpid on Rhino's main thread.");
@@ -168,7 +166,6 @@ public sealed class LivePanelCladdingPidService : ILivePanelCladdingPidService
             ObjectTypeFilter = ObjectType.Surface | ObjectType.Brep
         }).Where(obj => PanelCladdingPidPlanningService.IsPanelLayerPath(LayerPath(document, obj.Attributes), Project(document))).ToArray();
 
-    // The project root comes from the file name: ABC - Wireframe.3dm works under ABC-IEF-Wireframe.
     private static string Project(RhinoDoc document) => PanelCladdingProjectService.CodeFromDocumentPath(document.Path);
 
     private static string Scope(RhinoDoc document) => PanelCladdingProjectService.PanelLayerScope(Project(document));

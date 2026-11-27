@@ -24,7 +24,7 @@ public sealed class PanelCladdingEditorController
         _liveRepository = liveRepository;
         _saveService = saveService;
         _previewRenderer = previewRenderer;
-        _ = signatureService; // Retain constructor compatibility while type generation is suspended.
+        _ = signatureService;
         _workbookRepository = workbookRepository;
         _frameExtrusionImporter = frameExtrusionImporter;
     }

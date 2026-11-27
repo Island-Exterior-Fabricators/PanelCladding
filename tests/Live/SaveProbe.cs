@@ -1,5 +1,3 @@
-// Saves the document on the next idle tick (outside the script host's undo record) and records
-// its read-only / lock state around the save. Read returns the log so far.
 public static class SaveProbe
 {
     private const string Key = "SaveProbe.log";

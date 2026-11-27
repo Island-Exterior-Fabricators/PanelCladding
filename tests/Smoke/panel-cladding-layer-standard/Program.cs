@@ -50,7 +50,6 @@ internal static class Program
         Console.WriteLine("[OK] any <PROJECT>-IEF-Wireframe top-level layer is a project root");
     }
 
-    // Since 1.1.3 the Rhino file name names the project: only <code>-IEF-Wireframe is its root.
     private static void VerifyFileNameProject()
     {
         (string Path, string Code)[] names =
@@ -97,7 +96,6 @@ internal static class Program
     private static void VerifyPanelScope(Fixture fixture)
     {
         string[] panelLayers = fixture.Layers.Where(PanelCladdingPidPlanningService.IsPanelLayerPath).ToArray();
-        // Since 1.3.0 "Surfaces - Not in Scope" is excluded (not tracked), leaving eight of nine.
         Require(panelLayers.Length == 8 && panelLayers.All(path =>
                 path == PanelBranch || path.StartsWith(PanelBranch + "::", StringComparison.Ordinal)),
             "ABC panel scope must be exactly Surfaces - PNL and its seven tracked sublayers: " + string.Join(", ", panelLayers));
@@ -201,7 +199,6 @@ internal static class Program
         Require(PanelCladdingSpawnPlanningService.IsManagedExtrusionLayerPath("QRS-IEF-Wireframe::Curves - PNL::Curves - WT_02"),
             "Managed curve scope must follow any project root.");
 
-        // ABC keeps CID-bearing glass copies in the wireframe tree; they must not look like managed duplicates.
         CladdingLayer[] wireframeCopies = fixture.CladdingLayers
             .Where(row => row.Layer.StartsWith(Root + "::", StringComparison.Ordinal)).ToArray();
         Require(wireframeCopies.Length > 0 && wireframeCopies.All(row =>
@@ -312,7 +309,6 @@ internal static class Program
 
     private static void VerifyAbcSpawnPlan()
     {
-        // ABC E2-03-02 on Surfaces - WT_11: MPL-001 / LVR-001 / MPL-001 cladding over a 90 x 224.625 unit.
         var userText = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             ["CW_1.01_PID"] = "PID-ABC-E2-03-02",
@@ -354,8 +350,6 @@ internal static class Program
         Console.WriteLine("[OK] a live ABC panel plans STEP surfaces and Curves - WT_11 extrusion curves");
     }
 
-    // PCreport (1.3.0) names the retired roots once, in its RetiredRootLayers list, to report them;
-    // no predicate accepts them (checked above), and no other source file names them.
     private const string ComplianceSource = "PanelCladdingComplianceService.cs";
 
     private static void VerifyNoLegacyLayerNamesInSource()

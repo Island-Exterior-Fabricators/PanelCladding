@@ -1,26 +1,3 @@
-<#
-.SYNOPSIS
-Keeps client project data out of this public repository.
-
-.DESCRIPTION
-The hooks beside this script run it on every commit and push once `core.hooksPath` is `.githooks`
-(tests/Run-Regression.ps1 sets it); the repository-content-guard smoke runs it on the tracked files.
-
-  -Mode Staged    files the next commit adds or changes (pre-commit)
-  -Mode Message   a commit message file (commit-msg, -MessageFile)
-  -Mode Push      every commit and file a push sends that the remote does not have yet (pre-push;
-                  reads the hook's standard input)
-  -Mode Tracked   every tracked file in the working tree
-  -Mode Commit    every file and the message of one commit (-Rev)
-
-Rules: content-rules.json beside this script (file types, raw live-output folders, new evidence
-images, company file-server paths), plus a private list of real client names, project codes and
-numbers kept outside the repository: $env:PANELCLADDING_CONTENT_DENYLIST, or
-%APPDATA%\PanelCladding\content-denylist.txt. Plain lines match case-insensitively; "re:" lines are
-.NET regular expressions. Findings name the file, line and rule, never the matched text.
-
-Exit codes: 0 clean, 1 blocked, 2 the guard itself failed (also blocks).
-#>
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)]
@@ -63,12 +40,8 @@ function Invoke-GitText([string[]] $Arguments, [string] $InputText) {
     $utf8.GetString((Invoke-GitBytes $Arguments $InputText))
 }
 
-# Lines for `git cat-file --batch[-check]`. Windows PowerShell writes a byte order mark ahead of a
-# redirected standard input, so the first line is a blank one whose answer (" missing") is dropped;
-# every requested object must then be found.
 function Format-BatchInput([string[]] $Lines) { "`n" + (@($Lines | ForEach-Object { "$_`n" }) -join '') }
 
-# Object id -> content, read through one `git cat-file --batch`.
 function Read-Objects([string[]] $Ids) {
     $objects = @{}
     if (-not $Ids -or $Ids.Count -eq 0) { return $objects }
@@ -122,7 +95,7 @@ function Test-Text([string] $Where, [string] $Text, [bool] $WithTextRules) {
 }
 
 function Test-FileContent([string] $Path, [byte[]] $Bytes) {
-    if ($null -eq $Bytes -or [Array]::IndexOf($Bytes, [byte]0) -ge 0) { return }   # binary: path rules only
+    if ($null -eq $Bytes -or [Array]::IndexOf($Bytes, [byte]0) -ge 0) { return }
     $exempt = @($script:exemptions | Where-Object { $Path -eq $_ -or ($_.EndsWith('/') -and $Path.StartsWith($_, [StringComparison]::Ordinal)) }).Count -gt 0
     Test-Text $Path $utf8.GetString($Bytes) (-not $exempt)
 }
@@ -168,13 +141,12 @@ try {
     $checked = 0
     switch ($Mode) {
         'Staged' {
-            # :<old mode> <new mode> <old id> <new id> <status>\0<path>\0[<new path>\0]
             $tokens = (Invoke-GitText @('diff', '--cached', '--raw', '-z', '--no-abbrev', '-M', '--diff-filter=ACMRT')).Split([char]0)
             $staged = @()
             for ($i = 0; $i + 1 -lt $tokens.Length; ) {
                 $meta = $tokens[$i].TrimStart(':').Split(' ')
                 if ($meta[4] -match '^[RC]') { $path = $tokens[$i + 2]; $i += 3 } else { $path = $tokens[$i + 1]; $i += 2 }
-                if ($meta[1] -eq '160000') { continue }   # submodule
+                if ($meta[1] -eq '160000') { continue }
                 $staged += [pscustomobject]@{ Path = $path; Id = $meta[3]; IsNew = $meta[4] -ne 'R100' }
             }
             $contents = Read-Objects @($staged | ForEach-Object { $_.Id } | Select-Object -Unique)
@@ -193,10 +165,8 @@ try {
             $checked = 1
         }
         'Push' {
-            # <local ref> <local id> <remote ref> <remote id>, one line per ref being pushed.
             $tips = @([Console]::In.ReadToEnd() -split "`r?`n" | Where-Object { $_ } | ForEach-Object { $_.Split(' ')[1] } | Where-Object { $_ -notmatch '^0+$' })
             if ($tips.Count -gt 0) {
-                # What the remote already has (its remote-tracking refs) is not sent again.
                 $known = Invoke-GitText @('for-each-ref', '--format=%(refname)', "refs/remotes/$Remote/")
                 $exclude = if ($known.Trim()) { @('--not', "--remotes=$Remote") } else { @('--not', '--remotes') }
                 $listing = @((Invoke-GitText (@('rev-list', '--objects') + $tips + $exclude)) -split "`n" | Where-Object { $_ })

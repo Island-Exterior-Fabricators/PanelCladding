@@ -4,9 +4,6 @@ using PanelCladdingEditor.Domain.Models.PanelCladding;
 
 namespace PanelCladdingEditor.Application.Services.PanelCladding;
 
-// Builds the PNL sheet code tables from the document's codes, the sheet's existing rows and
-// the model's usage, in the project's PNL format. Codes are never reassigned; rows nothing
-// uses are kept but marked unused.
 public static partial class PanelNamingConventionService
 {
     public const string BlankFrameTypeValue = "NA";
@@ -32,7 +29,6 @@ public static partial class PanelNamingConventionService
         {
             frameConfigs[code] = config;
         }
-        // Sheet-only rows stay reserved; rows that are not a frame configuration are dropped.
         foreach ((string code, string config) in sheet.FrameConfigs.Where(item => PanelFrameConfigFormat.IsFormatted(item.Value)))
         {
             frameConfigs.TryAdd(code, config);
@@ -41,7 +37,6 @@ public static partial class PanelNamingConventionService
         (PanelNamingCodeRow[] wallTypes, string[] uncodedWallTypes) = CodeValues(
             sheet.WallTypes, usage.WallTypes, format.WallType,
             value => usage.WallTypes.Contains(value, StringComparer.OrdinalIgnoreCase));
-        // A sheet row whose value is NA stands for a blank CW_1.09_FRAME_TYPE (XYZ's Frame-Type 01).
         (PanelNamingCodeRow[] frameTypes, string[] uncodedFrameTypes) = CodeValues(
             sheet.FrameTypes, usage.FrameTypes, format.FrameType,
             value => usage.FrameTypes.Contains(value, StringComparer.OrdinalIgnoreCase) ||
@@ -63,8 +58,6 @@ public static partial class PanelNamingConventionService
         };
     }
 
-    // Sheet rows keep their codes. A new value takes the first code of the format without a value
-    // in the sheet, which is the first placeholder row when the sheet has them.
     private static (PanelNamingCodeRow[] Rows, string[] Uncoded) CodeValues(
         IReadOnlyDictionary<string, string> sheetRows, IReadOnlySet<string> values, string token, Func<string, bool> isUsed)
     {
@@ -95,11 +88,9 @@ public static partial class PanelNamingConventionService
             uncoded.ToArray());
     }
 
-    // The project code fills the Job Code cells one character each, or a single cell whole.
     public static bool JobCodeFits(string jobCode, int width) =>
         jobCode.Length > 0 && (width == 1 || width == jobCode.Length);
 
-    // WT-2 sorts before WT-10.
     private static string NaturalKey(string value) =>
         DigitsRegex().Replace(value.ToUpperInvariant(), match => match.Value.PadLeft(8, '0'));
 

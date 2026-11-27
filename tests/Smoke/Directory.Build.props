@@ -6,5 +6,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)..\Shared\RegressionPaths.cs" Link="RegressionPaths.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)..\Shared\ManualTimeProvider.cs" Link="ManualTimeProvider.cs" />
   </ItemGroup>
 </Project>

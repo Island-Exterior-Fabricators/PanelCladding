@@ -4,11 +4,6 @@ using System.Text.RegularExpressions;
 
 namespace RepositoryContentGuardSmoke;
 
-// The repository is public. The hooks in .githooks run .githooks/Test-RepositoryContent.ps1 on every
-// commit and push so that client project data (real project names, codes, numbers, file-server paths,
-// model exports, raw live-run output) never reaches it (AGENTS.md). This smoke checks that the rules
-// catch what they are meant for, that the hook scripts run it, that the tracked files pass the guard,
-// and that the hooks refuse and allow the right commits and pushes in a scratch repository.
 internal static class Program
 {
     private const string Guard = ".githooks/Test-RepositoryContent.ps1";
@@ -35,7 +30,6 @@ internal static class Program
         }
     }
 
-    // The shared rules catch the shapes they are meant for and leave fictional fixtures alone.
     private static void VerifyRules(string repo)
     {
         using JsonDocument rules = JsonDocument.Parse(File.ReadAllText(Path.Combine(repo, ".githooks", "content-rules.json")));
@@ -96,7 +90,6 @@ internal static class Program
         Console.WriteLine("[OK] pre-commit, commit-msg and pre-push are LF sh scripts that run the guard; pre-push also runs tools/check.ps1");
     }
 
-    // The tracked files pass the same guard the hooks use, with this machine's private list if it has one.
     private static void VerifyTrackedFiles(string repo)
     {
         (int code, string output) = RunGuard(repo, null, "-Mode", "Tracked");
@@ -160,7 +153,6 @@ internal static class Program
             Commit(work, withList, "a new evidence image", false, "new image in test evidence", ("Project_Test/261105_TEST_x/shot.png", "\u0089PNG\0"));
             CommitMessage(work, withList, "a private list name in the message", false, "Record the Zorblax Tower run");
 
-            // An image already on the remote may move into the archive.
             Write(work, "Project_Test/260101_TEST_old/view.png", "\u0089PNG\0old");
             Git(work, withList, "add", "-A");
             Git(work, withList, "commit", "-q", "--no-verify", "-m", "Older evidence image");
@@ -170,12 +162,10 @@ internal static class Program
             Require(Run(work, "git", withList, "commit", "-q", "-m", "Archive the older record").Code == 0, "Archiving an existing image was refused.");
             Require(Run(work, "git", withList, "push", "-q", "origin", "main").Code == 0, "Pushing an archive move was refused.");
 
-            // A commit made with --no-verify is still refused at push time, for its files and its message.
             PushRefused(work, withList, "a bypassed commit's file", "private client list entry 1", ("leak.md", "zorblax tower"), "Bypassed commit");
             PushRefused(work, withList, "a bypassed commit's message", "message", ("fine.md", "fine"), "Notes on Zorblax Tower");
             Require(Run(work, "git", withList, "push", "-q", "origin", "main").Code == 0, "A push with nothing new was refused.");
 
-            // Without a private list the structural rules still apply, and the guard says so.
             var withoutList = new Dictionary<string, string> { [ListVariable] = Path.Combine(root, "missing.txt") };
             (int code, string output) = Commit(work, withoutList, "a clean note without a private list", true, null, ("more.md", "fine"));
             Require(output.Contains("no private client list", StringComparison.Ordinal), "The guard did not report the missing private list.");
@@ -260,11 +250,7 @@ internal static class Program
         process.StandardInput.Close();
         Task<string> output = process.StandardOutput.ReadToEndAsync();
         Task<string> error = process.StandardError.ReadToEndAsync();
-        if (!process.WaitForExit(120_000))
-        {
-            process.Kill(true);
-            throw new TimeoutException($"{file} {string.Join(' ', arguments)} did not finish.");
-        }
+        process.WaitForExit();
         return (process.ExitCode, output.Result + error.Result);
     }
 
@@ -280,7 +266,7 @@ internal static class Program
         try
         {
             foreach (string file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
-                File.SetAttributes(file, FileAttributes.Normal);   // git marks its objects read-only
+                File.SetAttributes(file, FileAttributes.Normal);
             Directory.Delete(path, true);
         }
         catch (IOException) { }

@@ -16,6 +16,7 @@ It runs every check below, prints a `FAILED:` line for each failing step, and ex
 - It makes sure the .NET SDK pinned in `global.json` is present, and otherwise downloads it and verifies it against the SHA-512 pinned in `tools/dotnet-sdk.json`.
 - It runs the client data guard on every tracked file (`.githooks/Test-RepositoryContent.ps1 -Mode Tracked`).
 - It runs the static checks in `tests/Checks/`.
+- It runs `tools/RepoCheck`, which fails on any comment, any prose line that holds two sentences or wraps a sentence, and any test script that sleeps or waits with a time limit.
 - It builds `PanelCladding.sln` in Debug and Release with warnings as errors and NuGet restore in locked mode, so packages come only from the committed `packages.lock.json` files.
 - It builds the production RHP in both configurations and checks its assembly-level plug-in GUID (`tests/Package/Verify-PluginAssemblyIdentity.ps1`).
 - It builds and runs every managed smoke in Debug and Release (`tests/Run-Regression.ps1`).
@@ -25,11 +26,21 @@ Run it before you open a pull request.
 
 It needs Windows, Rhino 8 at `C:\Program Files\Rhino 8` (the projects reference its RhinoCommon) and network access the first time the pinned SDK is missing.
 The SDK download is kept under `%LOCALAPPDATA%\PanelCladding\toolchain`, or under `PANELCLADDING_TOOLCHAIN_ROOT` when that is set.
-When `LOCALAPPDATA` or `APPDATA` is not set, as in a fresh verification checkout, the check uses folders under the git-ignored `artifacts/check-home` instead.
+When `LOCALAPPDATA` or `APPDATA` is not set, as in a fresh verification checkout, the check uses folders under the git-ignored `artifacts/check-home` instead, and so it does for `DOTNET_CLI_HOME` and `NUGET_PACKAGES` when `USERPROFILE` is not set.
+When Windows reports no local application data folder, NuGet writes its `NuGet/Migrations` marker into the working directory; `.gitignore` ignores it, and RepoCheck scans only tracked files.
 
 Some tests need a running Rhino, an installed plug-in or a user session, so the check command leaves them out.
 Run them by hand when a change touches what they cover: the live suites in `tests/Live/`, the probes in `tests/Probes/`, and the package, installer, registration and Yak checks in `tests/Package/`.
 The [operations guide](docs/operations.md) says when each one is needed.
+
+## Code, documents and tests
+
+- No file holds comments, including scripts, configuration and Markdown.
+  Names, tests and the documents carry the intent; a reason worth keeping goes into the [design document](docs/design.md) or the [decision log](docs/decisions.md).
+- Documents are written one sentence per line, and a sentence is never wrapped.
+- Tests wait for an event, never for a duration, have no time limit of their own and never assert how long something took.
+  Code that depends on time takes a `TimeProvider`, and tests drive it with `tests/Shared/ManualTimeProvider.cs`; the analyzer list `tests/BannedSymbols.txt` keeps the system clock, sleeps and timed waits out of C# tests.
+- Generated files and other exclusions from these rules are listed in one place, `tools/RepoCheck/Exclusions.cs`.
 
 ## Setting up a clone
 

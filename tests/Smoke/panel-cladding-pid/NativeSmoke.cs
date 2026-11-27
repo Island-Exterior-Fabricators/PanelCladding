@@ -42,7 +42,6 @@ internal static class NativeSmoke
             attributes.SetUserString("unrelated", "keep");
             attributes.SetUserString("cw_1.05_lot", " Lot 12 ");
             attributes.SetUserString("CW_2.01_UNIT_WIDTH", "stale");
-            // Exercise duplicate casing cleanup, even though values are initially blank.
             attributes.SetUserString("cw_1.01_pid", "old");
             attributes.SetUserString("CW_1.06_UNIT_TYPE", row == 0 ? "F" : "L");
             attributes.SetUserString("CW_5.00_DEFINITION_A", row == 0 ? " " : "Parent");
@@ -89,7 +88,6 @@ internal static class NativeSmoke
         Check(doc.Objects.Count == 2, "Geometry count unchanged");
         var context = service.GetPanelObjectIds(doc.RuntimeSerialNumber);
         Check(context.Success && context.Data!.ToHashSet().SetEquals(ids), "Root and nested context discovery");
-        // The lower panel is context and both references, but only the upper panel is written.
         var partial = service.Assign(doc.RuntimeSerialNumber, request with { PanelObjectIds = [ids[1]] });
         Check(partial.Success && partial.Data?.UpdatedPanelCount == 1 && partial.Data.Plan.ContextPanelCount == 2, partial.Message);
         Check(doc.Objects.FindId(ids[1]).Attributes.GetUserString("CW_1.01_PID") == "PID-ABC-N1-02-01", "Partial native numbering uses unselected row");

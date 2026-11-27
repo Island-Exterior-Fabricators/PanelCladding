@@ -1,8 +1,8 @@
 # Live acceptance checks
 
-Checks for the manual test list of a release, run against the **installed** plug-in in a running
-Rhino 8 on a test model. `Run-Regression.ps1` does not run them: they need the installed RHP, Rhino
-and an interactive desktop session. They send no keyboard or mouse input, so the computer stays usable.
+Checks for the manual test list of a release, run against the **installed** plug-in in a running Rhino 8 on a test model.
+`Run-Regression.ps1` does not run them: they need the installed RHP, Rhino and an interactive desktop session.
+They send no keyboard or mouse input, so the computer stays usable.
 
 | File | Contents |
 | --- | --- |
@@ -11,7 +11,7 @@ and an interactive desktop session. They send no keyboard or mouse input, so the
 | `Hold-Workbook.ps1` | Opens the exported workbook in Excel through COM (`Visible = false`), records its sheets and holds it open for the export-while-open check. |
 | `New-NamingSheet.ps1` | Writes a minimal `<CODE> - Naming Convention.xlsx` for the naming-convention check. |
 | `Restart-Rhino.ps1` | Closes Rhino normally (`WM_CLOSE`, "Don't Save") and/or starts it on a model, then waits for the MCP_Rhino route. |
-| `Show-Results.py` | Prints a suite's results file, one line per check. |
+| `Show-Results.ps1` | Prints a suite's results file, one line per check. |
 | `SaveProbe.cs` | Saves the open model on the next idle tick and logs its read-only and lock state around the save (`SaveProbe.Queue(doc, tag)`, `SaveProbe.Read()`); used to find why Rhino stopped saving after PCweb. |
 
 ## Suites
@@ -28,16 +28,13 @@ and an interactive desktop session. They send no keyboard or mouse input, so the
 | `otherdocs` | 4. Speed on a large model, another model, unsaved document; 3. naming convention | Run on the large model; `mainModel` = a main-model-named copy with a naming sheet beside it. Opens other documents. |
 | `web` | PCweb: saved model, unsaved changes with LastSave / Save / Cancel, a second run while one waits | Wireframe Web installed; a saved model named `<CODE> - ....3dm` whose code is not a real project (PCweb links that project to it). `assembly` = a PanelCladdingEditor build to test when it is not the installed one. Saves the model; opens three browser tabs. |
 
-Suites change the test model (they write cladding layouts on a few panels of
-`XYZ-IEF-Wireframe::Surfaces - PNL::PNL-EXT-3A.1` and `PNL-EXT-3A.4`, bake, lock, hide and move
-them, suffix duplicate PIDs); use a copy of a project model. Each setup step removes what an earlier
-run left behind. Run `otherdocs` in a second Rhino so the main session keeps its model.
+Suites change the test model (they write cladding layouts on a few panels of `XYZ-IEF-Wireframe::Surfaces - PNL::PNL-EXT-3A.1` and `PNL-EXT-3A.4`, bake, lock, hide and move them, suffix duplicate PIDs); use a copy of a project model.
+Each setup step removes what an earlier run left behind.
+Run `otherdocs` in a second Rhino so the main session keeps its model.
 
 ## Running through MCP_Rhino
 
-Start Rhino from a normal user shell (not a sandboxed one: a Rhino started there may read a
-redirected registry and not load its plug-ins), open the test model, select it with
-`rhino_router_select_document`, then for each suite:
+Start Rhino from a normal user shell (not a sandboxed one: a Rhino started there may read a redirected registry and not load its plug-ins), open the test model, select it with `rhino_router_select_document`, then for each suite:
 
 ```text
 preview_rhino_script  libraryPath = <repo>\tests\Live\PcLive.cs, libraryType = PcLive,
@@ -46,29 +43,34 @@ preview_rhino_script  libraryPath = <repo>\tests\Live\PcLive.cs, libraryType = P
 apply_rhino_script    the returned token
 ```
 
-Add `"version":"1.4.0+<commit>"` to pin the build the `commands` suite expects; without it any
-installed version passes if Rhino loads it from its own versioned install folder.
+Add `"version":"1.4.0+<commit>"` to pin the build the `commands` suite expects; without it any installed version passes if Rhino loads it from its own versioned install folder.
 
-The suite runs after the apply returns; its results are written to `<evidenceDir>\<suite>.json`
-(and `PcLive.Read(Parameters)` returns them while it runs). Several suites can be joined with `+`.
+The suite runs after the apply returns; its results are written to `<evidenceDir>\<suite>.json` (and `PcLive.Read(Parameters)` returns them while it runs).
+Several suites can be joined with `+`.
 `excluded` and `otherdocs` reopen documents, so select the document again afterwards.
 
-`<evidenceDir>` is `%LOCALAPPDATA%\PanelCladding\LiveEvidence\<yyMMdd>` unless `"evidenceDir"` names
-another folder; `Start` returns it. Raw results describe the project model, so `Start` refuses a
-folder inside a git working tree. Report only sanitized conclusions (step names, pass/fail, counts),
-for example in the pull request description; delete the raw folder after the run.
+`<evidenceDir>` is `%LOCALAPPDATA%\PanelCladding\LiveEvidence\<yyMMdd>` unless `"evidenceDir"` names another folder; `Start` returns it.
+Raw results describe the project model, so `Start` refuses a folder inside a git working tree.
+Report only sanitized conclusions (step names, pass/fail, counts), for example in the pull request description; delete the raw folder after the run.
 
 ```powershell
-python .\tests\Live\Show-Results.py "$env:LOCALAPPDATA\PanelCladding\LiveEvidence\<yyMMdd>\bake.json" --commands
+.\tests\Live\Show-Results.ps1 -Path "$env:LOCALAPPDATA\PanelCladding\LiveEvidence\<yyMMdd>\bake.json" -Commands
 ```
 
-For `export` and `editor`, start the helpers first from a normal user shell (Rhino's process id is in
-`rhino_router_list_documents`):
+For `export` and `editor`, start the helpers first from a normal user shell (Rhino's process id is in `rhino_router_list_documents`):
 
 ```powershell
 .\tests\Live\Watch-Dialogs.ps1 -ProcessId <pid> -Answers Save,Save,Yes -Log <evidenceDir>\export-dialogs.json
 .\tests\Live\Hold-Workbook.ps1 -EvidenceDir <evidenceDir>
 ```
 
-Never call `RhinoDoc.Undo()` from a step: outside a command it left the document with an open
-undo record, and every later script was refused. Steps run the `_Undo` command instead.
+The script host strips `using` directives, so `PcLive.cs` names every type it needs outside the host's own imports in full.
+The `probe` suite selects the object ids listed in `"select"` (comma-separated, optional), runs the macro given as `"macro"`, and records what the macro added to the command history and what is selected.
+`Watch-Dialogs.ps1` gives each dialog that appears the next answer, which may list alternatives (`No|Don't Save`), logs the Save As dialog's offered name and folder first, and presses OK or Cancel and logs the mismatch when the button does not appear within `-ButtonWaitSeconds`.
+It presses a button with its UI Automation Invoke pattern, or with the `WM_COMMAND` message the button would send when the dialog exposes its buttons only as panes; `BM_CLICK` is ignored while the dialog is not the active window.
+
+The live suites and their helpers are outside the repository's test timing rule (`tools/RepoCheck/Exclusions.cs`): a step polls once per Rhino idle tick, waits up to a number of attempts for Rhino to finish background work, and the helpers stop after `-TimeoutSeconds`.
+The PCreport duration on a large model (4.14) is recorded as a note, not checked.
+
+Never call `RhinoDoc.Undo()` from a step: outside a command it left the document with an open undo record, and every later script was refused.
+Steps run the `_Undo` command instead.

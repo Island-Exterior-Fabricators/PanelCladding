@@ -10,8 +10,6 @@ using PanelCladdingEditor.Infrastructure.PanelCladding;
 
 namespace PanelCladdingNamingConventionSmoke;
 
-// PCtemplatePNL on generated sheets laid out like XYZ (one-letter frame configs, three-digit
-// cladding) and ABC (two-letter frame configs, two-digit cladding).
 internal static partial class Program
 {
     private static readonly PanelNamingFormat XyzFormat = new("A", "A", "01", "001", "01");
@@ -78,7 +76,6 @@ internal static partial class Program
         PanelNamingTemplateResult again = Required(template.Apply(path, XyzFormat));
         Require(!again.Changed && File.ReadAllBytes(path).SequenceEqual(configured), "Running PCtemplatePNL again changes nothing.");
 
-        // The save-time sync reads the format and leaves the configured sheet as it is.
         var workbook = new OpenXmlPanelNamingConventionWorkbook();
         PanelNamingConventionSheetContent sheet = Required(workbook.Read(path));
         PanelNamingFormat format = Required(PanelNamingFormat.Parse(sheet.RecordedFormat));
@@ -88,7 +85,6 @@ internal static partial class Program
         foreach ((string code, string config) in sheet.FrameConfigs) Require(registry.Register(code, config).Success, "Register " + code);
         Require(Resolve(registry, "0H 0V", expectAssigned: false) == "A", "0H 0V keeps code A.");
         PanelNamingConventionUsage walls = Usage(["F", "L"], ["A"], ["1A.1", "1A.2", "1C.1", "1C.2", "1C.4", "3A.2"]);
-        // Since 1.2.5 the sync also records CW_1.09 frame types; XYZ's are all in use (NA = blank).
         var usage = new PanelNamingConventionUsage
         {
             UnitTypes = walls.UnitTypes, FrameConfigCodes = walls.FrameConfigCodes, WallTypes = walls.WallTypes,
@@ -100,7 +96,6 @@ internal static partial class Program
                 File.ReadAllBytes(path).SequenceEqual(configured),
             "Saving the STN model leaves the configured sheet byte-for-byte unchanged: " + unchanged.Message);
 
-        // A new configuration takes the first placeholder in place; nothing moves.
         Require(Resolve(registry, "1H 0V", expectAssigned: true) == "B", "The next configuration gets B.");
         PanelNamingConventionUsage grown = Usage(["F", "L"], ["A", "B"], ["1A.1", "1A.2", "1C.1", "1C.2", "1C.4", "3A.2", "2C.1"]);
         tables = PanelNamingConventionService.BuildTables(registry.Entries, Required(workbook.Read(path)), new PanelNamingConventionUsage
@@ -158,7 +153,6 @@ internal static partial class Program
         }
         Require(!Required(template.Apply(path, abc001)).Changed, "A widened sheet is stable.");
 
-        // Back to two-digit cladding: P only held the example digit and placeholders, so it goes.
         PanelNamingTemplateResult narrowed = Required(template.Apply(path, PanelNamingFormat.Legacy));
         using (SpreadsheetDocument document = SpreadsheetDocument.Open(path, false))
         {
@@ -211,8 +205,6 @@ internal static partial class Program
         .. Enumerable.Range(13, 28).Select(row => $"O{row}:P{row}")
     ];
 
-    // XYZ as on 2026-10-26 (after the user's fix): one-letter wall and frame codes, Frame-Type
-    // 01.., Cladding 001.. with merged descriptions, Definition 01.. (10 and up as numbers).
     private static void CreateXyzWorkbook(string path, string[]? definitionCodes = null)
     {
         var cells = new List<Cell>
@@ -260,8 +252,6 @@ internal static partial class Program
         WritePnl(path, cells, XyzMerges, [(6, 6, 32), (8, 8, 12), (11, 11, 16), (13, 13, 35), (16, 16, 50), (18, 18, 78)]);
     }
 
-    // ABC as written by 1.1.4: Wall-Type I, Frame-Config J:K (AA codes), Frame-Type L:M,
-    // Cladding N:O, Definition P:Q, Seq S:V; only the three sync tables have titles.
     private static void CreateAbcWorkbook(string path, bool formula = false)
     {
         var cells = new List<Cell>
@@ -323,7 +313,6 @@ internal static partial class Program
     private static int ColumnNumber(string reference) =>
         reference.TakeWhile(char.IsLetter).Aggregate(0, (sum, letter) => sum * 26 + letter - 'A' + 1);
 
-    // Every cell as reference -> value, type and style.
     private static Dictionary<string, string> Snapshot(string path)
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Open(path, false);

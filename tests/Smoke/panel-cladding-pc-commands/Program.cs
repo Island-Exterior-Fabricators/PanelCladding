@@ -86,7 +86,6 @@ internal static class Program
                 $"{commandType} registers '{actualName}' instead of '{expectedName}'.");
             Require(actualName.StartsWith("PC", StringComparison.Ordinal),
                 $"{actualName} does not use the PC prefix.");
-            // Since 1.3.0: PC, the first word lowercase, later words capitalized; PNL stays an acronym.
             Require(Regex.IsMatch(actualName, "^PC[a-z]+(?:[A-Z][a-z]+|PNL)*$", RegexOptions.CultureInvariant),
                 $"{actualName} does not follow the PC + camel case naming rule.");
             Require(!actualName.StartsWith("PanelCladding", StringComparison.OrdinalIgnoreCase),
@@ -126,10 +125,6 @@ internal static class Program
             "Package metadata must not expose a production smoke command.");
     }
 
-    // Spellings before 1.3.0 still run in Rhino (names are case-insensitive) but must not be
-    // written in source messages or the installer. The package README names them on purpose.
-    // PCupdate, PCspawnSrf and PCspawnCrv no longer exist (PCbake replaces them) in any case;
-    // comment lines may still mention them.
     private static void VerifyNoFormerSpellings(string repositoryRoot)
     {
         var formerSpelling = new Regex(

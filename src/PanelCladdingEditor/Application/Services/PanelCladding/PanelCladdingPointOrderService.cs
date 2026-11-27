@@ -3,7 +3,6 @@ using PanelCladdingEditor.Domain.Models.PanelCladding;
 
 namespace PanelCladdingEditor.Application.Services.PanelCladding;
 
-// Standalone equivalent of MCP_Rhino's gravity-aware standard four-point skill.
 public sealed class PanelCladdingPointOrderService
 {
     public OperationResponse<IReadOnlyList<PanelPoint3>> Order(
@@ -20,7 +19,6 @@ public sealed class PanelCladdingPointOrderService
         down = Scale(down, 1 / length);
         var up = Scale(down, -1);
         var right = Cross(normal, down);
-        // Work relative to a nearby point to avoid loss of precision at large coordinates.
         var offsets = corners.Select(p => Subtract(p, corners[0])).ToArray();
         var center = new PanelPoint3(offsets.Average(p => p.X), offsets.Average(p => p.Y), offsets.Average(p => p.Z));
         if (offsets.Any(p => Math.Abs(Dot(p, normal)) > tolerance)) return Fail("NONPLANAR_QUAD");

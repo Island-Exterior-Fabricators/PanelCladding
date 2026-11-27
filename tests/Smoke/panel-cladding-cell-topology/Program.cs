@@ -55,7 +55,7 @@ internal static class Program
         AssertBoundary(canvas, dashed, "0A", "1A", vertical: true, dashedExpected: false);
         AssertBoundary(canvas, dashed, "0A", "0B", vertical: false, dashedExpected: false);
 
-        values[Key(0, "A")] = "1B"; // A cyclic draft cannot resolve to a cladding.
+        values[Key(0, "A")] = "1B";
         canvas.SetValues(values, new Dictionary<string, PanelCladdingMaterial>());
         Render(canvas, 720, 1000, Path.ChangeExtension(path, "invalid.png"), minimumBytes: 5000);
         Require(DashedLines(canvas).Count == 0, "Invalid parent cycles must not invent dashed boundaries.");
@@ -69,8 +69,6 @@ internal static class Program
 
     private static void IrregularParentBoundariesFollowResolvedRegions()
     {
-        // Reconstruct the supplied screenshot: 0B/0C/0D span columns 0-1,
-        // and 2A spans rows A-B. Blank primitive members have no displayed assignment.
         PanelCladdingLayout cells = BuildLayout(3, 4, new Dictionary<string, string>
         {
             [Key(0, "A")] = "MPL-002", [Key(1, "A")] = "MPL-001", [Key(2, "A")] = "1A",
@@ -114,8 +112,6 @@ internal static class Program
         AssertBoundary(canvas, dashed, "0A", "0B", vertical: false, dashedExpected: false);
         AssertBoundary(canvas, dashed, "0B", "0C", vertical: false, dashedExpected: false);
 
-        // Indirect ownership and references to a nonrepresentative physical member
-        // describe the same cladding and must produce exactly the same drawing.
         values[Key(2, "A")] = "0B";
         values[Key(2, "D")] = "1D";
         canvas.SetValues(values, materials);
@@ -123,7 +119,6 @@ internal static class Program
         Require(DashedLines(canvas).ToHashSet().SetEquals(dashed),
             "Indirect and hidden-member references changed the interior boundary set.");
 
-        // Move the material owner to a later-numbered logical cell.
         values[Key(0, "B")] = "2A";
         values[Key(1, "A")] = "0B";
         values[Key(2, "A")] = "MPL-001";
@@ -132,7 +127,6 @@ internal static class Program
         Require(DashedLines(canvas).ToHashSet().SetEquals(dashed),
             "Changing the owning cell label changed the interior boundary set.");
 
-        // Equal material codes alone never merge two separately assigned claddings.
         values[Key(0, "B")] = "MPL-001";
         values[Key(1, "A")] = "MPL-001";
         values[Key(2, "A")] = "1A";
@@ -165,7 +159,6 @@ internal static class Program
         var rects = Field<Dictionary<string, Rect>>(canvas, "_cellRects");
         Rect a = rects[Key(int.Parse(first[..1]), first[1..])];
         Rect b = rects[Key(int.Parse(second[..1]), second[1..])];
-        // Sample the shared edge away from T-junctions; first is left/below second.
         Point sample = vertical
             ? new Point((a.Right + b.Left) / 2d, (Math.Max(a.Top, b.Top) + Math.Min(a.Bottom, b.Bottom)) / 2d)
             : new Point((Math.Max(a.Left, b.Left) + Math.Min(a.Right, b.Right)) / 2d, (a.Top + b.Bottom) / 2d);

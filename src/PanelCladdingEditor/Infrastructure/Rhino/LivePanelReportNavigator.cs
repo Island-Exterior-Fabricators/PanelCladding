@@ -7,10 +7,6 @@ using RhinoObject = rhinocommon::Rhino.DocObjects.RhinoObject;
 
 namespace PanelCladdingEditor.Infrastructure.Rhino;
 
-/// <summary>
-/// Called by the modeless report window on Rhino's UI thread. Changes only the selection and the
-/// active view; locked or hidden objects are zoomed to but cannot be selected.
-/// </summary>
 public sealed class LivePanelReportNavigator : IPanelReportNavigator
 {
     private readonly uint _documentSerial;

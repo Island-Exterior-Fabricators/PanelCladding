@@ -7,23 +7,27 @@ using S = DocumentFormat.OpenXml.Spreadsheet;
 
 namespace PanelCladdingEditor.Infrastructure.PanelCladding;
 
-// Configures the PNL sheet for a project's PNL format (PCtemplatePNL). Row 7 holds the segment
-// headers (Wall-Type, Frame-Config, Frame-Type, Cladding, Definition; a header spans its merged
-// columns). Wall-Type is as wide as its code; the other segments are at least two columns, the
-// code and description columns of the table beneath them. Row 8 shows the code, one character
-// per cell, merged across the segment for a one-character code. Each segment's table (row-12
-// title) keeps rows 13-36 filled with placeholder codes. The format is recorded in the custom
-// property PanelCladdingEditor.PNLFormat. Codes that have a value are never changed or moved.
 public sealed class OpenXmlPanelNamingTemplate
 {
     public const string UnchangedMessage = "PANEL_NAMING_TEMPLATE_UNCHANGED";
+
+    private readonly TimeProvider _clock;
+
+    public OpenXmlPanelNamingTemplate()
+        : this(TimeProvider.System)
+    {
+    }
+
+    public OpenXmlPanelNamingTemplate(TimeProvider clock)
+    {
+        _clock = clock;
+    }
 
     private sealed record Segment(string Title, int First, int Last)
     {
         public int Width => Last - First + 1;
     }
 
-    // Tables of the sync keep its default columns; the others default to their header column.
     private static readonly IReadOnlyDictionary<string, string> SyncTableColumns =
         new Dictionary<string, string>(StringComparer.Ordinal) { ["Wall-Type"] = "H", ["Frame-Config"] = "J" };
 
@@ -54,16 +58,14 @@ public sealed class OpenXmlPanelNamingTemplate
         }
     }
 
-    // Codes in the given segments' tables that have a value and do not fit the format.
     public static IReadOnlyList<string> Misfits(PanelNamingTemplateState state, string title, string token) =>
         state.WrittenCodes.TryGetValue(title, out IReadOnlyList<string>? codes)
             ? codes.Where(code => !PanelNamingFormat.Fits(token, code)).ToArray()
             : [];
 
-    // Returns Ok(result) with Changed false and the file untouched when the sheet is already configured.
     public OperationResponse<PanelNamingTemplateResult> Apply(string path, PanelNamingFormat format)
     {
-        RemoveStaleOwnFiles(path);
+        RemoveStaleOwnFiles(path, _clock.GetUtcNow().UtcDateTime);
         var notes = new List<string>();
         OperationResponse written = ReplaceWorkbook(path, document => Configure(document, format, notes),
             "Close it in Excel and run PCtemplatePNL again.", UnchangedMessage);
@@ -101,7 +103,6 @@ public sealed class OpenXmlPanelNamingTemplate
         OperationResponse<Dictionary<string, int>> tables = LocateTables(sheet, located.Data);
         if (!tables.Success || tables.Data is null) return OperationResponse<bool>.Fail(tables.Message);
 
-        // Written codes must fit (codes never move); Definition is left alone when they do not.
         var tokens = format.Segments.ToDictionary(item => item.Title, item => item.Token, StringComparer.Ordinal);
         var configured = new HashSet<string>(StringComparer.Ordinal);
         foreach ((string title, string token) in format.Segments)
@@ -174,7 +175,6 @@ public sealed class OpenXmlPanelNamingTemplate
         return OperationResponse<bool>.Ok(changed);
     }
 
-    // Row-7 headers in segment order, each spanning its merge.
     private static OperationResponse<Segment[]> LocateSegments(Sheet sheet)
     {
         S.Row? header = FindRow(sheet.SheetData, HeaderRow);
@@ -207,7 +207,6 @@ public sealed class OpenXmlPanelNamingTemplate
         return OperationResponse<Segment[]>.Ok(segments.ToArray());
     }
 
-    // The code column of each segment's table: its row-12 title, else the default column.
     private static OperationResponse<Dictionary<string, int>> LocateTables(Sheet sheet, Segment[] segments)
     {
         S.Row? titleRow = FindRow(sheet.SheetData, TitleRow);
@@ -259,9 +258,6 @@ public sealed class OpenXmlPanelNamingTemplate
         return changed;
     }
 
-    // Rows 13-36 under the table: rows with neither code nor value get the next free codes; a code
-    // without a value that does not fit the format is renumbered. Grouped frame-config codes (AA,
-    // A1) take their first letter from the configuration, so they get no placeholders.
     private static bool FillPlaceholders(Sheet sheet, PnlStyleCache styles, Segment segment, int codeColumn, string token, List<string> notes)
     {
         if (segment.Title == PanelNamingFormat.SegmentTitles[1] && PanelNamingFormat.IsGrouped(token)) return false;
@@ -302,7 +298,6 @@ public sealed class OpenXmlPanelNamingTemplate
         return changed || filled > 0;
     }
 
-    // Adds a missing row-12 title in the style of another table title.
     private static bool EnsureTitle(Sheet sheet, string title, int codeColumn)
     {
         string column = ColumnName(codeColumn);
@@ -315,8 +310,6 @@ public sealed class OpenXmlPanelNamingTemplate
         return true;
     }
 
-    // Makes the row's cells first..last one merge (merged and wider than a cell) or unmerged.
-    // Other merges that lie only in this row and overlap the range are removed.
     private static bool MergeRow(Sheet sheet, uint row, int first, int last, bool merged = true)
     {
         S.MergeCells? merges = sheet.Worksheet.GetFirstChild<S.MergeCells>();
@@ -349,7 +342,6 @@ public sealed class OpenXmlPanelNamingTemplate
     private static S.MergeCells InsertMergeCells(S.Worksheet worksheet)
     {
         var merges = new S.MergeCells();
-        // mergeCells follows sheetData (and phonetic/conditional formatting elements, absent here).
         return worksheet.InsertAfter(merges, worksheet.GetFirstChild<S.SheetData>()!);
     }
 
@@ -371,8 +363,6 @@ public sealed class OpenXmlPanelNamingTemplate
         return (ColumnIndex(ends[0]), RowOf(ends[0]), ColumnIndex(last), RowOf(last));
     }
 
-    // Column shifts rewrite cell references, merges and column widths only, so sheets with
-    // anything else that refers to cells are left for the user to adjust.
     private static OperationResponse CheckShiftSupported(SpreadsheetDocument document, Sheet sheet)
     {
         var found = new List<string>();
@@ -391,9 +381,6 @@ public sealed class OpenXmlPanelNamingTemplate
                 "adjust the segment columns in Excel and run PCtemplatePNL again.");
     }
 
-    // Inserts count columns at index `at` (the column after a segment). Cells and merges from `at`
-    // move right; merges reaching the segment's last column grow with it; header rows (1-11) get
-    // the style of that column in the new cells; the new columns take its width.
     private static OperationResponse InsertColumns(Sheet sheet, int at, int count)
     {
         foreach (S.Row row in sheet.SheetData.Elements<S.Row>())
@@ -423,8 +410,6 @@ public sealed class OpenXmlPanelNamingTemplate
         return OperationResponse.Ok();
     }
 
-    // Removes count columns from `at` (the end of a segment). Only rows 7 and 8 (header span and
-    // example, both rewritten) may hold anything there.
     private static OperationResponse DeleteColumns(Sheet sheet, Segment segment, int at, int count)
     {
         foreach (S.Row row in sheet.SheetData.Elements<S.Row>().Where(row => row.RowIndex?.Value is not (HeaderRow or ExampleRow)))
@@ -463,7 +448,6 @@ public sealed class OpenXmlPanelNamingTemplate
         return OperationResponse.Ok();
     }
 
-    // Column widths: definitions from `at` move by count; inserted columns copy column at - 1.
     private static void ShiftColumnDefinitions(S.Worksheet worksheet, int at, int count)
     {
         if (worksheet.GetFirstChild<S.Columns>() is not S.Columns columns) return;

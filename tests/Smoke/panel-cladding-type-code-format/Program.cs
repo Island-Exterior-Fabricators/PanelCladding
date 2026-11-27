@@ -56,7 +56,6 @@ internal static class Program
         string root = FindRepositoryRoot();
         string editorSource = File.ReadAllText(Path.Combine(
             root, "src", "PanelCladdingEditor", "UI", "PanelCladdingEditorWindow.xaml.cs"));
-        // The editor's pending type-code preview was removed when type generation was suspended (260930).
         Require(!editorSource.Contains("-CL-", StringComparison.Ordinal),
             "The editor still shows the cladding type-code marker.");
 

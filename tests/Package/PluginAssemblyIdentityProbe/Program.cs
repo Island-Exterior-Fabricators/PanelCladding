@@ -1,15 +1,6 @@
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 
-// Reports the assembly-level GuidAttribute of one or more Rhino plug-in files.
-//
-// Rhino.PlugIns.PlugIn.Create resolves a managed plug-in id from this attribute and falls back to
-// Guid.Empty when it is absent, so two RHPs that both omit it collide with "ID already in use".
-// Metadata is read straight from the PE file: no Rhino install and no assembly loading required.
-//
-// Usage: PluginAssemblyIdentityProbe <plugin-file> [<plugin-file> ...]
-// Output: PLUGIN_ASSEMBLY_IDENTITY|path=<path>|assembly=<name>|pluginId=<guid>|declared=<bool>
-
 if (args.Length == 0)
 {
     Console.Error.WriteLine("Usage: PluginAssemblyIdentityProbe <plugin-file> [<plugin-file> ...]");

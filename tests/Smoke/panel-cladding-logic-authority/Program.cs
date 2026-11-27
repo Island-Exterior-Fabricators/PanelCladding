@@ -8,7 +8,6 @@ namespace PanelCladdingLogicAuthoritySmoke;
 internal static class Program
 {
     private const string Logic = PanelCladdingKeyService.CladdingLogicKey;
-    // 1H 1V grid on a 30 x 40 panel: cells 0A, 0B, 1A, 1B.
     private static readonly Dictionary<string, string> Grid = new()
     {
         ["CW_2.03_OFFSET_H0"] = "20", ["CW_2.04_OFFSET_V0"] = "15"
@@ -51,7 +50,6 @@ internal static class Program
         Console.WriteLine("[OK] UD_CLADDING_LOGIC stores materials, parents and blanks");
     }
 
-    // Unconfigured: only H/V decide; CW_4 keys are never read.
     private static void VerifyUnconfiguredPanels()
     {
         var keys = new PanelCladdingKeyService();

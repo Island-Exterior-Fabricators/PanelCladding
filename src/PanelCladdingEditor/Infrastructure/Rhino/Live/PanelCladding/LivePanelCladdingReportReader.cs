@@ -13,8 +13,6 @@ using Surface = rhinocommon::Rhino.Geometry.Surface;
 
 namespace PanelCladdingEditor.Infrastructure.Rhino.Live.PanelCladding;
 
-// PCreport's read-only view of a model: layer paths and every Brep, surface, extrusion and curve
-// with its object user text (case variants of a key kept apart). Nothing is written.
 public static class LivePanelCladdingReportReader
 {
     public static OperationResponse<PanelCladdingReportSnapshot> Read(RhinoDoc? document)

@@ -80,7 +80,6 @@ internal static class Program
             ["CW_2.02_UNIT_HEIGHT"] = "80.00000",
             ["CW_2.03_OFFSET_H0"] = "20",
             ["CW_2.04_OFFSET_V0"] = "40"
-            // Since 1.2.4 PCcreate writes no CW_4 placeholders and no UD_CLADDING_LOGIC.
         };
         Require(panel.UserTextWrites.Count == expectedWrites.Count, "Grid write count is incorrect.");
         Require(new[] { PanelCladdingKeyService.FrameAssignmentsKey, PanelCladdingKeyService.LegacyFrameAssignmentsKey,

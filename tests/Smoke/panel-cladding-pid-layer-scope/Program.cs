@@ -45,7 +45,6 @@ var identities = stored.Select(p => new PanelCladdingPidExistingIdentity(p.Objec
     p.UserText["CW_1.01_PID"], p.UserText["CW_1.02_CID"], false)).ToArray();
 Check(planner.ValidateDocumentIdentities(partial, stored, identities).Success, "Subset repeat checks unselected stored identities without rewriting them");
 
-// Two unselected objects with an unrelated duplicate PID now fail the whole-scope audit.
 var duplicated = stored.Select(p => p.ObjectId == Label("5") || p.ObjectId == Label("6")
     ? p with { UserText = new Dictionary<string, string>(p.UserText) { ["CW_1.01_PID"] = p.ObjectId == Label("5") ? "PID-OLD-DUP" : " pid-old-dup " } }
     : p).ToArray();
@@ -53,7 +52,6 @@ var duplicateCheck = planner.ValidateDocumentIdentities(partial, duplicated, [])
 Check(!duplicateCheck.Success && duplicateCheck.Message.Contains("duplicate PID", StringComparison.OrdinalIgnoreCase) &&
     duplicateCheck.Message.Contains(Label("5").ToString()) && duplicateCheck.Message.Contains(Label("6").ToString()), "Unselected pair detected with object IDs");
 
-// A selected correction is evaluated as a replacement before checking duplicates.
 var repairing = Required(Plan(duplicated, request with { PanelObjectIds = [Label("5")] }));
 Check(planner.ValidateDocumentIdentities(repairing, duplicated, []).Success, "Selected correction can resolve an old duplicate");
 var newlyConflicting = stored.Select(p => p.ObjectId == Label("5")
@@ -63,7 +61,6 @@ Check(!planner.ValidateDocumentIdentities(partial, newlyConflicting, []).Success
 Check(planner.ValidateDocumentIdentities(partial, context, []).Success, "Blank unselected PIDs stay blank and do not count as duplicates");
 Console.WriteLine("[OK] effective whole-scope PID audit detects unselected duplicate pairs, permits selected repairs and rejects selected/unselected collisions");
 
-// Context-only geometric duplicates remain ambiguous even if their attributes are blank.
 var geometryDuplicate = context.Append(context.Single(p => p.ObjectId == Label("5")) with { ObjectId = Guid.NewGuid() }).ToArray();
 Check(!Plan(geometryDuplicate, request with { PanelObjectIds = subsetIds }).Success, "Unselected ambiguous addresses cannot be silently skipped");
 Console.WriteLine("PASS: PCpid layer scope and selected-write regression");

@@ -2,11 +2,9 @@
 param(
     [ValidateSet('Debug', 'Release')]
     [string[]] $Configuration = @('Debug', 'Release'),
-    # Smoke folder names under tests/Smoke; wildcards are allowed.
     [string[]] $Name = @('*'),
     [switch] $List,
-    [switch] $NoBuild,
-    [int] $TimeoutSeconds = 900
+    [switch] $NoBuild
 )
 
 $ErrorActionPreference = 'Stop'
@@ -37,7 +35,6 @@ foreach ($config in $Configuration) {
         $status = 'pass'
         $exitCode = $null
         if (-not $NoBuild) {
-            # Serial builds: every smoke builds src as a test-host DLL into the same output folders.
             & dotnet build $smoke.Project -c $config -m:1 --nologo -v:q *> "$log.build"
             if ($LASTEXITCODE -ne 0) { $status = 'build-failed'; $exitCode = $LASTEXITCODE }
         }
@@ -54,15 +51,9 @@ foreach ($config in $Configuration) {
             $process.StandardInput.Close()
             $stdout = $process.StandardOutput.ReadToEndAsync()
             $stderr = $process.StandardError.ReadToEndAsync()
-            if ($process.WaitForExit($TimeoutSeconds * 1000)) {
-                $process.WaitForExit()
-                $exitCode = $process.ExitCode
-                if ($exitCode -ne 0) { $status = 'failed' }
-            }
-            else {
-                $process.Kill()
-                $status = 'timeout'
-            }
+            $process.WaitForExit()
+            $exitCode = $process.ExitCode
+            if ($exitCode -ne 0) { $status = 'failed' }
             Set-Content -LiteralPath $log -Encoding utf8 -Value ($stdout.Result + "`n--- stderr ---`n" + $stderr.Result)
         }
         $seconds = [math]::Round(((Get-Date) - $started).TotalSeconds, 1)

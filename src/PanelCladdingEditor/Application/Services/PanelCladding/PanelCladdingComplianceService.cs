@@ -4,9 +4,6 @@ using PanelCladdingEditor.Domain.Models.PanelCladding;
 
 namespace PanelCladdingEditor.Application.Services.PanelCladding;
 
-// PCreport's rules. Each rule reuses the predicate or service the commands use, so the report and
-// the commands agree on what is compliant. Objects the plug-in does not manage (wireframe copies
-// such as Surfaces - GLS, even with a PID) are not checked. Pure and read-only.
 public sealed class PanelCladdingComplianceService
 {
     private const string CladdingUserTextKey = "Cladding";
@@ -430,7 +427,6 @@ public sealed class PanelCladdingComplianceService
     private static string Pid(PanelCladdingReportObject item) =>
         Get(item.UserText, PanelCladdingSpawnPlanningService.PanelIdUserTextKey).Trim();
 
-    // The CID the commands use: derived from PID and role when the unit type allows it.
     private static string ResolvedCid(PanelCladdingReportObject item)
     {
         string pid = Pid(item);

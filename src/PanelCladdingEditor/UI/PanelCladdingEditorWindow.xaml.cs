@@ -18,7 +18,6 @@ namespace PanelCladdingEditor.UI;
 public partial class PanelCladdingEditorWindow : Window
 {
     private const string FrameExtrusionDragFormat = "PanelCladdingEditor.FrameExtrusionCode";
-    // Curve profile assignment is suspended: Extrusion view edits the layout only.
     private static bool _extrusionAssignmentEnabled = false;
     private readonly PanelCladdingEditorController _controller;
     private readonly IPanelViewportHighlight? _viewportHighlight;
@@ -755,7 +754,6 @@ public partial class PanelCladdingEditorWindow : Window
 
     private void RebuildOffsetLayout(PanelCladdingTopologyState topology)
     {
-        // Display IDs contain offsets; rebuild them from the unchanged indexed masks after a move.
         _mergedGroups.Clear();
         _deletedExtrusions.Clear();
         _hiddenExtrusions.Clear();
@@ -825,7 +823,6 @@ public partial class PanelCladdingEditorWindow : Window
             }
             catch (Exception exception) when (exception is FormatException or NotSupportedException)
             {
-                // Keep loading valid catalogue entries; malformed rows remain editable in Excel.
             }
         }
     }
@@ -854,7 +851,6 @@ public partial class PanelCladdingEditorWindow : Window
                 }
                 catch (Exception exception) when (exception is IOException or NotSupportedException)
                 {
-                    // Keep valid project profiles available when one workbook thumbnail is malformed.
                 }
             }
         }

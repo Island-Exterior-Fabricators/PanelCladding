@@ -6,9 +6,6 @@ namespace PanelCladdingEditor.Application.Services.PanelCladding;
 
 public sealed class PanelCladdingExtrusionPlanningService
 {
-    // Layer standard: panels live on <PROJECT>-IEF-Wireframe::Surfaces - PNL::Surfaces - <type>
-    // and their curves on <PROJECT>-IEF-Wireframe::Curves - PNL::Curves - <type>. The project
-    // root is taken from the panel's own layer, so any project code is supported.
     public const string ProjectRootLayerSuffix = "-IEF-Wireframe";
     public const string PanelSurfaceLayerName = "Surfaces - PNL";
     public const string CurveLayerName = "Curves - PNL";
@@ -204,8 +201,6 @@ public sealed class PanelCladdingExtrusionPlanningService
                 ? HorizontalObjectColor
                 : VerticalObjectColor;
 
-    // With a project code (from the Rhino file name) only <code>-IEF-Wireframe is the root;
-    // without one, as for an unsaved document, any *-IEF-Wireframe layer is.
     public static bool IsProjectRootLayer(string layerName) => IsProjectRootLayer(layerName, null);
 
     public static bool IsProjectRootLayer(string layerName, string? projectCode)
@@ -219,8 +214,6 @@ public sealed class PanelCladdingExtrusionPlanningService
             !string.IsNullOrWhiteSpace(name[..^ProjectRootLayerSuffix.Length]);
     }
 
-    // Layers the project does not track, such as "Surfaces - Not in Scope" or "Curves - By Others".
-    // A path is excluded when any segment contains a keyword, ignoring case, spaces, '-' and '_'.
     public static IReadOnlyList<string> ExcludedLayerKeywords { get; } =
         Array.AsReadOnly(new[] { "Not in Scope", "By Others" });
 
@@ -228,12 +221,9 @@ public sealed class PanelCladdingExtrusionPlanningService
         SplitLayerPath(layerPath).Any(segment => ExcludedLayerKeywords.Any(keyword =>
             LayerWord(segment).Contains(LayerWord(keyword), StringComparison.Ordinal)));
 
-    // The whole panel branch, excluded sublayers included: the auto attributes keep those panels'
-    // sizes and UD_PLANE current although nothing else tracks them.
     public static bool IsPanelBranchPath(string layerPath, string? projectCode) =>
         IsProjectBranch(SplitLayerPath(layerPath), PanelSurfaceLayerName, projectCode);
 
-    // The branch root itself and every nested sublayer belong to the branch, except excluded ones.
     public static bool IsPanelLayerPath(string layerPath) => IsPanelLayerPath(layerPath, null);
 
     public static bool IsPanelLayerPath(string layerPath, string? projectCode) =>
@@ -269,7 +259,6 @@ public sealed class PanelCladdingExtrusionPlanningService
                 $"PANEL_CLADDING_PANEL_TYPE_LAYER_REQUIRED: {sourcePanelLayerPath}");
         }
 
-        // Surfaces - WT_01 hosts its curves on Curves - WT_01 under the same project root.
         IEnumerable<string> curveTypeSegments = typeSegments.Select(segment =>
             segment.StartsWith(PanelTypeLayerPrefix, StringComparison.OrdinalIgnoreCase)
                 ? CurveTypeLayerPrefix + segment[PanelTypeLayerPrefix.Length..]

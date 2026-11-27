@@ -16,9 +16,6 @@ using ShowMessageResult = rhinocommon::Rhino.UI.ShowMessageResult;
 
 namespace PanelCladdingEditor.UI;
 
-// Opens the active saved model in Wireframe Web when it is installed. Wireframe Web reads the saved
-// file, so unsaved changes are saved first or left out. The launcher runs on a worker thread; its
-// result is written to the command line when it exits.
 [Guid("A073B617-D8ED-4689-8B3E-3B05B6B9F7E8")]
 public sealed class PanelCladdingWebCommand : RhinoCommand
 {
@@ -29,8 +26,6 @@ public sealed class PanelCladdingWebCommand : RhinoCommand
     protected override Result RunCommand(RhinoDoc doc, RunMode mode) =>
         Open(doc, document => mode == RunMode.Interactive ? AskInDialog(document) : AskOnCommandLine());
 
-    // The command once the unsaved-changes question is answered: true saves, false opens the last
-    // save, null cancels. Live tests pass the answer directly.
     internal static Result Open(RhinoDoc doc, Func<RhinoDoc, bool?> askToSave)
     {
         if (doc is null || string.IsNullOrWhiteSpace(doc.Path))
@@ -58,7 +53,6 @@ public sealed class PanelCladdingWebCommand : RhinoCommand
         }
         if (doc.Modified && doc.IsReadOnly)
         {
-            // Rhino cannot save it, so there is nothing to ask.
             RhinoApp.WriteLine($"PCweb: {file} is read-only; Wireframe Web opens its last save.");
         }
         else if (doc.Modified)
@@ -109,7 +103,6 @@ public sealed class PanelCladdingWebCommand : RhinoCommand
             _ => null,
         };
 
-    // Scripted runs (-PCweb): Enter saves, LastSave opens the saved file as it is.
     private static bool? AskOnCommandLine()
     {
         using var getter = new GetOption();

@@ -94,8 +94,6 @@ function Set-PanelPluginRegistration([string] $RegistryRoot, [string] $PluginId,
     $commandListKey = Join-Path $pluginKey 'CommandList'
     $canonicalRhp = [IO.Path]::GetFullPath($RhpPath)
     if (Test-Path -LiteralPath $pluginKey) {
-        # Replace only the verified product-owned key so stale shorthand,
-        # partial, or older command registrations cannot survive repair.
         Remove-Item -LiteralPath $pluginKey -Recurse -Force
     }
 
@@ -304,7 +302,6 @@ $unexpected = @($searchRoots | Where-Object { Test-Path -LiteralPath $_ -PathTyp
 })
 if ($unexpected.Count -gt 0) { throw "Another PanelCladdingEditor RHP is discoverable: $($unexpected[0].FullName)" }
 
-# Refuse foreign registration before moving any existing plug-in files.
 Assert-PanelPluginRegistrationOwner $RhinoPluginRegistryRoot $pluginId
 $installId = [Guid]::NewGuid().ToString('N')
 $pluginStage = Join-Path $RhinoPluginRoot ".$version-$installId"

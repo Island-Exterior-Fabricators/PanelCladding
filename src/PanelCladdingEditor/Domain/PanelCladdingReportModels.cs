@@ -1,7 +1,5 @@
 namespace PanelCladdingEditor.Domain.Models.PanelCladding;
 
-// Error: a command fails or produces wrong output. Warning: non-compliant, but tolerated or
-// corrected on the next write. Info: an observation.
 public enum PanelCladdingReportSeverity
 {
     Error,
@@ -29,7 +27,6 @@ public sealed record PanelCladdingReportObject(
     PanelCladdingReportObjectKind Kind,
     IReadOnlyDictionary<string, string> UserText);
 
-// What PCreport reads from the model: layer full paths and Brep/curve objects with user text.
 public sealed class PanelCladdingReportSnapshot
 {
     public string DocumentPath { get; init; } = string.Empty;
@@ -45,7 +42,6 @@ public sealed record PanelCladdingReportRule(
     PanelCladdingReportCategory Category,
     string Fix);
 
-// ObjectId is empty for a layer-level issue.
 public sealed record PanelCladdingReportIssue(
     PanelCladdingReportRule Rule,
     Guid ObjectId,

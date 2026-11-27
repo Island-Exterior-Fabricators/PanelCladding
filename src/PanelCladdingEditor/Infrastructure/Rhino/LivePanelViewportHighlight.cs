@@ -9,10 +9,6 @@ using RhinoDoc = rhinocommon::Rhino.RhinoDoc;
 
 namespace PanelCladdingEditor.Infrastructure.Rhino;
 
-/// <summary>
-/// View-only panel feedback. Called by the modeless editor on Rhino's UI thread;
-/// geometry is resolved in Rhino's display callback and is never retained or changed.
-/// </summary>
 public sealed class LivePanelViewportHighlight : DisplayConduit, IPanelViewportHighlight
 {
     private uint _documentSerial;
@@ -48,10 +44,6 @@ public sealed class LivePanelViewportHighlight : DisplayConduit, IPanelViewportH
         if (panel is null || panel.IsDeleted || !panel.Visible ||
             !panel.IsActiveInViewport(e.Viewport) || panel.Geometry is not Brep brep) return;
 
-        // DrawForeground has depth testing/writing disabled: this identification
-        // overlay must remain legible on coplanar panels and generated cladding.
-        // DrawBrepWires' integer is wire density, NOT pixel thickness. Draw actual
-        // Brep edges with DrawCurve so trimmed boundaries receive a real halo.
         foreach (var edge in brep.Edges)
         {
             e.Display.DrawCurve(edge, Color.FromArgb(25, 55, 65), 6);

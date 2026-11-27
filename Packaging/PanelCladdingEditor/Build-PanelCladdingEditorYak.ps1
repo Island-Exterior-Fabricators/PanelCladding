@@ -2,24 +2,19 @@
 param(
     [string]$Version,
     [string]$OutputRoot,
-    # Company-internal Yak source (network folder or private server). Omit to build only.
     [string]$Source,
-    # Publish this already built .yak to -Source instead of building a new one.
     [string]$PackagePath,
     [string]$YakPath = (Join-Path $env:ProgramFiles 'Rhino 8\System\Yak.exe')
 )
 
 function Publish-YakPackage([string] $Package) {
     if ($Source -match '^https?://') {
-        # A private Yak server applies its own authentication to yak push.
         & $YakPath push --source $Source $Package | Out-Host
         if ($LASTEXITCODE -ne 0) { throw "Yak push to $Source failed." }
     } else {
-        # A folder source is read directly by Rhino; yak push would demand a Rhino Accounts login.
         if (-not (Test-Path -LiteralPath $Source -PathType Container)) { throw "Package source folder does not exist: $Source" }
         $target = Join-Path $Source ([IO.Path]::GetFileName($Package))
         if (Test-Path -LiteralPath $target -PathType Leaf) {
-            # A published version is immutable: clients cache it by name and version.
             if ((Get-FileHash -LiteralPath $target).Hash -ne (Get-FileHash -LiteralPath $Package).Hash) {
                 throw "$target already exists with different content. Bump the version instead of replacing it."
             }
@@ -38,7 +33,6 @@ if (-not (Test-Path -LiteralPath $YakPath -PathType Leaf)) {
     throw "Rhino 8 Yak CLI was not found at $YakPath. Pass -YakPath."
 }
 if (-not [string]::IsNullOrWhiteSpace($Source) -and $Source -match '^https?://([^/]+\.)?rhino3d\.com') {
-    # Pushing there publishes to every Rhino user; that is a deliberate manual step, not a build option.
     throw "Refusing to push to the public McNeel package server ($Source). Use a company-internal source."
 }
 if (-not [string]::IsNullOrWhiteSpace($PackagePath)) {
@@ -50,7 +44,6 @@ if (-not [string]::IsNullOrWhiteSpace($PackagePath)) {
 }
 $definition = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot "package-manifest.json") | ConvertFrom-Json
 
-# Reuse the zip bundle build: publish, direct RHP rebuild, PE GUID check and dependency filtering.
 $bundle = @(& (Join-Path $PSScriptRoot "Build-PanelCladdingEditorPackage.ps1") -Version $Version -OutputRoot $OutputRoot)[-1]
 $bundle = [string]$bundle
 $Version = (Get-Content -Raw -LiteralPath (Join-Path $bundle "package-manifest.json") | ConvertFrom-Json).version
@@ -67,7 +60,6 @@ if (Test-Path -LiteralPath $stage) { Remove-Item -LiteralPath $stage -Recurse -F
 New-Item -ItemType Directory -Path $stage -Force | Out-Null
 Copy-Item -Path (Join-Path $plugin "*") -Destination $stage -Recurse -Force
 
-# The guid keyword lets Rhino offer this package when an opened model references the plug-in.
 @"
 ---
 name: PanelCladdingEditor

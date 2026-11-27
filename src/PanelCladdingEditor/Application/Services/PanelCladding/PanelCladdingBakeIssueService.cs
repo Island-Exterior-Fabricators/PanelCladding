@@ -3,9 +3,6 @@ using PanelCladdingEditor.Domain.Models.PanelCladding;
 
 namespace PanelCladdingEditor.Application.Services.PanelCladding;
 
-// PCbake skips a panel with its own problem and marks it with a text dot, so the rest of the
-// batch still bakes. A dot belongs to one panel through PanelUserTextKey; every run removes the
-// dots of the panels it was given and adds new ones for the panels that are skipped again.
 public static partial class PanelCladdingBakeIssueService
 {
     public const string IssueLayerPath = "PCbake Issues";
@@ -31,7 +28,6 @@ public static partial class PanelCladdingBakeIssueService
             : $"PCbake: {issue.Stage}\n{detail}";
     }
 
-    // Object ids and the PANEL_CLADDING_ prefix carry nothing for the reader of a dot.
     public static string ShortDetail(string detail)
     {
         string text = GuidPattern().Replace(detail ?? string.Empty, string.Empty);
@@ -40,7 +36,6 @@ public static partial class PanelCladdingBakeIssueService
         return text.Length <= MaxDetailLength ? text : text[..(MaxDetailLength - 1)].TrimEnd() + "…";
     }
 
-    // One issue per panel; the earliest stage wins because later stages never ran for it.
     public static IReadOnlyList<PanelCladdingBakeIssue> Merge(IEnumerable<PanelCladdingBakeIssue> issues) =>
         issues.Where(issue => issue.PanelObjectId != Guid.Empty)
             .GroupBy(issue => issue.PanelObjectId)
@@ -53,7 +48,6 @@ public static partial class PanelCladdingBakeIssueService
     [GeneratedRegex(@"\{?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\}?")]
     private static partial Regex GuidPattern();
 
-    // A removed id leaves ": :"; a layer path's "::" has no space and is kept.
     [GeneratedRegex(@":\s+(?=:)")]
     private static partial Regex SeparatorRunPattern();
 }

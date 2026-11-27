@@ -37,7 +37,6 @@ internal static class Program
         Console.WriteLine("[OK] UD_CLADDING_LOGIC / UD_FRAME_CONFIG replace CW_9.01 / CW_9.02");
     }
 
-    // A panel written by 1.1.0-1.2.1 carries only CW_9.xx keys and must still read.
     private static void VerifyLegacyPanelReads()
     {
         var service = new PanelCladdingKeyService();
