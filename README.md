@@ -1,10 +1,10 @@
 # PanelCladding
 
-**PanelCladdingEditor** is a Rhino 8 plug-in for designing curtain-wall panel cladding. It numbers
-facade panels, lays out each panel's frame grid and cladding cells, and bakes the result into
-managed cladding surfaces and extrusion curves that stay in sync with the panel's attributes.
+**PanelCladdingEditor** is a Rhino 8 plug-in for designing curtain-wall panel cladding.
+It numbers facade panels, lays out each panel's frame grid and cladding cells, and bakes the result into managed cladding surfaces and extrusion curves that stay in sync with the panel's attributes.
 
-Windows x64 and Rhino 8 (.NET 8) only. No MCP server, .NET SDK or administrator access is needed.
+Windows x64 and Rhino 8 (.NET 8) only.
+No MCP server, .NET SDK or administrator access is needed.
 
 ## Features
 
@@ -26,22 +26,20 @@ Windows x64 and Rhino 8 (.NET 8) only. No MCP server, .NET SDK or administrator 
 
 The plug-in also works in the background:
 
-- **Panel auto attributes** - width, height, dimension, area, weight and the panel frame
-  (`UD_PLANE`) stay current on every panel as panels are added, edited or moved.
-- **Naming-convention sync** - saving the project's main model, `<CODE> - Wireframe.3dm`, updates
-  the code tables in `<CODE> - Naming Convention.xlsx` next to it.
+- **Panel auto attributes** - width, height, dimension, area, weight and the panel frame (`UD_PLANE`) stay current on every panel as panels are added, edited or moved.
+- **Naming-convention sync** - saving the project's main model, `<CODE> - Wireframe.3dm`, updates the code tables in `<CODE> - Naming Convention.xlsx` next to it.
 
 ## How to use
 
-The full command behaviour, attribute keys and code formats are in the
-[package README](Packaging/PanelCladdingEditor/README.md). This is the short version.
+The full command behaviour, attribute keys and code formats are in the [package README](Packaging/PanelCladdingEditor/README.md).
+This is the short version.
 
 ### Before you start
 
-- Save the model as `<CODE> - Wireframe.3dm`. `<CODE>` is the project code: `ABC - Wireframe.3dm`
-  is project `ABC`. Every command needs a saved model.
-- Draw each panel as a vertical, planar, four-corner surface facing outward, and put it on a panel
-  type layer:
+- Save the model as `<CODE> - Wireframe.3dm`.
+  `<CODE>` is the project code: `ABC - Wireframe.3dm` is project `ABC`.
+  Every command needs a saved model.
+- Draw each panel as a vertical, planar, four-corner surface facing outward, and put it on a panel type layer:
 
   | Objects | Layer |
   | --- | --- |
@@ -49,64 +47,58 @@ The full command behaviour, attribute keys and code formats are in the
   | Extrusion curves (baked) | `<CODE>-IEF-Wireframe::Curves - PNL::Curves - <type>` |
   | Cladding surfaces (baked) | `Reference::Surfaces - STEP::Surfaces - <prefix>::<material>` |
 
-  Baked layers are created for you. Layers named `Not in Scope` or `By Others` are skipped.
+  Baked layers are created for you.
+  Layers named `Not in Scope` or `By Others` are skipped.
 - Keep `<CODE> - Naming Convention.xlsx` next to the model, and close it in Excel while you work.
 
 ### 1. Set up the project
 
-Run `PCtemplatePNL` once per project. Answer the four code-format prompts (Wall-Type,
-Frame-Config, Frame-Type, Cladding); it lays out the workbook's PNL sheet.
+Run `PCtemplatePNL` once per project.
+Answer the four code-format prompts (Wall-Type, Frame-Config, Frame-Type, Cladding); it lays out the workbook's PNL sheet.
 
 ### 2. Number the panels
 
-Run `PCpid`. Enter the project code, select the panels, then pick a north-facing panel and a
-first-floor panel. Each panel gets its PID, CID, elevation, level, name and blank setup keys.
-Number panels before baking: a panel with baked surfaces or curves cannot be renumbered until
-they are deleted.
+Run `PCpid`.
+Enter the project code, select the panels, then pick a north-facing panel and a first-floor panel.
+Each panel gets its PID, CID, elevation, level, name and blank setup keys.
+Number panels before baking: a panel with baked surfaces or curves cannot be renumbered until they are deleted.
 
 ### 3. Set each panel's grid
 
-Run `PCcreate`, select the panels, then select the guide curves that cross them. Each guide
-becomes a horizontal or vertical intermediate track in the panel's grid.
+Run `PCcreate`, select the panels, then select the guide curves that cross them.
+Each guide becomes a horizontal or vertical intermediate track in the panel's grid.
 
 ### 4. Configure cladding and frames
 
-Run `PCeditor` and select one panel. The editor has two views:
+Run `PCeditor` and select one panel.
+The editor has two views:
 
-- **Cladding view** - drag a material from the sidebar onto a cell, or select a cell and use
-  **Parent cell** to make it share another cell's material. Use **Setup** to choose the project
-  workbook and manage its material catalogue.
-- **Extrusion view** - select frame or intermediate curves and use **Merge**, **Explode**,
-  **Hide**, **Add H**, **Add V** or **Delete**; type offsets to move dividers.
+- **Cladding view** - drag a material from the sidebar onto a cell, or select a cell and use **Parent cell** to make it share another cell's material.
+  Use **Setup** to choose the project workbook and manage its material catalogue.
+- **Extrusion view** - select frame or intermediate curves and use **Merge**, **Explode**, **Hide**, **Add H**, **Add V** or **Delete**; type offsets to move dividers.
 
-Save with **Save Cladding**, **Save Extrusions** or **Save Both** (needed when the grid size
-changed). To repeat a configuration on other panels, run `PCmatchSrf` (cladding) or `PCmatchCrv`
-(frames): select the target panels first, then the source panel. `PCcrvTemplate` applies a quick
-full-run merge to panels that have no frame configuration yet.
+Save with **Save Cladding**, **Save Extrusions** or **Save Both** (needed when the grid size changed).
+To repeat a configuration on other panels, run `PCmatchSrf` (cladding) or `PCmatchCrv` (frames): select the target panels first, then the source panel.
+`PCcrvTemplate` applies a quick full-run merge to panels that have no frame configuration yet.
 
 ### 5. Bake the geometry
 
 Run `PCbake`, select the panels and choose `Scope`: `Surfaces` (default), `Curves` or `All`.
-Panels need a `CW_1.05_LOT` value before their surfaces can be baked. Rerun `PCbake` after any
-change: surfaces and curves are overwritten in place from the panel's current values, missing ones
-are added and obsolete ones removed. Hand edits on baked geometry are replaced, so sync them first
-(step 6) if you want to keep them.
-A panel that cannot be baked (no PID, a duplicate CID, a layout that cannot be generated, ...) is
-skipped and left unchanged: a red dot on layer `PCbake Issues` says why, the command line lists it
-and it stays selected. Fix it and bake it again; its dot is removed.
+Panels need a `CW_1.05_LOT` value before their surfaces can be baked.
+Rerun `PCbake` after any change: surfaces and curves are overwritten in place from the panel's current values, missing ones are added and obsolete ones removed.
+Hand edits on baked geometry are replaced, so sync them first (step 6) if you want to keep them.
+A panel that cannot be baked (no PID, a duplicate CID, a layout that cannot be generated, ...) is skipped and left unchanged: a red dot on layer `PCbake Issues` says why, the command line lists it and it stays selected.
+Fix it and bake it again; its dot is removed.
 
 ### 6. Edit geometry by hand (optional)
 
 You can split, merge or re-layer baked cladding surfaces, or edit baked curves, directly in Rhino.
-Then select the panels and run `PCsyncSrf` (surfaces) or `PCsyncCrv` (curves) to read the changes
-back into the panel, so the next `PCeditor` or `PCbake` starts from them.
+Then select the panels and run `PCsyncSrf` (surfaces) or `PCsyncCrv` (curves) to read the changes back into the panel, so the next `PCeditor` or `PCbake` starts from them.
 
 ### 7. Check and share
 
-Run `PCreport` to list layer and attribute problems; click a row to zoom to the object, **Rescan**
-after fixing, **Export** for an Excel copy. Run `PCweb` to open the saved model in Wireframe Web;
-install Wireframe Web first (per user) from its
-[releases page](https://github.com/Island-Exterior-Fabricators/wireframe-web/releases).
+Run `PCreport` to list layer and attribute problems; click a row to zoom to the object, **Rescan** after fixing, **Export** for an Excel copy.
+Run `PCweb` to open the saved model in Wireframe Web; install Wireframe Web first (per user) from its [releases page](https://github.com/Island-Exterior-Fabricators/wireframe-web/releases).
 
 Every command that changes the model is a single Rhino Undo step.
 
@@ -115,25 +107,25 @@ Every command that changes the model is a single Rhino Undo step.
 ### Requirements
 
 - Windows x64.
-- Rhino 8 running .NET 8. Rhino 8.20 or newer uses .NET 8 by default; if yours runs .NET
-  Framework, run `SetDotNetRuntime`, choose .NET Core and restart Rhino.
+- Rhino 8 running .NET 8.
+  Rhino 8.20 or newer uses .NET 8 by default; if yours runs .NET Framework, run `SetDotNetRuntime`, choose .NET Core and restart Rhino.
 - macOS is not supported.
 
 ### From the release zip (recommended)
 
-1. Download **PanelCladdingEditor-&lt;version&gt;-win-x64.zip** from the
-   [latest release](https://github.com/Island-Exterior-Fabricators/PanelCladding/releases/latest)
-   (not the source-code zip).
+1. Download **PanelCladdingEditor-&lt;version&gt;-win-x64.zip** from the [latest release](https://github.com/Island-Exterior-Fabricators/PanelCladding/releases/latest) (not the source-code zip).
 2. Extract all files to a folder you can write to.
 3. Close every Rhino window.
-4. Double-click **Install.cmd**. Do not use Run as administrator.
+4. Double-click **Install.cmd**.
+   Do not use Run as administrator.
 5. When installation and validation pass, start Rhino and run `PCeditor`.
 
-The plug-in installs to `%LOCALAPPDATA%\PanelCladdingEditor\plugin\<version>` and registers only
-under `HKEY_CURRENT_USER`. If your organization blocks unsigned PowerShell scripts, ask IT.
+The plug-in installs to `%LOCALAPPDATA%\PanelCladdingEditor\plugin\<version>` and registers only under `HKEY_CURRENT_USER`.
+If your organization blocks unsigned PowerShell scripts, ask IT.
 
-**Upgrade:** repeat the same steps with the new zip. It replaces the previous version and keeps it
-in a rollback folder. Read the release notes before upgrading across command changes.
+**Upgrade:** repeat the same steps with the new zip.
+It replaces the previous version and keeps it in a rollback folder.
+Read the release notes before upgrading across command changes.
 
 **Uninstall:** close Rhino and double-click **Uninstall.cmd** in the extracted folder.
 
@@ -143,7 +135,8 @@ in a rollback folder. Read the release notes before upgrading across command cha
 
 If your team publishes the plug-in to an internal Package Manager source:
 
-1. Close Rhino. If the zip version is installed, run its **Uninstall.cmd** first.
+1. Close Rhino.
+   If the zip version is installed, run its **Uninstall.cmd** first.
 2. In Rhino, open `Options > Package Manager` and add the team's source folder to `Sources`.
 3. Run `_PackageManager`, search `PanelCladdingEditor`, install it and restart Rhino.
 

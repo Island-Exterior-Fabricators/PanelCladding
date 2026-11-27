@@ -99,6 +99,7 @@ internal static class Program
         ExpectProse("a.md", FileKind.Markdown, "- `docs/` - design\n- `tools/` - tools\n\nIntro:\n\n1. Step one.\n   Its second sentence.", []);
         ExpectProse("a.md", FileKind.Markdown, "# Heading. With dots\n\n| a. B | c |\n| --- | --- |\n\n```text\nOne. Two\nthree\n```", []);
         ExpectProse("a.txt", FileKind.PlainText, "INSTALL\n1. Download it.\nNo wrap here,\nbut here.", [(3, ProseRules.WrappedRule)]);
+        ExpectProse("a.txt", FileKind.PlainText, "Run these:\n    tool -Mode Repair\n    tool -Mode Validate\nThen close it.", []);
         Require(ProseRules.SentenceBreaks("First one. Second `x. Y` one. Third.").Count == 2, "Sentence breaks skip inline code.");
         Console.WriteLine("[OK] prose: two sentences on a line and wrapped sentences are found; headings, tables and code are not prose");
     }

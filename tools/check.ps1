@@ -81,6 +81,16 @@ if (-not ($toolchain -and $rhino)) {
     Complete-Check
 }
 
+Invoke-Step 'No comments, one sentence per line, no timed waits in tests (tools/RepoCheck)' {
+    & dotnet build tools/RepoCheck/RepoCheck.csproj -c Release -warnaserror --nologo -v:q
+    if ($LASTEXITCODE -ne 0) { return }
+    & dotnet (Join-Path $repo 'tools\RepoCheck\bin\Release\net8.0\RepoCheck.dll') $repo
+} | Out-Null
+
+Invoke-Step 'Banned time APIs fail a test build (tests/Checks/Test-BannedTestApis.ps1)' {
+    Invoke-Script (Join-Path $repo 'tests\Checks\Test-BannedTestApis.ps1') @()
+} | Out-Null
+
 foreach ($configuration in 'Debug', 'Release') {
     Invoke-Step "Build PanelCladding.sln ($configuration, warnings as errors, locked restore)" {
         & dotnet build PanelCladding.sln -c $configuration -m:1 -warnaserror --nologo -v:m

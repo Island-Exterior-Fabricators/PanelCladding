@@ -45,7 +45,7 @@ public static class ProseRules
     {
         string trimmed = line.Trim();
         if (trimmed.Length == 0 || Rule.IsMatch(trimmed)) return true;
-        if (plainText) return IsPlainHeading(trimmed);
+        if (plainText) return IsPlainHeading(trimmed) || IsPlainCode(line);
         return trimmed.StartsWith('#') || trimmed.StartsWith('|') || trimmed.StartsWith('<') || trimmed.StartsWith('>');
     }
 
@@ -78,9 +78,11 @@ public static class ProseRules
     {
         string trimmed = next.Trim();
         if (trimmed.Length == 0 || Fence.IsMatch(next) || ListMarker.IsMatch(next) || Rule.IsMatch(trimmed)) return false;
-        if (plainText) return !IsPlainHeading(trimmed);
+        if (plainText) return !IsPlainHeading(trimmed) && !IsPlainCode(next);
         return !(trimmed.StartsWith('#') || trimmed.StartsWith('|') || trimmed.StartsWith('<') || trimmed.StartsWith('>'));
     }
+
+    private static bool IsPlainCode(string line) => line.StartsWith("    ", StringComparison.Ordinal);
 
     private static bool IsPlainHeading(string trimmed) =>
         trimmed.Any(char.IsLetter) && !trimmed.Any(char.IsLower);
